@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ampersend — Projects</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --blue:#1a6eff;--black:#1a1a1a;--white:#fff;--surface:#f5f5f3;
+      --border:#e2e2e2;--muted:#888;--blue-light:#e8f0ff;
+      --sa:#1a6eff;--sq:#BA7517;--ss:#1e7e34;--sc:#888;--su:#dc3545;
+    }
+    html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--black);background:var(--surface);}
+    nav{height:52px;background:var(--white);border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;position:sticky;top:0;z-index:100;}
+    .nl{display:flex;align-items:center;gap:12px;}
+    .logo{font-size:16px;font-weight:600;letter-spacing:-0.03em;color:var(--black);text-decoration:none;}
+    .logo span{color:var(--blue);}
+    .nsep{width:0.5px;height:18px;background:var(--border);}
+    .ntitle{font-size:13px;font-weight:500;}
+    .nr{display:flex;align-items:center;gap:8px;}
+    .nbtn{padding:6px 12px;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:var(--white);color:var(--black);display:flex;align-items:center;gap:5px;font-family:inherit;}
+    .nbtn:hover{background:var(--surface);}
+    .nbtn.primary{background:var(--black);color:#fff;border-color:var(--black);}
+    .nbtn.primary:hover{background:#333;}
+
+    .main{padding:1.5rem;max-width:1400px;margin:0 auto;}
+
+    /* TOOLBAR */
+    .toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:10px;}
+    .toolbar-left{display:flex;align-items:center;gap:8px;}
+    .search-wrap{display:flex;align-items:center;gap:7px;background:var(--white);border:0.5px solid var(--border);border-radius:6px;padding:7px 10px;width:240px;}
+    .search-wrap i{color:var(--muted);font-size:15px;}
+    .search-wrap input{border:none;background:transparent;font-size:13px;color:var(--black);font-family:inherit;outline:none;width:100%;}
+    .search-wrap input::placeholder{color:var(--muted);}
+    .filter-wrap{display:flex;gap:5px;}
+    .fchip{padding:4px 10px;border-radius:99px;font-size:11px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:var(--white);color:var(--muted);font-family:inherit;}
+    .fchip.on{color:#fff;border-color:transparent;}
+    .fchip[data-s="active"].on{background:var(--sa);}
+    .fchip[data-s="quoted"].on{background:var(--sq);}
+    .fchip[data-s="scheduled"].on{background:var(--ss);}
+    .fchip[data-s="complete"].on{background:var(--sc);}
+    .fchip[data-s="urgent"].on{background:var(--su);}
+
+    /* TABLE */
+    .table-wrap{background:var(--white);border:0.5px solid var(--border);border-radius:8px;overflow:hidden;}
+    .tbl{width:100%;border-collapse:collapse;font-size:13px;}
+    .tbl th{font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);padding:9px 14px;border-bottom:0.5px solid var(--border);text-align:left;background:var(--surface);white-space:nowrap;position:relative;}
+    .tbl th.sortable{cursor:pointer;}
+    .tbl th.sortable:hover{color:var(--black);}
+    .tbl td{padding:0;border-bottom:0.5px solid var(--border);vertical-align:top;}
+    .tbl tr:last-child td{border-bottom:none;}
+    .tbl tr:hover td{background:var(--surface);}
+    .tbl tr.expanded td{background:var(--blue-light);}
+
+    .td-inner{padding:10px 14px;display:flex;align-items:center;gap:8px;min-height:44px;}
+    .status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+    .status-tag{font-size:10px;font-weight:500;text-transform:capitalize;padding:2px 7px;border-radius:3px;white-space:nowrap;}
+    .prog-mini{display:flex;gap:2px;align-items:center;}
+    .prog-mini-seg{height:4px;width:16px;border-radius:1px;}
+    .add-col-btn{padding:0 8px;background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;height:36px;display:flex;align-items:center;}
+    .add-col-btn:hover{color:var(--blue);}
+
+    /* EXPANDED ROW */
+    .exp-row td{padding:0!important;background:var(--blue-light)!important;}
+    .exp-panel{padding:1.25rem 1.5rem;border-top:0.5px solid var(--border);}
+    .exp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:1.25rem;}
+    .exp-field{display:flex;flex-direction:column;gap:4px;}
+    .exp-label{font-size:10px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;justify-content:space-between;}
+    .exp-label button{background:none;border:none;cursor:pointer;color:var(--muted);font-size:12px;padding:0;line-height:1;}
+    .exp-label button:hover{color:var(--su);}
+    .exp-input{font-size:13px;padding:7px 9px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;width:100%;}
+    .exp-input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,110,255,0.08);}
+    .exp-select{font-size:13px;padding:7px 9px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;width:100%;}
+    .exp-select:focus{outline:none;border-color:var(--blue);}
+
+    /* PROGRESS EDITOR */
+    .prog-section{margin-bottom:1.25rem;}
+    .prog-section-title{font-size:11px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+    .stage-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;}
+    .stage-item{display:flex;align-items:center;gap:8px;}
+    .stage-check{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border);background:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;color:#fff;}
+    .stage-check.done{background:var(--sa);border-color:var(--sa);}
+    .stage-name-input{flex:1;font-size:13px;padding:5px 8px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;}
+    .stage-name-input:focus{outline:none;border-color:var(--blue);}
+    .stage-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;padding:0;line-height:1;flex-shrink:0;}
+    .stage-del:hover{color:var(--su);}
+    .prog-bar-full{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:4px;}
+    .prog-bar-fill{height:6px;background:var(--sa);border-radius:3px;transition:width 0.3s;}
+    .prog-pct{font-size:11px;color:var(--muted);}
+
+    .exp-actions{display:flex;align-items:center;gap:8px;padding-top:12px;border-top:0.5px solid var(--border);}
+    .exp-save{padding:7px 18px;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:var(--black);color:#fff;font-family:inherit;}
+    .exp-save:hover{background:#333;}
+    .exp-del{padding:7px 14px;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:var(--white);color:var(--su);font-family:inherit;margin-left:auto;}
+    .exp-del:hover{background:#fff0f0;border-color:var(--su);}
+
+    /* ADD FIELD MODAL */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:2000;display:none;align-items:center;justify-content:center;}
+    .overlay.open{display:flex;}
+    .modal{background:var(--white);border-radius:8px;width:360px;max-width:95vw;border:0.5px solid var(--border);}
+    .mh{padding:1rem 1.25rem;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+    .mh-t{font-size:15px;font-weight:500;}
+    .mh-x{background:none;border:none;cursor:pointer;color:var(--muted);font-size:20px;line-height:1;}
+    .mb{padding:1rem 1.25rem;}
+    .fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
+    .fg label{font-size:11px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);}
+    .fg input,.fg select{font-size:13px;padding:8px 10px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);width:100%;font-family:inherit;}
+    .fg input:focus,.fg select:focus{outline:none;border-color:var(--blue);}
+    .mf{padding:10px 1.25rem;border-top:0.5px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
+    .mbtn{padding:8px 18px;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:var(--white);color:var(--black);font-family:inherit;}
+    .mbtn:hover{background:var(--surface);}
+    .mbtn.primary{background:var(--black);color:#fff;border-color:var(--black);}
+    .mbtn.primary:hover{background:#333;}
+
+    .empty-state{padding:4rem 2rem;text-align:center;color:var(--muted);font-size:13px;line-height:1.6;}
+    .empty-state i{font-size:32px;display:block;margin-bottom:10px;opacity:0.3;}
+  </style>
+</head>
+<body>
+<nav>
+  <div class="nl">
+    <a href="/index.html" class="logo">Ampers<span>&</span>nd</a>
+    <div class="nsep"></div>
+    <span class="ntitle">Projects</span>
+  </div>
+  <div class="nr">
+    <a href="/tracker.html" class="nbtn"><i class="ti ti-map-pin"></i> Map view</a>
+    <button class="nbtn primary" onclick="addJob()"><i class="ti ti-plus"></i> Add job</button>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <div class="search-wrap">
+        <i class="ti ti-search" aria-hidden="true"></i>
+        <input type="text" id="search" placeholder="Search jobs..." oninput="renderTable()"/>
+      </div>
+      <div class="filter-wrap">
+        <button class="fchip on" data-s="urgent" onclick="toggleF(this)">Urgent</button>
+        <button class="fchip on" data-s="active" onclick="toggleF(this)">Active</button>
+        <button class="fchip on" data-s="quoted" onclick="toggleF(this)">Quoted</button>
+        <button class="fchip on" data-s="scheduled" onclick="toggleF(this)">Scheduled</button>
+        <button class="fchip on" data-s="complete" onclick="toggleF(this)">Complete</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="tbl" id="tbl">
+      <thead id="thead"></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ADD FIELD MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="mh"><span class="mh-t">Add custom field</span><button class="mh-x" onclick="closeModal()">×</button></div>
+    <div class="mb">
+      <div class="fg"><label>Field name</label><input id="f-fname" placeholder="e.g. Contract value, ESA number..."/></div>
+      <div class="fg">
+        <label>Field type</label>
+        <select id="f-ftype">
+          <option value="text">Text</option>
+          <option value="number">Number</option>
+          <option value="email">Email</option>
+          <option value="phone">Phone</option>
+          <option value="date">Date</option>
+        </select>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="mbtn" onclick="closeModal()">Cancel</button>
+      <button class="mbtn primary" onclick="saveField()">Add field</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SC={active:'#1a6eff',quoted:'#BA7517',scheduled:'#1e7e34',complete:'#888',urgent:'#dc3545'};
+const SB={active:'rgba(26,110,255,0.12)',quoted:'rgba(186,117,23,0.12)',scheduled:'rgba(30,126,52,0.1)',complete:'rgba(136,136,136,0.1)',urgent:'rgba(220,53,69,0.12)'};
+const STAGES={residential:['Site visit','Rough-in','Inspection','Final'],commercial:['Design','Permit','Rough-in','Inspection','Final'],panel:['Permit','Rough-in','Inspection','Final'],lighting:['Design','Supply','Install','Commission'],service:['Permit','Disconnect','Install','Inspection']};
+
+let jobs=[
+  {id:1,customer:'Mike Tremblay',address:'14 Dundas St E, Belleville',phone:'(613) 555-0121',email:'',type:'panel',status:'active',stage:2,notes:'200A panel upgrade',customStages:null,customFields:{}},
+  {id:2,customer:'Sandra Kowalski',address:'88 Front St, Belleville',phone:'(613) 555-0188',email:'',type:'residential',status:'urgent',stage:1,notes:'No power to kitchen circuits',customStages:null,customFields:{}},
+  {id:3,customer:'Peterborough Dev Corp',address:'245 Water St, Peterborough',phone:'(705) 555-0199',email:'',type:'commercial',status:'quoted',stage:0,notes:'New commercial fit-out',customStages:null,customFields:{}},
+  {id:4,customer:'Janet Okafor',address:'7 Bridge St, Napanee',phone:'(613) 555-0143',email:'',type:'lighting',status:'scheduled',stage:0,notes:'Lighting upgrade throughout',customStages:null,customFields:{}},
+  {id:5,customer:'Trenton Marina',address:'Waterfront Dr, Trenton',phone:'(613) 555-0177',email:'',type:'service',status:'complete',stage:4,notes:'Dock electrical complete',customStages:null,customFields:{}},
+];
+let nextId=6;
+let filters=new Set(['active','quoted','scheduled','complete','urgent']);
+let expandedId=null;
+let sortCol='customer',sortDir=1;
+let customColumns=[
+  {key:'customer',label:'Customer',core:true},
+  {key:'address',label:'Address',core:true},
+  {key:'phone',label:'Phone',core:true},
+  {key:'status',label:'Status',core:true},
+  {key:'type',label:'Type',core:true},
+  {key:'progress',label:'Progress',core:true},
+];
+
+function getStages(j){return j.customStages||(STAGES[j.type]||STAGES.residential);}
+
+function toggleF(btn){
+  const s=btn.dataset.s;
+  if(filters.has(s)){filters.delete(s);btn.classList.remove('on');}
+  else{filters.add(s);btn.classList.add('on');}
+  renderTable();
+}
+
+function renderTable(){
+  const q=document.getElementById('search').value.toLowerCase();
+  let filtered=jobs.filter(j=>{
+    if(!filters.has(j.status))return false;
+    if(q&&!j.customer.toLowerCase().includes(q)&&!j.address.toLowerCase().includes(q))return false;
+    return true;
+  });
+  filtered.sort((a,b)=>{
+    let av=a[sortCol]||'',bv=b[sortCol]||'';
+    return av>bv?sortDir:av<bv?-sortDir:0;
+  });
+
+  // Header
+  const thead=document.getElementById('thead');
+  const customCols=customColumns.filter(c=>!c.core);
+  thead.innerHTML=`<tr>
+    ${customColumns.map(c=>`<th class="sortable" onclick="setSort('${c.key}')">${c.label}${sortCol===c.key?`<i class="ti ti-chevron-${sortDir===1?'up':'down'}" style="font-size:10px;margin-left:4px"></i>`:''}</th>`).join('')}
+    ${customCols.map(c=>`<th>${c.label}</th>`).join('')}
+    <th><button class="add-col-btn" onclick="openModal()" title="Add custom field"><i class="ti ti-plus" aria-hidden="true"></i></button></th>
+  </tr>`;
+
+  const tbody=document.getElementById('tbody');
+  if(!filtered.length){
+    tbody.innerHTML=`<tr><td colspan="${customColumns.length+1}"><div class="empty-state"><i class="ti ti-clipboard-list"></i>No jobs found</div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML='';
+  filtered.forEach(j=>{
+    const stages=getStages(j);
+    const done=Math.min(j.stage||0,stages.length);
+    const pct=Math.round(done/stages.length*100);
+    const isExp=expandedId===j.id;
+
+    const mainRow=document.createElement('tr');
+    mainRow.className=isExp?'expanded':'';
+    mainRow.style.cursor='pointer';
+    mainRow.onclick=()=>toggleExpand(j.id);
+
+    const progMini=j.status==='active'
+      ?`<div class="prog-mini">${stages.map((_,i)=>`<div class="prog-mini-seg" style="background:${i<done?SC.active:'rgba(26,110,255,0.2)'}"></div>`).join('')}<span style="font-size:10px;color:var(--muted);margin-left:4px">${pct}%</span></div>`
+      :`<span style="color:var(--muted);font-size:12px">—</span>`;
+
+    mainRow.innerHTML=`
+      <td><div class="td-inner"><div class="status-dot" style="background:${SC[j.status]}"></div>${j.customer}</div></td>
+      <td><div class="td-inner">${j.address||'—'}</div></td>
+      <td><div class="td-inner">${j.phone||'—'}</div></td>
+      <td><div class="td-inner"><span class="status-tag" style="background:${SB[j.status]};color:${SC[j.status]}">${j.status}</span></div></td>
+      <td><div class="td-inner" style="text-transform:capitalize">${j.type}</div></td>
+      <td><div class="td-inner">${progMini}</div></td>
+      ${customColumns.filter(c=>!c.core).map(c=>`<td><div class="td-inner">${j.customFields[c.key]||'—'}</div></td>`).join('')}
+      <td><div class="td-inner"><i class="ti ti-chevron-${isExp?'up':'down'}" style="color:var(--muted);font-size:14px"></i></div></td>
+    `;
+    tbody.appendChild(mainRow);
+
+    if(isExp){
+      const expRow=document.createElement('tr');
+      expRow.className='exp-row';
+      expRow.innerHTML=`<td colspan="${customColumns.length+1}"></td>`;
+      expRow.onclick=e=>e.stopPropagation();
+
+      const stages2=getStages(j);
+      const done2=Math.min(j.stage||0,stages2.length);
+      const pct2=Math.round(done2/stages2.length*100);
+
+      expRow.querySelector('td').innerHTML=`<div class="exp-panel">
+        <div class="exp-grid" id="exp-grid-${j.id}">
+          <div class="exp-field">
+            <div class="exp-label">Customer</div>
+            <input class="exp-input" value="${j.customer}" onchange="updateField(${j.id},'customer',this.value)"/>
+          </div>
+          <div class="exp-field">
+            <div class="exp-label">Address</div>
+            <input class="exp-input" value="${j.address||''}" onchange="updateField(${j.id},'address',this.value)"/>
+          </div>
+          <div class="exp-field">
+            <div class="exp-label">Phone</div>
+            <input class="exp-input" value="${j.phone||''}" onchange="updateField(${j.id},'phone',this.value)"/>
+          </div>
+          <div class="exp-field">
+            <div class="exp-label">Email</div>
+            <input class="exp-input" type="email" value="${j.email||''}" onchange="updateField(${j.id},'email',this.value)"/>
+          </div>
+          <div class="exp-field">
+            <div class="exp-label">Status</div>
+            <select class="exp-select" onchange="updateField(${j.id},'status',this.value)">
+              ${['quoted','scheduled','active','urgent','complete'].map(s=>`<option value="${s}" ${j.status===s?'selected':''}>${s}</option>`).join('')}
+            </select>
+          </div>
+          <div class="exp-field">
+            <div class="exp-label">Job type</div>
+            <select class="exp-select" onchange="updateField(${j.id},'type',this.value);resetStages(${j.id})">
+              ${['residential','commercial','panel','lighting','service'].map(t=>`<option value="${t}" ${j.type===t?'selected':''}>${t}</option>`).join('')}
+            </select>
+          </div>
+          <div class="exp-field" style="grid-column:1/-1">
+            <div class="exp-label">Notes</div>
+            <input class="exp-input" value="${j.notes||''}" onchange="updateField(${j.id},'notes',this.value)"/>
+          </div>
+          ${customColumns.filter(c=>!c.core).map(c=>`
+          <div class="exp-field">
+            <div class="exp-label">${c.label} <button onclick="removeCustomCol('${c.key}')" title="Remove field"><i class="ti ti-x"></i></button></div>
+            <input class="exp-input" type="${c.type||'text'}" value="${j.customFields[c.key]||''}" onchange="updateCustomField(${j.id},'${c.key}',this.value)"/>
+          </div>`).join('')}
+        </div>
+
+        <div class="prog-section">
+          <div class="prog-section-title">
+            <span>Progress stages</span>
+            <button class="nbtn" style="padding:3px 10px;font-size:11px" onclick="addStage(${j.id})"><i class="ti ti-plus"></i> Add stage</button>
+          </div>
+          <div class="prog-bar-full"><div class="prog-bar-fill" id="pbar-${j.id}" style="width:${pct2}%"></div></div>
+          <div class="prog-pct" style="margin-bottom:10px">${pct2}% complete · ${done2} of ${stages2.length} stages</div>
+          <div class="stage-list" id="stage-list-${j.id}">
+            ${stages2.map((s,i)=>`
+            <div class="stage-item" id="stage-${j.id}-${i}">
+              <div class="stage-check ${i<done2?'done':''}" onclick="toggleStage(${j.id},${i})">
+                ${i<done2?'<i class="ti ti-check" style="font-size:11px"></i>':''}
+              </div>
+              <input class="stage-name-input" value="${s}" onchange="updateStageName(${j.id},${i},this.value)"/>
+              <button class="stage-del" onclick="deleteStage(${j.id},${i})" title="Remove stage"><i class="ti ti-x"></i></button>
+            </div>`).join('')}
+          </div>
+        </div>
+
+        <div class="exp-actions">
+          <button class="exp-save" onclick="renderTable()">Done editing</button>
+          <button class="exp-del" onclick="deleteJob(${j.id})"><i class="ti ti-trash"></i> Delete job</button>
+        </div>
+      </div>`;
+      tbody.appendChild(expRow);
+    }
+  });
+}
+
+function toggleExpand(id){
+  expandedId=expandedId===id?null:id;
+  renderTable();
+}
+
+function setSort(col){
+  if(sortCol===col)sortDir*=-1;else{sortCol=col;sortDir=1;}
+  renderTable();
+}
+
+function updateField(id,field,value){
+  const j=jobs.find(x=>x.id===id);if(j)j[field]=value;
+}
+
+function updateCustomField(id,key,value){
+  const j=jobs.find(x=>x.id===id);if(j){if(!j.customFields)j.customFields={};j.customFields[key]=value;}
+}
+
+function resetStages(id){
+  const j=jobs.find(x=>x.id===id);if(j){j.customStages=null;j.stage=0;}
+  renderTable();
+}
+
+function toggleStage(id,idx){
+  const j=jobs.find(x=>x.id===id);if(!j)return;
+  const stages=getStages(j);
+  const done=Math.min(j.stage||0,stages.length);
+  if(idx<done){j.stage=idx;}
+  else{j.stage=idx+1;}
+  renderTable();
+}
+
+function updateStageName(id,idx,value){
+  const j=jobs.find(x=>x.id===id);if(!j)return;
+  if(!j.customStages)j.customStages=[...getStages(j)];
+  j.customStages[idx]=value;
+}
+
+function addStage(id){
+  const j=jobs.find(x=>x.id===id);if(!j)return;
+  if(!j.customStages)j.customStages=[...getStages(j)];
+  j.customStages.push('New stage');
+  renderTable();
+}
+
+function deleteStage(id,idx){
+  const j=jobs.find(x=>x.id===id);if(!j)return;
+  if(!j.customStages)j.customStages=[...getStages(j)];
+  j.customStages.splice(idx,1);
+  if(j.stage>j.customStages.length)j.stage=j.customStages.length;
+  renderTable();
+}
+
+function deleteJob(id){
+  if(!confirm('Delete this job permanently?'))return;
+  jobs=jobs.filter(j=>j.id!==id);
+  expandedId=null;
+  renderTable();
+}
+
+function addJob(){
+  jobs.push({id:nextId++,customer:'New job',address:'',phone:'',email:'',type:'residential',status:'quoted',stage:0,notes:'',customStages:null,customFields:{}});
+  expandedId=jobs[jobs.length-1].id;
+  renderTable();
+  setTimeout(()=>document.querySelector('.exp-panel .exp-input')?.focus(),100);
+}
+
+function openModal(){document.getElementById('overlay').classList.add('open');}
+function closeModal(){document.getElementById('overlay').classList.remove('open');}
+
+function saveField(){
+  const name=document.getElementById('f-fname').value.trim();
+  if(!name)return;
+  const type=document.getElementById('f-ftype').value;
+  const key='cf_'+name.toLowerCase().replace(/\s+/g,'_');
+  if(customColumns.find(c=>c.key===key)){alert('A field with that name already exists.');return;}
+  customColumns.push({key,label:name,type,core:false});
+  jobs.forEach(j=>{if(!j.customFields)j.customFields={};});
+  closeModal();
+  document.getElementById('f-fname').value='';
+  renderTable();
+}
+
+function removeCustomCol(key){
+  if(!confirm('Remove this field from all jobs?'))return;
+  customColumns=customColumns.filter(c=>c.key!==key);
+  jobs.forEach(j=>{if(j.customFields)delete j.customFields[key];});
+  renderTable();
+}
+
+renderTable();
+</script>
+</body>
+</html>

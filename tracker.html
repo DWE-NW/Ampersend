@@ -154,6 +154,7 @@
     <span class="ntitle">Project tracker</span>
   </div>
   <div class="nr">
+    <a href="/projects.html" class="nbtn"><i class="ti ti-list"></i> Project list</a>
     <button class="nbtn primary" onclick="startAddJob()"><i class="ti ti-plus"></i> Add job</button>
   </div>
 </nav>
@@ -587,14 +588,26 @@ function renderSb(highlight){
     const groupJobs=grouped[status];
     if(!groupJobs.length)return'';
     const isOpen=!collapsedGroups.has(status);
-    const jobRows=groupJobs.map(j=>`
-      <div class="ji ${selId===j.id?'sel':''}" onclick="showDetail(${j.id})">
+    const jobRows=groupJobs.map(j=>{
+      const stages=STAGES[j.type]||STAGES.residential;
+      const done=Math.min(j.stage||0,stages.length);
+      const pct=Math.round(done/stages.length*100);
+      const progBar=j.status==='active'?`
+        <div style="margin-top:5px;display:flex;align-items:center;gap:6px;">
+          <div style="flex:1;height:3px;background:rgba(26,110,255,0.15);border-radius:2px;overflow:hidden;">
+            <div style="width:${pct}%;height:3px;background:#1a6eff;border-radius:2px;"></div>
+          </div>
+          <span style="font-size:10px;color:var(--muted);flex-shrink:0">${pct}%</span>
+        </div>`:'';
+      return`<div class="ji ${selId===j.id?'sel':''}" onclick="showDetail(${j.id})">
         <div class="jd" style="background:${SC[j.status]}"></div>
         <div class="jinfo">
           <div class="jn">${j.customer}</div>
           <div class="jm">${j.address||'No address'}</div>
+          ${progBar}
         </div>
-      </div>`).join('');
+      </div>`;
+    }).join('');
     return`
       <div>
         <div class="jgroup-header" onclick="toggleGroup('${status}')">
