@@ -55,6 +55,15 @@
     .jm{font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .jt{font-size:10px;font-weight:500;text-transform:capitalize;padding:2px 6px;border-radius:3px;white-space:nowrap;flex-shrink:0;margin-top:2px;}
     .sempty{padding:2rem 1rem;text-align:center;color:var(--muted);font-size:13px;line-height:1.6;}
+    .jgroup-header{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;cursor:pointer;border-bottom:0.5px solid var(--border);background:var(--surface);user-select:none;}
+    .jgroup-header:hover{background:#efefed;}
+    .jgroup-left{display:flex;align-items:center;gap:7px;}
+    .jgroup-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+    .jgroup-name{font-size:11px;font-weight:500;letter-spacing:0.05em;text-transform:capitalize;color:var(--black);}
+    .jgroup-count{font-size:10px;color:var(--muted);background:var(--border);padding:1px 6px;border-radius:99px;}
+    .jgroup-chevron{font-size:13px;color:var(--muted);transition:transform 0.2s;}
+    .jgroup-chevron.open{transform:rotate(180deg);}
+    .jgroup-body{overflow:hidden;}
 
     .mapwrap{flex:1;position:relative;}
     #map{width:100%;height:100%;}
@@ -555,14 +564,54 @@ function toggleF(btn){
   drawGrid();
 }
 
+const GROUP_ORDER=['urgent','active','quoted','scheduled','complete'];
+const GROUP_LABELS={urgent:'Urgent',active:'Active',quoted:'Quoted',scheduled:'Scheduled',complete:'Complete'};
+const collapsedGroups=new Set(['complete']);
+
+function toggleGroup(status){
+  if(collapsedGroups.has(status))collapsedGroups.delete(status);
+  else collapsedGroups.add(status);
+  renderSb();
+}
+
 function renderSb(highlight){
   const filtered=jobs.filter(j=>filters.has(j.status));
   document.getElementById('st-total').textContent=filtered.length;
   document.getElementById('st-active').textContent=filtered.filter(j=>j.status==='active').length;
   document.getElementById('st-urgent').textContent=filtered.filter(j=>j.status==='urgent').length;
-  const list=document.getElementById('jlist'),show=highlight||filtered;
-  if(!show.length){list.innerHTML='<div class="sempty">No jobs yet.<br>Click any grid cell to add one.</div>';return;}
-  list.innerHTML=show.map(j=>`<div class="ji ${selId===j.id?'sel':''}" onclick="showDetail(${j.id})"><div class="jd" style="background:${SC[j.status]}"></div><div class="jinfo"><div class="jn">${j.customer}</div><div class="jm">${j.address||'No address'}</div></div><span class="jt" style="background:${SB[j.status]};color:${SC[j.status]}">${j.status}</span></div>`).join('');
+  const list=document.getElementById('jlist');
+  const show=highlight||filtered;
+  if(!show.length){list.innerHTML='<div class="sempty">No jobs yet.<br>Press Add job to get started.</div>';return;}
+
+  const grouped={};
+  GROUP_ORDER.forEach(s=>grouped[s]=[]);
+  show.forEach(j=>{if(grouped[j.status])grouped[j.status].push(j);});
+
+  list.innerHTML=GROUP_ORDER.map(status=>{
+    const groupJobs=grouped[status];
+    if(!groupJobs.length)return'';
+    const isOpen=!collapsedGroups.has(status);
+    const jobRows=groupJobs.map(j=>`
+      <div class="ji ${selId===j.id?'sel':''}" onclick="showDetail(${j.id})">
+        <div class="jd" style="background:${SC[j.status]}"></div>
+        <div class="jinfo">
+          <div class="jn">${j.customer}</div>
+          <div class="jm">${j.address||'No address'}</div>
+        </div>
+      </div>`).join('');
+    return`
+      <div>
+        <div class="jgroup-header" onclick="toggleGroup('${status}')">
+          <div class="jgroup-left">
+            <div class="jgroup-dot" style="background:${SC[status]}"></div>
+            <span class="jgroup-name">${GROUP_LABELS[status]}</span>
+            <span class="jgroup-count">${groupJobs.length}</span>
+          </div>
+          <i class="ti ti-chevron-down jgroup-chevron ${isOpen?'open':''}" aria-hidden="true"></i>
+        </div>
+        <div class="jgroup-body" style="display:${isOpen?'block':'none'}">${jobRows}</div>
+      </div>`;
+  }).join('');
 }
 
 const sinput=document.getElementById('sinput'),sclr=document.getElementById('sclr'),sr=document.getElementById('sr');
