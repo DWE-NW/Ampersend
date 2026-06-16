@@ -320,13 +320,9 @@ function drillInto(cellCentreLL){
 }
 
 function goView(i){
-  const filtered=jobs.filter(j=>filters.has(j.status));
-  let centre=VIEWS[i].center;
-  if(filtered.length>0){
-    const avgLat=filtered.reduce((s,j)=>s+j.lat,0)/filtered.length;
-    const avgLng=filtered.reduce((s,j)=>s+j.lng,0)/filtered.length;
-    centre=[avgLat,avgLng];
-  }
+  const centre=selId
+    ? (()=>{const j=jobs.find(x=>x.id===selId);return j?[j.lat,j.lng]:map.getCenter();})()
+    : map.getCenter();
   map.flyTo(centre,VIEWS[i].zoom,{duration:0.8});
 }
 
