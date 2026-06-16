@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DW Electric — Smart Estimator</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue: #1a6eff;
+      --black: #1a1a1a;
+      --border: #e2e2e2;
+      --surface: #f7f7f7;
+      --muted: #888;
+      --blue-light: #e8f0ff;
+      --green: #1e7e34;
+      --green-light: #e6f4ea;
+      --amber: #a06000;
+      --amber-light: #fff8e1;
+      --red-light: #fff0f0;
+      --red: #c0392b;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--black);
+      background: #f4f4f4;
+      min-height: 100vh;
+    }
+    .shell {
+      max-width: 860px;
+      margin: 0 auto;
+      background: #fff;
+      min-height: 100vh;
+      padding: 0 2rem 3rem;
+      border-left: 0.5px solid var(--border);
+      border-right: 0.5px solid var(--border);
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 0 1.25rem;
+      border-bottom: 2px solid var(--black);
+      margin-bottom: 1.5rem;
+    }
+    .logo-text { font-size: 22px; font-weight: 600; letter-spacing: -0.03em; color: var(--black); }
+    .logo-dash { color: var(--blue); }
+    .doc-badge { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+    .tabs { display: flex; border-bottom: 0.5px solid var(--border); margin-bottom: 1.5rem; }
+    .tab {
+      padding: 9px 20px; font-size: 13px; cursor: pointer;
+      border: none; border-bottom: 2px solid transparent;
+      color: var(--muted); background: none;
+      font-family: inherit; margin-bottom: -1px; transition: color 0.15s;
+    }
+    .tab.active { color: var(--black); border-bottom-color: var(--blue); font-weight: 500; }
+    .tab:hover:not(.active) { color: var(--black); }
+    .panel { display: none; } .panel.active { display: block; }
+    .sec-label {
+      font-size: 10px; font-weight: 500; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+    }
+    .card {
+      background: #fff; border: 0.5px solid var(--border);
+      border-radius: 6px; padding: 1rem 1.25rem; margin-bottom: 1rem;
+    }
+    .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    .g4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; }
+    .fg { display: flex; flex-direction: column; gap: 4px; }
+    .fg label { font-size: 11px; color: var(--muted); font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
+    .fg input, .fg select, .fg textarea {
+      font-size: 13px; padding: 8px 10px;
+      border: 0.5px solid var(--border); border-radius: 4px;
+      background: #fff; color: var(--black); width: 100%; font-family: inherit;
+      transition: border-color 0.15s;
+    }
+    .fg textarea { resize: vertical; min-height: 80px; }
+    .fg input:focus, .fg select:focus, .fg textarea:focus {
+      outline: none; border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(26,110,255,0.1);
+    }
+    .room-row { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 8px; }
+    .room-row .fg { flex: 1; }
+    .rooms-list { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; min-height: 28px; }
+    .room-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--blue-light); color: var(--blue);
+      font-size: 12px; padding: 4px 10px; border-radius: 3px; font-weight: 500;
+    }
+    .room-tag button { background: none; border: none; color: var(--blue); cursor: pointer; font-size: 16px; padding: 0; line-height: 1; }
+    .btn {
+      padding: 8px 16px; border-radius: 4px; font-size: 13px; font-weight: 500;
+      cursor: pointer; display: inline-flex; align-items: center; gap: 7px;
+      font-family: inherit; border: 0.5px solid var(--border);
+      background: #fff; color: var(--black); transition: background 0.15s;
+    }
+    .btn:hover { background: var(--surface); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-black { background: var(--black); color: #fff; border-color: var(--black); }
+    .btn-black:hover { background: #333; }
+    .btn-blue { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .btn-blue:hover { background: #155ee0; }
+    .btn-sm { padding: 5px 12px; font-size: 12px; }
+    .ai-box {
+      background: var(--surface); border: 0.5px solid var(--border);
+      border-radius: 6px; padding: 1rem; margin-bottom: 1rem;
+    }
+    .ai-box.thinking { border-color: var(--blue); background: var(--blue-light); }
+    .ai-box.clarify { border-color: #f0a500; background: #fffbf0; }
+    .ai-box.success { border-color: var(--green); background: var(--green-light); }
+    .ai-label {
+      font-size: 10px; font-weight: 500; letter-spacing: 0.1em;
+      text-transform: uppercase; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .ai-label.blue { color: var(--blue); }
+    .ai-label.amber { color: var(--amber); }
+    .ai-label.green { color: var(--green); }
+    .ai-msg { font-size: 13px; line-height: 1.6; color: var(--black); }
+    .clarify-q { margin-bottom: 12px; }
+    .clarify-q p { font-size: 13px; margin-bottom: 7px; font-weight: 500; }
+    .clarify-q .options { display: flex; flex-wrap: wrap; gap: 6px; }
+    .clarify-q .options button {
+      padding: 5px 13px; border-radius: 3px; font-size: 12px;
+      border: 0.5px solid var(--border); background: #fff;
+      cursor: pointer; font-family: inherit; transition: all 0.1s;
+    }
+    .clarify-q .options button:hover, .clarify-q .options button.picked {
+      background: var(--blue-light); border-color: var(--blue); color: var(--blue);
+    }
+    .items-head {
+      display: grid; grid-template-columns: 2.5fr 85px 70px 85px 32px;
+      gap: 8px; font-size: 10px; font-weight: 500; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--muted);
+      padding: 0 2px 8px; border-bottom: 0.5px solid var(--border);
+    }
+    .line-row {
+      display: grid; grid-template-columns: 2.5fr 85px 70px 85px 32px;
+      gap: 8px; align-items: start; padding: 6px 0;
+      border-bottom: 0.5px solid var(--surface);
+    }
+    .line-row input, .line-row select {
+      font-size: 13px; padding: 6px 8px;
+      border: 0.5px solid var(--border); border-radius: 4px;
+      background: #fff; color: var(--black); width: 100%; font-family: inherit;
+    }
+    .line-row input:focus, .line-row select:focus { outline: none; border-color: var(--blue); }
+    .line-desc { display: flex; flex-direction: column; gap: 3px; }
+    .code-note { font-size: 10px; color: var(--blue); font-style: italic; padding: 0 2px; }
+    .del-btn {
+      background: none; border: 0.5px solid var(--border); border-radius: 4px;
+      width: 28px; height: 28px; display: flex; align-items: center;
+      justify-content: center; cursor: pointer; color: var(--muted); font-size: 14px; margin-top: 1px;
+    }
+    .del-btn:hover { background: var(--red-light); border-color: #ffaaaa; color: var(--red); }
+    .add-btn {
+      background: none; border: 0.5px dashed var(--border); border-radius: 4px;
+      padding: 8px 14px; font-size: 12px; color: var(--muted); cursor: pointer;
+      display: flex; align-items: center; gap: 6px; font-family: inherit;
+      width: 100%; justify-content: center; margin-top: 8px;
+    }
+    .add-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
+    .totals { display: flex; justify-content: flex-end; margin-top: 1.25rem; }
+    .totals-inner { min-width: 260px; }
+    .t-row { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; color: #555; }
+    .t-grand {
+      display: flex; justify-content: space-between; font-size: 17px;
+      font-weight: 600; border-top: 2px solid var(--black); margin-top: 6px; padding-top: 10px;
+    }
+    .t-grand span:last-child { color: var(--blue); }
+    .action-bar {
+      display: flex; gap: 10px; margin-top: 1.5rem;
+      padding-top: 1.25rem; border-top: 0.5px solid var(--border); flex-wrap: wrap;
+    }
+    .cat-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .cat-table th {
+      font-size: 10px; font-weight: 500; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--muted);
+      padding: 6px 8px; border-bottom: 0.5px solid var(--border); text-align: left;
+    }
+    .cat-table td { padding: 6px 8px; border-bottom: 0.5px solid var(--surface); vertical-align: middle; }
+    .cat-table input {
+      font-size: 12px; padding: 4px 7px; border: 0.5px solid var(--border);
+      border-radius: 3px; background: #fff; color: var(--black); font-family: inherit;
+    }
+    .cat-table input:focus { outline: none; border-color: var(--blue); }
+    .badge { display: inline-block; font-size: 10px; padding: 2px 7px; border-radius: 2px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
+    .badge-labour { background: var(--amber-light); color: var(--amber); }
+    .badge-material { background: var(--blue-light); color: var(--blue); }
+    .badge-permit { background: var(--green-light); color: var(--green); }
+    .badge-other { background: var(--surface); color: var(--muted); }
+    .assembly-group { margin-bottom: 1rem; }
+    .assembly-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 12px; background: var(--surface); border-radius: 4px;
+      margin-bottom: 4px; font-size: 13px; font-weight: 500;
+    }
+    .assembly-item {
+      display: flex; justify-content: space-between; font-size: 12px;
+      padding: 4px 12px; color: #444;
+    }
+    .assembly-item span:last-child { color: var(--muted); }
+    .spinner {
+      display: inline-block; width: 14px; height: 14px;
+      border: 2px solid var(--blue-light); border-top-color: var(--blue);
+      border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: -3px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .api-key-banner {
+      background: #fffbf0; border: 0.5px solid #f0a500;
+      border-radius: 6px; padding: 12px 16px; margin-bottom: 1rem;
+      font-size: 13px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .api-key-banner input {
+      flex: 1; min-width: 200px; font-size: 13px; padding: 6px 10px;
+      border: 0.5px solid var(--border); border-radius: 4px; font-family: inherit;
+    }
+    .api-key-banner input:focus { outline: none; border-color: var(--blue); }
+    @media (max-width: 600px) {
+      .shell { padding: 0 1rem 3rem; }
+      .g4 { grid-template-columns: 1fr 1fr; }
+      .items-head, .line-row { grid-template-columns: 1fr 70px 60px 32px; }
+      .items-head span:nth-child(2), .line-row > select { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="topbar">
+    <div class="logo-text">DW<span class="logo-dash">—</span>Electric</div>
+    <div class="doc-badge">Smart Estimator</div>
+  </div>
+
+  <div id="api-key-banner" class="api-key-banner">
+    <i class="ti ti-key" style="color:#f0a500;font-size:18px"></i>
+    <span style="font-weight:500">Enter your Anthropic API key to enable AI features</span>
+    <input type="password" id="api-key-input" placeholder="sk-ant-..." />
+    <button class="btn btn-sm btn-black" onclick="saveKey()">Save key</button>
+    <span style="font-size:11px;color:var(--muted)">Stored locally in your browser only</span>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('build',this)">Build estimate</button>
+    <button class="tab" onclick="switchTab('items',this)">Line items</button>
+    <button class="tab" onclick="switchTab('catalogue',this)">Catalogue</button>
+  </div>
+
+  <!-- BUILD TAB -->
+  <div id="tab-build" class="panel active">
+    <div class="card">
+      <div class="sec-label">Job details</div>
+      <div class="g4" style="margin-bottom:0">
+        <div class="fg"><label>Estimate #</label><input type="text" id="est-num" value="EST-001"/></div>
+        <div class="fg"><label>Date issued</label><input type="date" id="est-date"/></div>
+        <div class="fg"><label>Customer name</label><input type="text" id="cust-name" placeholder="Jane Smith"/></div>
+        <div class="fg"><label>Job address</label><input type="text" id="job-addr" placeholder="123 Main St, Belleville ON"/></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sec-label">Rooms & areas</div>
+      <div class="rooms-list" id="rooms-list"><span style="font-size:12px;color:var(--muted)">No rooms added yet</span></div>
+      <div class="room-row">
+        <div class="fg">
+          <label>Room type</label>
+          <select id="room-type">
+            <option value="">Select room...</option>
+            <option>Kitchen</option>
+            <option>Bathroom</option>
+            <option>Living room</option>
+            <option>Bedroom</option>
+            <option>Garage</option>
+            <option>Workshop</option>
+            <option>Basement</option>
+            <option>Outdoor / exterior</option>
+            <option>Panel / utility room</option>
+          </select>
+        </div>
+        <div class="fg" style="max-width:110px">
+          <label>Sq ft</label>
+          <input type="number" id="room-sqft" placeholder="e.g. 180" min="0"/>
+        </div>
+        <button class="btn btn-sm" onclick="addRoom()" style="margin-bottom:1px"><i class="ti ti-plus"></i> Add</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sec-label">Describe the job</div>
+      <div class="fg" style="margin-bottom:12px">
+        <textarea id="job-desc" placeholder="e.g. Full kitchen reno — counter receptacles, under-cabinet lighting, dedicated fridge and microwave circuits, new range hood wiring. Also 200A panel upgrade in utility room."></textarea>
+      </div>
+      <button class="btn btn-black" onclick="startAI()" id="analyze-btn">
+        <i class="ti ti-sparkles"></i> Analyze &amp; build estimate
+      </button>
+    </div>
+
+    <div id="ai-area"></div>
+  </div>
+
+  <!-- LINE ITEMS TAB -->
+  <div id="tab-items" class="panel">
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="sec-label" style="margin:0">Line items</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span id="item-count" style="font-size:12px;color:var(--muted)"></span>
+        </div>
+      </div>
+      <div class="items-head">
+        <span>Description</span><span>Category</span><span>Qty</span><span>Unit price</span><span></span>
+      </div>
+      <div id="line-items-list"></div>
+      <button class="add-btn" onclick="addManualItem()"><i class="ti ti-plus"></i> Add item manually</button>
+      <div class="totals">
+        <div class="totals-inner">
+          <div class="t-row"><span>Subtotal</span><span id="subtotal">$0.00</span></div>
+          <div class="t-row"><span>HST (13%)</span><span id="tax">$0.00</span></div>
+          <div class="t-grand"><span>Total</span><span id="grand-total">$0.00</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="sec-label" style="margin-bottom:8px">Terms & notes</div>
+      <div class="fg">
+        <textarea id="terms-text" style="min-height:64px">Payment due within 30 days of invoice. This estimate is valid for 30 days from date of issue. All work performed to CSA and ESA standards. Permit costs included where noted.</textarea>
+      </div>
+    </div>
+    <div class="action-bar">
+      <button class="btn btn-black" onclick="window.print()"><i class="ti ti-printer"></i> Print / save PDF</button>
+      <button class="btn btn-blue" onclick="alert('Email sending requires the hosted version with your Anthropic API key configured. Coming soon!')"><i class="ti ti-send"></i> Send via email</button>
+      <button class="btn" onclick="clearEstimate()"><i class="ti ti-trash"></i> Clear estimate</button>
+    </div>
+  </div>
+
+  <!-- CATALOGUE TAB -->
+  <div id="tab-catalogue" class="panel">
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="sec-label" style="margin:0">Materials & labour rates</div>
+        <button class="btn btn-sm btn-blue" onclick="addCatItem()"><i class="ti ti-plus"></i> Add item</button>
+      </div>
+      <table class="cat-table">
+        <thead>
+          <tr><th>Description</th><th>Category</th><th>Unit</th><th>Price ($)</th><th></th></tr>
+        </thead>
+        <tbody id="cat-body"></tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="sec-label" style="margin-bottom:12px">Assembly bundles</div>
+      <div id="assemblies-list"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const TAX = 0.13;
+let rooms = [];
+let lineItems = [];
+
+let catItems = [
+  {id:1,desc:'Electrician labour',cat:'labour',unit:'hr',price:95},
+  {id:2,desc:'Apprentice labour',cat:'labour',unit:'hr',price:65},
+  {id:3,desc:'Single receptacle (15A)',cat:'material',unit:'ea',price:4.50},
+  {id:4,desc:'Single receptacle (20A)',cat:'material',unit:'ea',price:7.00},
+  {id:5,desc:'GFCI receptacle (15A)',cat:'material',unit:'ea',price:18.00},
+  {id:6,desc:'GFCI receptacle (20A)',cat:'material',unit:'ea',price:22.00},
+  {id:7,desc:'Single-pole switch',cat:'material',unit:'ea',price:5.00},
+  {id:8,desc:'3-way switch',cat:'material',unit:'ea',price:9.00},
+  {id:9,desc:'Dimmer switch',cat:'material',unit:'ea',price:28.00},
+  {id:10,desc:'1-gang outlet box',cat:'material',unit:'ea',price:2.50},
+  {id:11,desc:'2-gang outlet box',cat:'material',unit:'ea',price:3.50},
+  {id:12,desc:'Cover plate (1-gang)',cat:'material',unit:'ea',price:1.50},
+  {id:13,desc:'Cover plate (2-gang)',cat:'material',unit:'ea',price:2.00},
+  {id:14,desc:'14/2 NMD90 wire',cat:'material',unit:'ft',price:0.55},
+  {id:15,desc:'12/2 NMD90 wire',cat:'material',unit:'ft',price:0.75},
+  {id:16,desc:'10/2 NMD90 wire',cat:'material',unit:'ft',price:1.10},
+  {id:17,desc:'200A Square D panel',cat:'material',unit:'ea',price:420},
+  {id:18,desc:'100A Square D panel',cat:'material',unit:'ea',price:280},
+  {id:19,desc:'20A breaker',cat:'material',unit:'ea',price:14},
+  {id:20,desc:'15A breaker',cat:'material',unit:'ea',price:11},
+  {id:21,desc:'ESA permit',cat:'permit',unit:'ea',price:150},
+  {id:22,desc:'LED pot light (4")',cat:'material',unit:'ea',price:24},
+  {id:23,desc:'Under-cabinet light fixture',cat:'material',unit:'ea',price:45},
+  {id:24,desc:'Range hood wiring',cat:'labour',unit:'ea',price:120},
+];
+
+const assemblies = [
+  {name:'1-gang receptacle installation (15A)',items:[
+    {desc:'15A receptacle',qty:1,ref:3},{desc:'1-gang outlet box',qty:1,ref:10},
+    {desc:'Cover plate',qty:1,ref:12},{desc:'14/2 wire (avg 15ft)',qty:15,ref:14},
+    {desc:'Labour',qty:0.75,ref:1}
+  ]},
+  {name:'GFCI receptacle installation',items:[
+    {desc:'GFCI receptacle (20A)',qty:1,ref:6},{desc:'1-gang outlet box',qty:1,ref:10},
+    {desc:'Cover plate',qty:1,ref:12},{desc:'12/2 wire (avg 15ft)',qty:15,ref:15},
+    {desc:'Labour',qty:1,ref:1}
+  ]},
+  {name:'Pot light installation (4")',items:[
+    {desc:'LED pot light (4")',qty:1,ref:22},{desc:'14/2 wire (avg 12ft)',qty:12,ref:14},
+    {desc:'Labour',qty:0.5,ref:1}
+  ]},
+  {name:'200A panel upgrade',items:[
+    {desc:'200A Square D panel',qty:1,ref:17},{desc:'20A breakers (set of 8)',qty:8,ref:19},
+    {desc:'Labour',qty:10,ref:1},{desc:'ESA permit',qty:1,ref:21}
+  ]},
+];
+
+function getApiKey() { return localStorage.getItem('dwe_api_key') || ''; }
+function saveKey() {
+  const k = document.getElementById('api-key-input').value.trim();
+  if (k) { localStorage.setItem('dwe_api_key', k); document.getElementById('api-key-banner').style.display='none'; alert('API key saved.'); }
+}
+window.addEventListener('DOMContentLoaded', () => {
+  if (getApiKey()) document.getElementById('api-key-banner').style.display = 'none';
+  const today = new Date();
+  document.getElementById('est-date').value = today.toISOString().split('T')[0];
+  renderRooms();
+  renderCatalogue();
+});
+
+function switchTab(t, btn) {
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + t).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (t === 'items') renderLineItems();
+  if (t === 'catalogue') renderCatalogue();
+}
+
+function switchTabDirect(t) {
+  const tabs = document.querySelectorAll('.tab');
+  const map = ['build','items','catalogue'];
+  tabs.forEach((b,i) => { if(map[i]===t) b.classList.add('active'); else b.classList.remove('active'); });
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + t).classList.add('active');
+  if (t === 'items') renderLineItems();
+  if (t === 'catalogue') renderCatalogue();
+}
+
+function addRoom() {
+  const type = document.getElementById('room-type').value;
+  const sqft = document.getElementById('room-sqft').value;
+  if (!type) return;
+  rooms.push({ type, sqft: sqft || '?' });
+  document.getElementById('room-type').value = '';
+  document.getElementById('room-sqft').value = '';
+  renderRooms();
+}
+function removeRoom(i) { rooms.splice(i, 1); renderRooms(); }
+function renderRooms() {
+  const el = document.getElementById('rooms-list');
+  if (rooms.length === 0) { el.innerHTML = '<span style="font-size:12px;color:var(--muted)">No rooms added yet</span>'; return; }
+  el.innerHTML = rooms.map((r, i) =>
+    `<span class="room-tag">${r.type} · ${r.sqft} sq ft<button onclick="removeRoom(${i})" aria-label="Remove room">×</button></span>`
+  ).join('');
+}
+
+async function startAI() {
+  const key = getApiKey();
+  if (!key) { alert('Please enter your Anthropic API key in the banner at the top first.'); return; }
+  const desc = document.getElementById('job-desc').value.trim();
+  if (!desc && rooms.length === 0) { alert('Add at least one room or describe the job first.'); return; }
+  const btn = document.getElementById('analyze-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Analyzing...';
+  const area = document.getElementById('ai-area');
+  area.innerHTML = `<div class="ai-box thinking"><div class="ai-label blue"><span class="spinner"></span> Reading job description</div><div class="ai-msg">Applying Ontario Electrical Code rules and building your estimate…</div></div>`;
+  const roomSummary = rooms.map(r => `${r.type} (${r.sqft} sq ft)`).join(', ');
+  const catSummary = catItems.map(c => `${c.desc} @ $${c.price}/${c.unit}`).join('; ');
+  const prompt = `You are an expert Ontario licensed electrician estimating assistant for DW Electric, a professional electrical and lighting design company in Ontario, Canada.
+
+Rooms: ${roomSummary || 'Not specified'}
+Job description: ${desc || 'Not specified'}
+Catalogue: ${catSummary}
+
+Return ONLY valid JSON (no markdown, no explanation):
+{
+  "clarifications": [
+    {"id": "c1", "question": "Question text", "options": ["Option A","Option B","Option C"]}
+  ],
+  "ready_items": [
+    {"desc": "Item description", "cat": "labour", "qty": 10, "price": 95, "code_note": "OEC reference if applicable"}
+  ],
+  "summary": "One sentence summary of the job scope"
+}
+
+Rules:
+- Maximum 3 clarification questions, only where answer meaningfully changes scope
+- Kitchen: apply OEC 26-712 counter receptacle spacing (1 per 900mm counter run), GFCI within 1.5m of sink, dedicated 20A circuits for fridge/microwave/dishwasher
+- Bathroom: OEC 26-710 GFCI required on all receptacles, minimum 1 dedicated 20A circuit
+- Garage/workshop: OEC 26-724 GFCI on all receptacles
+- Panel upgrades: always include ESA permit
+- Use catalogue prices where available
+- Add code_note only where OEC drives the requirement (keep it short)`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1000, messages: [{ role: 'user', content: prompt }] })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    const text = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
+    const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
+    window._aiResult = parsed;
+    window._pendingClarify = {};
+    renderAIResult(parsed);
+  } catch (e) {
+    area.innerHTML = `<div class="ai-box" style="border-color:#ffaaaa;background:var(--red-light)"><div class="ai-msg" style="color:var(--red)">Error: ${e.message}. Check your API key and try again.</div></div>`;
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<i class="ti ti-sparkles"></i> Analyze &amp; build estimate';
+}
+
+function renderAIResult(parsed) {
+  const area = document.getElementById('ai-area');
+  let html = `<div class="ai-box thinking"><div class="ai-label blue"><i class="ti ti-check"></i> Job understood</div><div class="ai-msg">${parsed.summary || ''}</div></div>`;
+  if (parsed.clarifications && parsed.clarifications.length > 0) {
+    html += `<div class="ai-box clarify"><div class="ai-label amber"><i class="ti ti-help-circle"></i> A few quick questions before I build the estimate</div>`;
+    parsed.clarifications.forEach(q => {
+      html += `<div class="clarify-q"><p>${q.question}</p>`;
+      if (q.options && q.options.length) {
+        html += `<div class="options">`;
+        q.options.forEach(opt => { html += `<button onclick="pickClarify('${q.id}',this,'${opt.replace(/'/g,"\\'")}') ">${opt}</button>`; });
+        html += `</div>`;
+      }
+      html += `</div>`;
+    });
+    html += `<button class="btn btn-black" style="margin-top:10px" onclick="confirmAndBuild()"><i class="ti ti-arrow-right"></i> Build estimate with these answers</button></div>`;
+  } else {
+    applyItems(parsed.ready_items || []);
+    html += `<div style="margin-top:0.5rem"><button class="btn btn-blue" onclick="switchTabDirect('items')"><i class="ti ti-list"></i> View line items →</button></div>`;
+  }
+  area.innerHTML = html;
+}
+
+function pickClarify(id, btn, val) {
+  btn.closest('.options').querySelectorAll('button').forEach(b => b.classList.remove('picked'));
+  btn.classList.add('picked');
+  window._pendingClarify = window._pendingClarify || {};
+  window._pendingClarify[id] = val;
+}
+
+function confirmAndBuild() {
+  const parsed = window._aiResult;
+  applyItems(parsed.ready_items || []);
+  const area = document.getElementById('ai-area');
+  area.innerHTML += `<div class="ai-box success" style="margin-top:1rem"><div class="ai-label green"><i class="ti ti-check"></i> Estimate built</div><div class="ai-msg">Line items generated. Switch to the Line Items tab to review and adjust pricing.</div></div><div style="margin-top:0.75rem"><button class="btn btn-blue" onclick="switchTabDirect('items')"><i class="ti ti-list"></i> View line items →</button></div>`;
+}
+
+function applyItems(items) {
+  items.forEach(i => lineItems.push({ id: Date.now() + Math.random(), desc: i.desc, cat: i.cat || 'material', qty: i.qty || 1, price: i.price || 0, codeNote: i.code_note || '' }));
+}
+
+function addManualItem() {
+  lineItems.push({ id: Date.now(), desc: '', cat: 'material', qty: 1, price: 0, codeNote: '' });
+  renderLineItems();
+}
+
+function removeLineItem(id) { lineItems = lineItems.filter(i => i.id !== id); renderLineItems(); }
+
+function updateLine(id, field, value) {
+  const i = lineItems.find(x => x.id === id);
+  if (i) { i[field] = (field === 'qty' || field === 'price') ? parseFloat(value) || 0 : value; updateTotals(); }
+}
+
+function renderLineItems() {
+  const c = document.getElementById('line-items-list');
+  if (!c) return;
+  c.innerHTML = '';
+  lineItems.forEach(item => {
+    const row = document.createElement('div');
+    row.className = 'line-row';
+    row.innerHTML = `
+      <div class="line-desc">
+        <input type="text" placeholder="Description" value="${item.desc.replace(/"/g,'&quot;')}" oninput="updateLine(${item.id},'desc',this.value)"/>
+        ${item.codeNote ? `<span class="code-note">${item.codeNote}</span>` : ''}
+      </div>
+      <select onchange="updateLine(${item.id},'cat',this.value)">
+        <option value="labour" ${item.cat==='labour'?'selected':''}>Labour</option>
+        <option value="material" ${item.cat==='material'?'selected':''}>Material</option>
+        <option value="permit" ${item.cat==='permit'?'selected':''}>Permit</option>
+        <option value="other" ${item.cat==='other'?'selected':''}>Other</option>
+      </select>
+      <input type="number" min="0" step="0.5" value="${item.qty}" oninput="updateLine(${item.id},'qty',this.value)"/>
+      <input type="number" min="0" step="0.01" value="${item.price}" oninput="updateLine(${item.id},'price',this.value)" placeholder="0.00"/>
+      <button class="del-btn" onclick="removeLineItem(${item.id})" aria-label="Remove item"><i class="ti ti-trash"></i></button>`;
+    c.appendChild(row);
+  });
+  updateTotals();
+  const cnt = document.getElementById('item-count');
+  if (cnt) cnt.textContent = lineItems.length + ' item' + (lineItems.length !== 1 ? 's' : '');
+}
+
+function updateTotals() {
+  const sub = lineItems.reduce((s, i) => s + (i.qty * i.price), 0);
+  const tax = sub * TAX;
+  const s = document.getElementById('subtotal');
+  const t = document.getElementById('tax');
+  const g = document.getElementById('grand-total');
+  if (s) s.textContent = '$' + sub.toFixed(2);
+  if (t) t.textContent = '$' + tax.toFixed(2);
+  if (g) g.textContent = '$' + (sub + tax).toFixed(2);
+}
+
+function clearEstimate() {
+  if (confirm('Clear all line items?')) { lineItems = []; renderLineItems(); }
+}
+
+function renderCatalogue() {
+  const tbody = document.getElementById('cat-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  catItems.forEach(item => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input value="${item.desc}" style="width:100%;min-width:160px" oninput="updateCat(${item.id},'desc',this.value)"/></td>
+      <td><span class="badge badge-${item.cat}">${item.cat}</span></td>
+      <td><input value="${item.unit}" style="width:50px" oninput="updateCat(${item.id},'unit',this.value)"/></td>
+      <td><input type="number" value="${item.price}" step="0.01" style="width:80px" oninput="updateCat(${item.id},'price',this.value)"/></td>
+      <td><button class="del-btn" onclick="deleteCat(${item.id})" aria-label="Remove"><i class="ti ti-trash"></i></button></td>`;
+    tbody.appendChild(tr);
+  });
+  const al = document.getElementById('assemblies-list');
+  if (!al) return;
+  al.innerHTML = assemblies.map(a => {
+    const total = a.items.reduce((s, i) => { const c = catItems.find(x => x.id === i.ref); return s + (c ? c.price * i.qty : 0); }, 0);
+    return `<div class="assembly-group">
+      <div class="assembly-header"><span>${a.name}</span><span style="color:var(--blue);font-size:13px">$${total.toFixed(2)}</span></div>
+      ${a.items.map(i => { const c = catItems.find(x => x.id === i.ref); return `<div class="assembly-item"><span>${i.qty} × ${i.desc}</span><span>${c ? '$' + (c.price * i.qty).toFixed(2) : ''}</span></div>`; }).join('')}
+    </div>`;
+  }).join('');
+}
+
+function updateCat(id, field, value) {
+  const i = catItems.find(x => x.id === id);
+  if (i) i[field] = field === 'price' ? parseFloat(value) || 0 : value;
+}
+function deleteCat(id) { catItems = catItems.filter(x => x.id !== id); renderCatalogue(); }
+function addCatItem() {
+  catItems.push({ id: Date.now(), desc: 'New item', cat: 'material', unit: 'ea', price: 0 });
+  renderCatalogue();
+}
+</script>
+</body>
+</html>
