@@ -1,273 +1,245 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Ampersend — Project Tracker</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css"/>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --blue: #1a6eff;
-      --black: #1a1a1a;
-      --white: #ffffff;
-      --surface: #f5f5f3;
-      --border: #e2e2e2;
-      --muted: #888;
-      --blue-light: #e8f0ff;
-      --status-active: #1a6eff;
-      --status-quoted: #BA7517;
-      --status-scheduled: #1e7e34;
-      --status-complete: #888;
-      --status-urgent: #dc3545;
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --blue:#1a6eff;--black:#1a1a1a;--white:#fff;--surface:#f5f5f3;
+      --border:#e2e2e2;--muted:#888;--blue-light:#e8f0ff;
+      --sa:#1a6eff;--sq:#BA7517;--ss:#1e7e34;--sc:#888;--su:#dc3545;
     }
-    html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--black); background: var(--surface); }
+    html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--black);background:var(--surface);overflow:hidden;}
+    nav{height:52px;background:var(--white);border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1.25rem;z-index:1000;position:relative;}
+    .nl{display:flex;align-items:center;gap:12px;}
+    .logo{font-size:16px;font-weight:600;letter-spacing:-0.03em;color:var(--black);text-decoration:none;}
+    .logo span{color:var(--blue);}
+    .nsep{width:0.5px;height:18px;background:var(--border);}
+    .ntitle{font-size:13px;font-weight:500;}
+    .nr{display:flex;align-items:center;gap:8px;}
+    .nbtn{padding:6px 12px;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:var(--white);color:var(--black);display:flex;align-items:center;gap:5px;font-family:inherit;}
+    .nbtn:hover{background:var(--surface);}
+    .nbtn.primary{background:var(--black);color:#fff;border-color:var(--black);}
+    .nbtn.primary:hover{background:#333;}
+    .nbtn.drawing{background:var(--blue);color:#fff;border-color:var(--blue);}
 
-    nav {
-      height: 52px; background: var(--white); border-bottom: 0.5px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 1.25rem; position: relative; z-index: 1000;
-    }
-    .nav-left { display: flex; align-items: center; gap: 12px; }
-    .nav-logo { font-size: 16px; font-weight: 600; letter-spacing: -0.03em; color: var(--black); text-decoration: none; }
-    .nav-logo span { color: var(--blue); }
-    .nav-divider { width: 0.5px; height: 18px; background: var(--border); }
-    .nav-title { font-size: 13px; font-weight: 500; color: var(--black); }
-    .nav-right { display: flex; align-items: center; gap: 8px; }
-    .nav-btn {
-      padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;
-      cursor: pointer; border: 0.5px solid var(--border); background: var(--white);
-      color: var(--black); display: flex; align-items: center; gap: 5px; font-family: inherit;
-    }
-    .nav-btn:hover { background: var(--surface); }
-    .nav-btn.primary { background: var(--black); color: var(--white); border-color: var(--black); }
-    .nav-btn.primary:hover { background: #333; }
+    .body{display:flex;height:calc(100vh - 52px);}
+    .sidebar{width:290px;flex-shrink:0;background:var(--white);border-right:0.5px solid var(--border);display:flex;flex-direction:column;overflow:hidden;z-index:500;}
+    .sbh{padding:12px 14px;border-bottom:0.5px solid var(--border);}
+    .sbl{font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;}
+    .sc2{background:var(--surface);border-radius:4px;padding:8px 6px;text-align:center;}
+    .sc2 .n{font-size:20px;font-weight:600;letter-spacing:-0.02em;line-height:1;}
+    .sc2 .l{font-size:10px;color:var(--muted);font-weight:500;letter-spacing:0.04em;text-transform:uppercase;margin-top:3px;}
+    .sc2.a .n{color:var(--sa);}
+    .sc2.u .n{color:var(--su);}
+    .filters{display:flex;gap:5px;flex-wrap:wrap;}
+    .fc{padding:3px 9px;border-radius:99px;font-size:11px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:var(--white);color:var(--muted);font-family:inherit;}
+    .fc.on{color:#fff;border-color:transparent;}
+    .fc[data-s="active"].on{background:var(--sa);}
+    .fc[data-s="quoted"].on{background:var(--sq);}
+    .fc[data-s="scheduled"].on{background:var(--ss);}
+    .fc[data-s="complete"].on{background:var(--sc);}
+    .fc[data-s="urgent"].on{background:var(--su);}
+    .jlist{flex:1;overflow-y:auto;}
+    .ji{padding:10px 14px;border-bottom:0.5px solid var(--border);cursor:pointer;display:flex;align-items:flex-start;gap:9px;}
+    .ji:hover{background:var(--surface);}
+    .ji.sel{background:var(--blue-light);}
+    .jd{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+    .jinfo{flex:1;min-width:0;}
+    .jn{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .jm{font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .jt{font-size:10px;font-weight:500;text-transform:capitalize;padding:2px 6px;border-radius:3px;white-space:nowrap;flex-shrink:0;margin-top:2px;}
+    .sempty{padding:2rem 1rem;text-align:center;color:var(--muted);font-size:13px;line-height:1.6;}
 
-    .app-body { display: flex; height: calc(100vh - 52px); }
+    .mapwrap{flex:1;position:relative;}
+    #map{width:100%;height:100%;}
 
-    /* SIDEBAR */
-    .sidebar {
-      width: 300px; flex-shrink: 0; background: var(--white);
-      border-right: 0.5px solid var(--border); display: flex;
-      flex-direction: column; overflow: hidden; z-index: 500;
-    }
-    .sidebar-header { padding: 1rem; border-bottom: 0.5px solid var(--border); }
-    .sidebar-title { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
-    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-    .stat-pill {
-      background: var(--surface); border-radius: 4px; padding: 8px 6px; text-align: center;
-    }
-    .stat-pill .num { font-size: 18px; font-weight: 600; letter-spacing: -0.02em; }
-    .stat-pill .lbl { font-size: 10px; color: var(--muted); font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
-    .stat-pill.active .num { color: var(--status-active); }
-    .stat-pill.urgent .num { color: var(--status-urgent); }
-    .stat-pill.total .num { color: var(--black); }
+    /* FLOAT CARD */
+    .float-card{position:absolute;top:1rem;right:4rem;z-index:900;background:var(--white);border:0.5px solid var(--border);border-radius:10px;width:310px;box-shadow:0 4px 16px rgba(0,0,0,0.08);overflow:visible;}
+    .fc-search{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:0.5px solid var(--border);}
+    .fc-search i{color:var(--muted);font-size:16px;flex-shrink:0;}
+    .fc-search input{flex:1;border:none;background:transparent;font-size:13px;color:var(--black);font-family:inherit;outline:none;}
+    .fc-search input::placeholder{color:var(--muted);}
+    .fc-clr{background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:0;line-height:1;display:none;}
+    .fc-meta{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;}
+    .fc-vl{font-size:10px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);}
+    .fc-pills{display:flex;gap:3px;}
+    .zp{padding:2px 9px;border-radius:99px;font-size:10px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:var(--white);color:var(--muted);font-family:inherit;transition:all 0.15s;}
+    .zp:hover{background:var(--surface);color:var(--black);}
+    .sr{position:absolute;top:100%;left:0;right:0;background:var(--white);border:0.5px solid var(--border);border-radius:0 0 8px 8px;display:none;max-height:200px;overflow-y:auto;z-index:1000;box-shadow:0 4px 12px rgba(0,0,0,0.08);}
+    .sr.show{display:block;}
+    .sri{padding:9px 12px;font-size:13px;cursor:pointer;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:8px;}
+    .sri:last-child{border-bottom:none;}
+    .sri:hover{background:var(--surface);}
+    .sri i{color:var(--muted);font-size:14px;flex-shrink:0;}
+    .sri-n{font-weight:500;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .sri-s{font-size:11px;color:var(--muted);}
+    .sr-msg{padding:10px 12px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px;}
+    .spinner{width:12px;height:12px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0;}
+    @keyframes spin{to{transform:rotate(360deg);}}
 
-    .filter-row { padding: 10px 1rem; border-bottom: 0.5px solid var(--border); display: flex; gap: 6px; flex-wrap: wrap; }
-    .filter-chip {
-      padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 500;
-      cursor: pointer; border: 0.5px solid var(--border); background: var(--white);
-      color: var(--muted); font-family: inherit; transition: all 0.1s;
-    }
-    .filter-chip.on { color: var(--white); border-color: transparent; }
-    .filter-chip.f-active.on { background: var(--status-active); }
-    .filter-chip.f-quoted.on { background: var(--status-quoted); }
-    .filter-chip.f-scheduled.on { background: var(--status-scheduled); }
-    .filter-chip.f-complete.on { background: var(--status-complete); }
-    .filter-chip.f-urgent.on { background: var(--status-urgent); }
+    .legend{position:absolute;bottom:1rem;left:1rem;z-index:900;background:var(--white);border:0.5px solid var(--border);border-radius:8px;padding:10px 12px;}
+    .lt{font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+    .li{display:flex;align-items:center;gap:7px;font-size:11px;padding:2px 0;}
+    .ld{width:10px;height:10px;border-radius:2px;}
 
-    .jobs-list { flex: 1; overflow-y: auto; }
-    .job-item {
-      padding: 10px 1rem; border-bottom: 0.5px solid var(--border);
-      cursor: pointer; transition: background 0.1s; display: flex; align-items: flex-start; gap: 10px;
-    }
-    .job-item:hover { background: var(--surface); }
-    .job-item.selected { background: var(--blue-light); }
-    .job-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
-    .job-info { flex: 1; min-width: 0; }
-    .job-name { font-size: 13px; font-weight: 500; color: var(--black); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .job-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
-    .job-status { font-size: 10px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; white-space: nowrap; }
+    .draw-bar{position:absolute;bottom:1rem;right:1rem;z-index:900;background:var(--white);border:1.5px solid var(--blue);border-radius:8px;padding:10px 14px;display:none;align-items:center;gap:10px;box-shadow:0 4px 12px rgba(26,110,255,0.15);}
+    .draw-bar.show{display:flex;}
+    .draw-msg{font-size:12px;color:var(--blue);font-weight:500;}
+    .draw-cnt{font-size:12px;color:var(--muted);}
 
-    .sidebar-empty { padding: 2rem 1rem; text-align: center; color: var(--muted); font-size: 13px; }
+    .dpanel{position:absolute;top:1rem;right:4rem;z-index:900;width:280px;background:var(--white);border:0.5px solid var(--border);border-radius:8px;display:none;margin-top:116px;}
+    .dpanel.open{display:block;}
+    .dph{padding:11px 14px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+    .dph-t{font-size:13px;font-weight:500;}
+    .dph-x{background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;line-height:1;}
+    .dpb{padding:12px 14px;}
+    .dpf{margin-bottom:9px;}
+    .dpl{font-size:10px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;}
+    .dpv{font-size:13px;}
+    .prog-wrap{margin-bottom:10px;}
+    .prog-row{display:flex;gap:3px;margin-top:5px;}
+    .prog-s{flex:1;height:6px;border-radius:2px;background:var(--surface);border:0.5px solid var(--border);cursor:pointer;}
+    .prog-s.done{background:var(--sa);border-color:var(--sa);}
+    .prog-lbls{display:flex;justify-content:space-between;margin-top:3px;}
+    .prog-lbls span{font-size:10px;color:var(--muted);}
+    .dpa{padding:10px 14px;border-top:0.5px solid var(--border);display:flex;gap:7px;}
+    .dbtn{flex:1;padding:7px 4px;border-radius:4px;font-size:11px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:var(--white);color:var(--black);font-family:inherit;display:flex;align-items:center;justify-content:center;gap:4px;}
+    .dbtn:hover{background:var(--surface);}
+    .dbtn.primary{background:var(--black);color:#fff;border-color:var(--black);}
+    .dbtn.primary:hover{background:#333;}
 
-    /* MAP */
-    .map-wrap { flex: 1; position: relative; }
-    #map { width: 100%; height: 100%; }
-
-    /* LEGEND */
-    .legend {
-      position: absolute; bottom: 1rem; left: 1rem; z-index: 1000;
-      background: var(--white); border: 0.5px solid var(--border);
-      border-radius: 6px; padding: 10px 12px;
-    }
-    .legend-title { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
-    .legend-item { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--black); padding: 2px 0; }
-    .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
-
-    /* PANEL — job detail */
-    .detail-panel {
-      position: absolute; top: 1rem; right: 1rem; z-index: 1000;
-      width: 280px; background: var(--white); border: 0.5px solid var(--border);
-      border-radius: 8px; display: none;
-    }
-    .detail-panel.open { display: block; }
-    .dp-header { padding: 12px 14px; border-bottom: 0.5px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-    .dp-title { font-size: 13px; font-weight: 500; }
-    .dp-close { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 18px; padding: 0; line-height: 1; }
-    .dp-body { padding: 12px 14px; }
-    .dp-field { margin-bottom: 10px; }
-    .dp-label { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
-    .dp-value { font-size: 13px; color: var(--black); }
-    .dp-actions { padding: 10px 14px; border-top: 0.5px solid var(--border); display: flex; gap: 8px; }
-    .dp-btn { flex: 1; padding: 7px; border-radius: 4px; font-size: 12px; font-weight: 500; cursor: pointer; border: 0.5px solid var(--border); background: var(--white); color: var(--black); font-family: inherit; }
-    .dp-btn:hover { background: var(--surface); }
-    .dp-btn.primary { background: var(--black); color: var(--white); border-color: var(--black); }
-    .dp-btn.primary:hover { background: #333; }
-
-    /* ADD JOB MODAL */
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.4);
-      z-index: 2000; display: none; align-items: center; justify-content: center;
-    }
-    .modal-overlay.open { display: flex; }
-    .modal {
-      background: var(--white); border-radius: 8px; width: 420px;
-      max-width: 95vw; border: 0.5px solid var(--border);
-    }
-    .modal-header { padding: 1rem 1.25rem; border-bottom: 0.5px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-    .modal-title { font-size: 15px; font-weight: 500; }
-    .modal-close { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 20px; line-height: 1; }
-    .modal-body { padding: 1rem 1.25rem; }
-    .mfg { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
-    .mfg label { font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
-    .mfg input, .mfg select, .mfg textarea {
-      font-size: 13px; padding: 8px 10px; border: 0.5px solid var(--border);
-      border-radius: 4px; background: var(--white); color: var(--black);
-      width: 100%; font-family: inherit;
-    }
-    .mfg input:focus, .mfg select:focus, .mfg textarea:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,110,255,0.1); }
-    .mfg textarea { resize: vertical; min-height: 60px; }
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .modal-footer { padding: 10px 1.25rem; border-top: 0.5px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; }
-    .m-btn { padding: 8px 18px; border-radius: 4px; font-size: 13px; font-weight: 500; cursor: pointer; border: 0.5px solid var(--border); background: var(--white); color: var(--black); font-family: inherit; }
-    .m-btn:hover { background: var(--surface); }
-    .m-btn.primary { background: var(--black); color: var(--white); border-color: var(--black); }
-    .m-btn.primary:hover { background: #333; }
-    .grid-loc-note { font-size: 11px; color: var(--blue); padding: 6px 8px; background: var(--blue-light); border-radius: 4px; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
-
-    .leaflet-container { font-family: inherit; }
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:2000;display:none;align-items:center;justify-content:center;}
+    .overlay.open{display:flex;}
+    .modal{background:var(--white);border-radius:8px;width:420px;max-width:95vw;border:0.5px solid var(--border);}
+    .mh{padding:1rem 1.25rem;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+    .mh-t{font-size:15px;font-weight:500;}
+    .mh-x{background:none;border:none;cursor:pointer;color:var(--muted);font-size:20px;line-height:1;}
+    .mb{padding:1rem 1.25rem;}
+    .fg{display:flex;flex-direction:column;gap:4px;margin-bottom:11px;}
+    .fg label{font-size:11px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);}
+    .fg input,.fg select,.fg textarea{font-size:13px;padding:8px 10px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);width:100%;font-family:inherit;}
+    .fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,110,255,0.1);}
+    .fg textarea{resize:vertical;min-height:56px;}
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .pin-note{font-size:11px;color:var(--blue);padding:6px 9px;background:var(--blue-light);border-radius:4px;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+    .mf{padding:10px 1.25rem;border-top:0.5px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
+    .mbtn{padding:8px 18px;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:var(--white);color:var(--black);font-family:inherit;}
+    .mbtn:hover{background:var(--surface);}
+    .mbtn.primary{background:var(--black);color:#fff;border-color:var(--black);}
+    .mbtn.primary:hover{background:#333;}
+    .leaflet-control-zoom{border:0.5px solid var(--border)!important;border-radius:6px!important;overflow:hidden;}
+    .leaflet-control-zoom a{color:var(--black)!important;}
   </style>
 </head>
 <body>
-
 <nav>
-  <div class="nav-left">
-    <a href="/index.html" class="nav-logo">Ampers<span>&</span>nd</a>
-    <div class="nav-divider"></div>
-    <span class="nav-title">Project tracker</span>
+  <div class="nl">
+    <a href="/index.html" class="logo">Ampers<span>&</span>nd</a>
+    <div class="nsep"></div>
+    <span class="ntitle">Project tracker</span>
   </div>
-  <div class="nav-right">
-    <button class="nav-btn" onclick="document.getElementById('zoom-info').style.display='block'">
-      <i class="ti ti-help-circle"></i> How to use
-    </button>
-    <button class="nav-btn primary" onclick="openAddModal(null)">
-      <i class="ti ti-plus"></i> Add job
-    </button>
+  <div class="nr">
+    <button class="nbtn primary" onclick="startAddJob()"><i class="ti ti-plus"></i> Add job</button>
   </div>
 </nav>
 
-<div class="app-body">
-
+<div class="body">
   <div class="sidebar">
-    <div class="sidebar-header">
-      <div class="sidebar-title">Overview</div>
-      <div class="stats-row">
-        <div class="stat-pill total"><div class="num" id="stat-total">0</div><div class="lbl">Total</div></div>
-        <div class="stat-pill active"><div class="num" id="stat-active">0</div><div class="lbl">Active</div></div>
-        <div class="stat-pill urgent"><div class="num" id="stat-urgent">0</div><div class="lbl">Urgent</div></div>
+    <div class="sbh">
+      <div class="sbl">Overview</div>
+      <div class="stats">
+        <div class="sc2"><div class="n" id="st-total">0</div><div class="l">Jobs</div></div>
+        <div class="sc2 a"><div class="n" id="st-active">0</div><div class="l">Active</div></div>
+        <div class="sc2 u"><div class="n" id="st-urgent">0</div><div class="l">Urgent</div></div>
+      </div>
+      <div class="filters">
+        <button class="fc on" data-s="active" onclick="toggleF(this)">Active</button>
+        <button class="fc on" data-s="quoted" onclick="toggleF(this)">Quoted</button>
+        <button class="fc on" data-s="scheduled" onclick="toggleF(this)">Scheduled</button>
+        <button class="fc on" data-s="complete" onclick="toggleF(this)">Complete</button>
+        <button class="fc on" data-s="urgent" onclick="toggleF(this)">Urgent</button>
       </div>
     </div>
-    <div class="filter-row">
-      <button class="filter-chip f-active on" data-status="active" onclick="toggleFilter(this)">Active</button>
-      <button class="filter-chip f-quoted on" data-status="quoted" onclick="toggleFilter(this)">Quoted</button>
-      <button class="filter-chip f-scheduled on" data-status="scheduled" onclick="toggleFilter(this)">Scheduled</button>
-      <button class="filter-chip f-complete on" data-status="complete" onclick="toggleFilter(this)">Complete</button>
-      <button class="filter-chip f-urgent on" data-status="urgent" onclick="toggleFilter(this)">Urgent</button>
-    </div>
-    <div class="jobs-list" id="jobs-list">
-      <div class="sidebar-empty">No jobs yet. Click the map grid to add one.</div>
-    </div>
+    <div class="jlist" id="jlist"></div>
   </div>
 
-  <div class="map-wrap">
+  <div class="mapwrap">
     <div id="map"></div>
 
+    <div class="float-card">
+      <div class="fc-search">
+        <i class="ti ti-search" aria-hidden="true"></i>
+        <input type="text" id="sinput" placeholder="Search address..." autocomplete="off"/>
+        <button class="fc-clr" id="sclr" onclick="clearSearch()" aria-label="Clear">×</button>
+      </div>
+      <div class="fc-meta">
+        <span class="fc-vl">View</span>
+        <div class="fc-pills">
+          <button class="zp" onclick="goView(0)">Regional</button>
+          <button class="zp" onclick="goView(1)">Town</button>
+          <button class="zp" onclick="goView(2)">Street</button>
+          <button class="zp" onclick="goView(3)">Property</button>
+        </div>
+      </div>
+      <div class="sr" id="sr"></div>
+    </div>
+
     <div class="legend">
-      <div class="legend-title">Status</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#1a6eff"></div>Active</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#BA7517"></div>Quoted</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#1e7e34"></div>Scheduled</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#888"></div>Complete</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#dc3545"></div>Urgent</div>
+      <div class="lt">Status</div>
+      <div class="li"><div class="ld" style="background:#1a6eff"></div>Active</div>
+      <div class="li"><div class="ld" style="background:#BA7517"></div>Quoted</div>
+      <div class="li"><div class="ld" style="background:#1e7e34"></div>Scheduled</div>
+      <div class="li"><div class="ld" style="background:#888"></div>Complete</div>
+      <div class="li"><div class="ld" style="background:#dc3545"></div>Urgent</div>
     </div>
 
-    <div class="detail-panel" id="detail-panel">
-      <div class="dp-header">
-        <span class="dp-title" id="dp-title">Job details</span>
-        <button class="dp-close" onclick="closeDetail()" aria-label="Close">×</button>
-      </div>
-      <div class="dp-body" id="dp-body"></div>
-      <div class="dp-actions">
-        <button class="dp-btn" onclick="editJob()"><i class="ti ti-edit"></i> Edit</button>
-        <button class="dp-btn" onclick="deleteJob()"><i class="ti ti-trash"></i> Remove</button>
-        <button class="dp-btn primary" onclick="viewEstimate()"><i class="ti ti-file-dollar"></i> Estimate</button>
-      </div>
+    <div class="draw-bar" id="draw-bar">
+      <i class="ti ti-map-pin" style="color:var(--blue);font-size:14px"></i>
+      <span class="draw-msg">Click cells to outline the job area</span>
+      <span class="draw-cnt" id="draw-cnt">0 selected</span>
+      <button class="nbtn primary" style="padding:5px 12px;font-size:11px" onclick="confirmDraw()">Next — job details</button>
+      <button class="nbtn" style="padding:5px 10px;font-size:11px" onclick="cancelDraw()">Cancel</button>
     </div>
 
+    <div class="dpanel" id="dpanel">
+      <div class="dph"><span class="dph-t" id="dp-title"></span><button class="dph-x" onclick="closeDetail()">×</button></div>
+      <div class="dpb" id="dp-body"></div>
+      <div class="dpa">
+        <button class="dbtn" onclick="doEdit()"><i class="ti ti-edit"></i> Edit</button>
+        <button class="dbtn" onclick="doDelete()"><i class="ti ti-trash"></i> Delete</button>
+        <button class="dbtn primary" onclick="window.location.href='/estimator.html'"><i class="ti ti-file-dollar"></i> Estimate</button>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- ADD JOB MODAL -->
-<div class="modal-overlay" id="modal-overlay">
+<div class="overlay" id="overlay">
   <div class="modal">
-    <div class="modal-header">
-      <span class="modal-title" id="modal-title">Add job to map</span>
-      <button class="modal-close" onclick="closeModal()" aria-label="Close">×</button>
-    </div>
-    <div class="modal-body">
-      <div class="grid-loc-note" id="grid-loc-note">
-        <i class="ti ti-map-pin" style="font-size:14px"></i>
-        <span id="grid-loc-text">Pinned to selected grid cell</span>
+    <div class="mh"><span class="mh-t" id="m-title">Add job</span><button class="mh-x" onclick="closeModal()">×</button></div>
+    <div class="mb">
+      <div class="pin-note" id="pin-note"><i class="ti ti-map-pin" style="font-size:13px"></i><span id="pin-text">Pinned to map location</span></div>
+      <div class="g2">
+        <div class="fg"><label>Customer</label><input id="f-cust" placeholder="Jane Smith"/></div>
+        <div class="fg"><label>Phone</label><input id="f-phone" placeholder="(705) 555-0100"/></div>
       </div>
-      <div class="grid-2">
-        <div class="mfg">
-          <label>Customer name</label>
-          <input type="text" id="f-customer" placeholder="Jane Smith" />
-        </div>
-        <div class="mfg">
-          <label>Phone</label>
-          <input type="tel" id="f-phone" placeholder="(705) 555-0100" />
-        </div>
-      </div>
-      <div class="mfg">
-        <label>Job address</label>
-        <input type="text" id="f-address" placeholder="31 Merryfield Cres, Belleville ON" />
-      </div>
-      <div class="grid-2">
-        <div class="mfg">
-          <label>Job type</label>
+      <div class="fg"><label>Address</label><input id="f-addr" placeholder="31 Merryfield Cres, Belleville ON"/></div>
+      <div class="g2">
+        <div class="fg"><label>Job type</label>
           <select id="f-type">
-            <option>Residential</option>
-            <option>Commercial</option>
-            <option>Industrial</option>
-            <option>Lighting design</option>
-            <option>Service upgrade</option>
+            <option value="residential">Residential</option>
+            <option value="commercial">Commercial</option>
+            <option value="panel">Panel upgrade</option>
+            <option value="lighting">Lighting design</option>
+            <option value="service">Service upgrade</option>
           </select>
         </div>
-        <div class="mfg">
-          <label>Status</label>
+        <div class="fg"><label>Status</label>
           <select id="f-status">
             <option value="quoted">Quoted</option>
             <option value="scheduled">Scheduled</option>
@@ -277,357 +249,361 @@
           </select>
         </div>
       </div>
-      <div class="mfg">
-        <label>Notes</label>
-        <textarea id="f-notes" placeholder="Panel upgrade, 200A service..."></textarea>
-      </div>
+      <div class="fg"><label>Notes</label><textarea id="f-notes" placeholder="Panel upgrade, 200A service..."></textarea></div>
     </div>
-    <div class="modal-footer">
-      <button class="m-btn" onclick="closeModal()">Cancel</button>
-      <button class="m-btn primary" onclick="saveJob()"><i class="ti ti-check"></i> Save job</button>
+    <div class="mf">
+      <button class="mbtn" onclick="closeModal()">Cancel</button>
+      <button class="mbtn primary" onclick="saveJob()"><i class="ti ti-check"></i> Save job</button>
     </div>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
 <script>
-const GRID_SIZE = 0.008;
-const STATUS_COLORS = {
-  active: '#1a6eff',
-  quoted: '#BA7517',
-  scheduled: '#1e7e34',
-  complete: '#888888',
-  urgent: '#dc3545'
-};
-const STATUS_BG = {
-  active: 'rgba(26,110,255,0.18)',
-  quoted: 'rgba(186,117,23,0.18)',
-  scheduled: 'rgba(30,126,52,0.15)',
-  complete: 'rgba(136,136,136,0.12)',
-  urgent: 'rgba(220,53,69,0.18)'
-};
-
-let jobs = [
-  {id:1, customer:'Mike Tremblay', address:'14 Dundas St E, Belleville', phone:'(613) 555-0121', type:'Service upgrade', status:'active', notes:'200A panel upgrade', lat:44.1634, lng:-77.3832},
-  {id:2, customer:'Sandra Kowalski', address:'88 Front St, Belleville', phone:'(613) 555-0188', type:'Residential', status:'urgent', notes:'No power to kitchen circuits', lat:44.1598, lng:-77.3801},
-  {id:3, customer:'Peterborough Dev Corp', address:'245 Water St, Peterborough', phone:'(705) 555-0199', type:'Commercial', status:'quoted', notes:'New commercial fit-out', lat:44.3001, lng:-78.3209},
-  {id:4, customer:'Janet Okafor', address:'7 Bridge St, Napanee', phone:'(613) 555-0143', type:'Residential', status:'scheduled', notes:'Lighting upgrade throughout', lat:44.2499, lng:-76.9502},
-  {id:5, customer:'Trenton Marina', address:'Waterfront Dr, Trenton', phone:'(613) 555-0177', type:'Commercial', status:'complete', notes:'Dock electrical complete', lat:44.0965, lng:-77.5785},
+const SC={active:'#1a6eff',quoted:'#BA7517',scheduled:'#1e7e34',complete:'#888',urgent:'#dc3545'};
+const SB={active:'rgba(26,110,255,0.15)',quoted:'rgba(186,117,23,0.15)',scheduled:'rgba(30,126,52,0.12)',complete:'rgba(136,136,136,0.1)',urgent:'rgba(220,53,69,0.15)'};
+const SF={active:'rgba(26,110,255,0.5)',quoted:'rgba(186,117,23,0.5)',scheduled:'rgba(30,126,52,0.45)',complete:'rgba(136,136,136,0.4)',urgent:'rgba(220,53,69,0.5)'};
+const STAGES={residential:['Site visit','Rough-in','Inspection','Final'],commercial:['Design','Permit','Rough-in','Inspection','Final'],panel:['Permit','Rough-in','Inspection','Final'],lighting:['Design','Supply','Install','Commission'],service:['Permit','Disconnect','Install','Inspection']};
+const VIEWS=[
+  {zoom:9, center:[44.3,-77.4]},
+  {zoom:13,center:[44.18,-77.38]},
+  {zoom:16,center:[44.18,-77.38]},
+  {zoom:19,center:[44.18,-77.38]},
 ];
-let nextId = 6;
-let activeFilters = new Set(['active','quoted','scheduled','complete','urgent']);
-let selectedJobId = null;
-let pendingCell = null;
-let editingJobId = null;
-let gridLayer = null;
-let markerLayer = null;
 
-const map = L.map('map', {
-  center: [44.18, -77.38],
-  zoom: 11,
-  zoomControl: true,
-}).setView([44.18, -77.38], 11);
+function cellMeters(z){
+  if(z>=19)return 5;if(z>=18)return 10;if(z>=17)return 20;
+  if(z>=16)return 40;if(z>=14)return 200;if(z>=12)return 600;
+  if(z>=10)return 2000;return 8000;
+}
+function mToDeg(m,lat){return{la:m/111320,lo:m/(111320*Math.cos(lat*Math.PI/180))};}
 
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-  attribution: '© OpenStreetMap © CARTO',
-  subdomains: 'abcd',
-  maxZoom: 19
+let jobs=[
+  {id:1,customer:'Mike Tremblay',address:'14 Dundas St E, Belleville',phone:'(613) 555-0121',type:'panel',status:'active',stage:2,notes:'200A panel upgrade',lat:44.1634,lng:-77.3832,cells:null},
+  {id:2,customer:'Sandra Kowalski',address:'88 Front St, Belleville',phone:'(613) 555-0188',type:'residential',status:'urgent',stage:1,notes:'No power to kitchen circuits',lat:44.1598,lng:-77.3761,cells:null},
+  {id:3,customer:'Peterborough Dev Corp',address:'245 Water St, Peterborough',phone:'(705) 555-0199',type:'commercial',status:'quoted',stage:0,notes:'New commercial fit-out',lat:44.3001,lng:-78.3209,cells:null},
+  {id:4,customer:'Janet Okafor',address:'7 Bridge St, Napanee',phone:'(613) 555-0143',type:'lighting',status:'scheduled',stage:0,notes:'Lighting upgrade throughout',lat:44.2499,lng:-76.9502,cells:null},
+  {id:5,customer:'Trenton Marina',address:'Waterfront Dr, Trenton',phone:'(613) 555-0177',type:'service',status:'complete',stage:4,notes:'Dock electrical complete',lat:44.0965,lng:-77.5785,cells:null},
+];
+let nextId=6,filters=new Set(['active','quoted','scheduled','complete','urgent']);
+let selId=null,pendingLL=null,editId=null,gridLayer=null,searchPin=null,searchTO=null;
+let drawMode=false,selCells=new Set(),pendingCells=null;
+
+const map=L.map('map',{center:[44.18,-77.38],zoom:13,zoomControl:true,scrollWheelZoom:false,touchZoom:false,doubleClickZoom:false});
+map.scrollWheelZoom.disable();
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{
+  attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:20
 }).addTo(map);
 
-markerLayer = L.layerGroup().addTo(map);
+map.on('zoomend moveend',drawGrid);
 
-function getCellKey(lat, lng) {
-  return `${Math.floor(lat/GRID_SIZE)}_${Math.floor(lng/GRID_SIZE)}`;
+function currentLevel(){
+  const z=map.getZoom();
+  if(z>=18)return 3;
+  if(z>=15)return 2;
+  if(z>=12)return 1;
+  return 0;
 }
 
-function getCellBounds(lat, lng) {
-  const s = Math.floor(lat/GRID_SIZE) * GRID_SIZE;
-  const w = Math.floor(lng/GRID_SIZE) * GRID_SIZE;
-  return [[s, w],[s+GRID_SIZE, w+GRID_SIZE]];
+function drillInto(cellCentreLL){
+  const next=Math.min(currentLevel()+1,3);
+  map.flyTo(cellCentreLL,VIEWS[next].zoom,{duration:0.6});
 }
 
-function getJobsInCell(cellKey) {
-  return jobs.filter(j => {
-    const k = getCellKey(j.lat, j.lng);
-    return k === cellKey && activeFilters.has(j.status);
-  });
-}
-
-function getDominantStatus(cellJobs) {
-  const priority = ['urgent','active','quoted','scheduled','complete'];
-  for (const s of priority) {
-    if (cellJobs.some(j => j.status === s)) return s;
+function goView(i){
+  const filtered=jobs.filter(j=>filters.has(j.status));
+  let centre=VIEWS[i].center;
+  if(filtered.length>0){
+    const avgLat=filtered.reduce((s,j)=>s+j.lat,0)/filtered.length;
+    const avgLng=filtered.reduce((s,j)=>s+j.lng,0)/filtered.length;
+    centre=[avgLat,avgLng];
   }
-  return null;
+  map.flyTo(centre,VIEWS[i].zoom,{duration:0.8});
 }
 
-function drawGrid() {
-  if (gridLayer) map.removeLayer(gridLayer);
-  gridLayer = L.layerGroup();
-  const bounds = map.getBounds();
-  const sw = bounds.getSouthWest();
-  const ne = bounds.getNorthEast();
-  const startLat = Math.floor(sw.lat/GRID_SIZE) * GRID_SIZE;
-  const startLng = Math.floor(sw.lng/GRID_SIZE) * GRID_SIZE;
+function getCellDims(){
+  const z=map.getZoom(),lat=map.getCenter().lat;
+  return mToDeg(cellMeters(z),lat);
+}
 
-  const cellMap = {};
-  jobs.forEach(j => {
-    if (!activeFilters.has(j.status)) return;
-    const k = getCellKey(j.lat, j.lng);
-    if (!cellMap[k]) cellMap[k] = [];
+function latLngToCell(latlng){
+  const{la,lo}=getCellDims();
+  const row=Math.floor(latlng.lat/la),col=Math.floor(latlng.lng/lo);
+  return{k:`${row}_${col}`,row,col};
+}
+
+function drawGrid(){
+  if(gridLayer)map.removeLayer(gridLayer);
+  gridLayer=L.layerGroup();
+  const{la,lo}=getCellDims();
+  const b=map.getBounds();
+  const z=map.getZoom();
+  const showProg=z>=18;
+
+  const cellMap={};
+  jobs.forEach(j=>{
+    if(!filters.has(j.status))return;
+    const{k}=latLngToCell({lat:j.lat,lng:j.lng});
+    if(!cellMap[k])cellMap[k]=[];
     cellMap[k].push(j);
+    if(j.cells&&j.cells.length>1){
+      j.cells.forEach(ck=>{
+        if(ck===k)return;
+        if(!cellMap[ck])cellMap[ck]=[];
+        if(!cellMap[ck].find(x=>x.id===j.id))cellMap[ck].push(j);
+      });
+    }
   });
 
-  for (let lat = startLat; lat < ne.lat; lat += GRID_SIZE) {
-    for (let lng = startLng; lng < ne.lng; lng += GRID_SIZE) {
-      const key = getCellKey(lat + GRID_SIZE/2, lng + GRID_SIZE/2);
-      const cellJobs = cellMap[key] || [];
-      const domStatus = getDominantStatus(cellJobs);
-      const hasJobs = cellJobs.length > 0;
-      const urgentCount = cellJobs.filter(j => j.status === 'urgent').length;
+  const sLat=Math.floor(b.getSouth()/la)*la;
+  const sLng=Math.floor(b.getWest()/lo)*lo;
+  const placedIndicators=new Set();
 
-      const rect = L.rectangle(
-        [[lat, lng],[lat+GRID_SIZE, lng+GRID_SIZE]],
-        {
-          color: hasJobs ? STATUS_COLORS[domStatus] : 'rgba(26,110,255,0.15)',
-          weight: hasJobs ? 1.5 : 0.5,
-          fillColor: hasJobs ? STATUS_BG[domStatus] : 'transparent',
-          fillOpacity: 1,
-          interactive: true,
+  for(let lat=sLat;lat<=b.getNorth()+la;lat+=la){
+    for(let lng=sLng;lng<=b.getEast()+lo;lng+=lo){
+      const row=Math.floor((lat+la*0.5)/la),col=Math.floor((lng+lo*0.5)/lo);
+      const k=`${row}_${col}`;
+      const s=row*la,n=s+la,w=col*lo,e=w+lo;
+      const cj=cellMap[k]||[];
+      const hasJ=cj.length>0;
+      const isSel=drawMode&&selCells.has(k);
+      const priority=['urgent','active','quoted','scheduled','complete'];
+      let dom=null;
+      for(const st of priority)if(cj.some(j=>j.status===st)){dom=st;break;}
+      const uCnt=cj.filter(j=>j.status==='urgent').length;
+
+      let fc='transparent',c='rgba(26,110,255,0.15)',wt=0.5;
+      if(isSel){fc='rgba(26,110,255,0.4)';c='#1a6eff';wt=2;}
+      else if(hasJ){fc=SB[dom];c=SC[dom];wt=1.5;}
+
+      const rect=L.rectangle([[s,w],[n,e]],{color:c,weight:wt,fillColor:fc,fillOpacity:1,interactive:true});
+
+      if(drawMode){
+        rect.on('click',ev=>{
+          L.DomEvent.stopPropagation(ev);
+          if(selCells.has(k))selCells.delete(k);else selCells.add(k);
+          const cnt=selCells.size;
+          document.getElementById('draw-cnt').textContent=`${cnt} cell${cnt!==1?'s':''} selected`;
+          drawGrid();
+        });
+      } else {
+        rect.on('click',ev=>{
+          L.DomEvent.stopPropagation(ev);
+          const level=currentLevel();
+          if(level<3){
+            drillInto([s+la/2,w+lo/2]);
+          } else {
+            if(cj.length>0){if(cj.length===1)showDetail(cj[0].id);else renderSb(cj);}
+          }
+        });
+        if(hasJ){
+          rect.on('mouseover',()=>rect.setStyle({weight:2.5}));
+          rect.on('mouseout',()=>rect.setStyle({weight:1.5}));
         }
-      );
-
-      rect.on('click', function(e) {
-        L.DomEvent.stopPropagation(e);
-        const clickLat = lat + GRID_SIZE/2;
-        const clickLng = lng + GRID_SIZE/2;
-        const cj = getJobsInCell(getCellKey(clickLat, clickLng));
-        if (cj.length > 0) {
-          showCellJobs(cj);
-        } else {
-          openAddModal({lat: e.latlng.lat, lng: e.latlng.lng});
-        }
-      });
-
-      rect.on('mouseover', function() {
-        if (hasJobs) rect.setStyle({weight: 2.5});
-      });
-      rect.on('mouseout', function() {
-        rect.setStyle({weight: hasJobs ? 1.5 : 0.5});
-      });
-
+      }
       gridLayer.addLayer(rect);
 
-      if (hasJobs) {
-        const centerLat = lat + GRID_SIZE/2;
-        const centerLng = lng + GRID_SIZE/2;
-        const count = cellJobs.length;
-        const badgeBg = urgentCount > 0 ? '#dc3545' : STATUS_COLORS[domStatus];
-        const icon = L.divIcon({
-          className: '',
-          html: `<div style="
-            background:${badgeBg};color:#fff;border-radius:50%;
-            width:${count > 9 ? 22 : 18}px;height:${count > 9 ? 22 : 18}px;
-            display:flex;align-items:center;justify-content:center;
-            font-size:10px;font-weight:700;
-            font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-            border:2px solid #fff;
-          ">${count}</div>`,
-          iconSize: [24, 24],
-          iconAnchor: [12, 12],
-        });
-        L.marker([centerLat, centerLng], {icon, interactive: false}).addTo(gridLayer);
+      if(hasJ&&!isSel){
+        const cl=s+la/2,cg=w+lo/2;
+        const bg=uCnt>0?'#dc3545':SC[dom];
+        const uniqueJobs=[...new Map(cj.map(j=>[j.id,j])).values()];
+        const unplacedJobs=uniqueJobs.filter(j=>!placedIndicators.has(j.id));
+        if(unplacedJobs.length===0)continue;
+        unplacedJobs.forEach(j=>placedIndicators.add(j.id));
+
+        if(showProg&&uniqueJobs.length===1&&uniqueJobs[0].status==='active'){
+          const j=uniqueJobs[0],stages=STAGES[j.type]||STAGES.residential;
+          const total=stages.length,done=Math.min(j.stage||0,total);
+          const pct=Math.round(done/total*100);
+          const p1=map.latLngToContainerPoint([s,w]);
+          const p2=map.latLngToContainerPoint([n,e]);
+          const cellW=Math.abs(p2.x-p1.x),cellH=Math.abs(p2.y-p1.y);
+          const barW=Math.max(8,cellW-4);
+          const fillW=Math.round(barW*(done/total));
+          const icon=L.divIcon({
+            className:'',
+            html:`<div style="width:${barW}px;pointer-events:none;"><div style="width:${barW}px;height:6px;background:rgba(26,110,255,0.2);border-radius:3px;overflow:hidden;"><div style="width:${fillW}px;height:6px;background:#1a6eff;border-radius:3px;"></div></div></div>`,
+            iconSize:[barW,6],
+            iconAnchor:[barW/2,-Math.round(cellH/2)+6]
+          });
+          L.marker([s+la*0.05,cg],{icon,interactive:false}).addTo(gridLayer);
+        } else {
+          const cnt=uniqueJobs.length;
+          const icon=L.divIcon({className:'',html:`<div style="background:${bg};color:#fff;border-radius:50%;min-width:18px;height:18px;padding:0 4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:-apple-system,sans-serif;border:2px solid #fff;">${cnt}</div>`,iconSize:[18,18],iconAnchor:[9,9]});
+          L.marker([cl,cg],{icon,interactive:false}).addTo(gridLayer);
+        }
       }
     }
   }
   gridLayer.addTo(map);
+  renderSb();
 }
 
-function renderMarkers() {
-  markerLayer.clearLayers();
-  jobs.forEach(j => {
-    if (!activeFilters.has(j.status)) return;
-    const icon = L.divIcon({
-      className: '',
-      html: `<div style="
-        width:12px;height:12px;border-radius:50%;
-        background:${STATUS_COLORS[j.status]};
-        border:2px solid #fff;
-        box-shadow:0 1px 3px rgba(0,0,0,0.3);
-      "></div>`,
-      iconSize:[12,12], iconAnchor:[6,6]
-    });
-    const marker = L.marker([j.lat, j.lng], {icon});
-    marker.on('click', () => showJobDetail(j.id));
-    markerLayer.addLayer(marker);
-  });
-}
-
-function showCellJobs(cellJobs) {
-  if (cellJobs.length === 1) {
-    showJobDetail(cellJobs[0].id);
-  } else {
-    renderSidebar(cellJobs);
-  }
-}
-
-function showJobDetail(id) {
-  const j = jobs.find(x => x.id === id);
-  if (!j) return;
-  selectedJobId = id;
-  document.getElementById('dp-title').textContent = j.customer;
-  document.getElementById('dp-body').innerHTML = `
-    <div class="dp-field"><div class="dp-label">Address</div><div class="dp-value">${j.address}</div></div>
-    <div class="dp-field"><div class="dp-label">Phone</div><div class="dp-value">${j.phone}</div></div>
-    <div class="dp-field"><div class="dp-label">Type</div><div class="dp-value">${j.type}</div></div>
-    <div class="dp-field"><div class="dp-label">Status</div><div class="dp-value"><span style="color:${STATUS_COLORS[j.status]};font-weight:500;text-transform:capitalize">${j.status}</span></div></div>
-    ${j.notes ? `<div class="dp-field"><div class="dp-label">Notes</div><div class="dp-value">${j.notes}</div></div>` : ''}
-  `;
-  document.getElementById('detail-panel').classList.add('open');
-  map.panTo([j.lat, j.lng]);
-  renderSidebar();
-}
-
-function closeDetail() {
-  selectedJobId = null;
-  document.getElementById('detail-panel').classList.remove('open');
-  renderSidebar();
-}
-
-function editJob() {
-  if (!selectedJobId) return;
-  const j = jobs.find(x => x.id === selectedJobId);
-  if (!j) return;
-  editingJobId = selectedJobId;
-  closeDetail();
-  document.getElementById('modal-title').textContent = 'Edit job';
-  document.getElementById('grid-loc-note').style.display = 'none';
-  document.getElementById('f-customer').value = j.customer;
-  document.getElementById('f-phone').value = j.phone;
-  document.getElementById('f-address').value = j.address;
-  document.getElementById('f-type').value = j.type;
-  document.getElementById('f-status').value = j.status;
-  document.getElementById('f-notes').value = j.notes || '';
-  document.getElementById('modal-overlay').classList.add('open');
-}
-
-function deleteJob() {
-  if (!selectedJobId) return;
-  if (confirm('Remove this job from the map?')) {
-    jobs = jobs.filter(j => j.id !== selectedJobId);
-    closeDetail();
-    refresh();
-  }
-}
-
-function viewEstimate() {
-  window.location.href = '/estimator.html';
-}
-
-function openAddModal(cell) {
-  editingJobId = null;
-  pendingCell = cell;
-  document.getElementById('modal-title').textContent = 'Add job to map';
-  document.getElementById('grid-loc-note').style.display = 'flex';
-  document.getElementById('grid-loc-text').textContent = cell
-    ? `Pinned to: ${cell.lat.toFixed(4)}, ${cell.lng.toFixed(4)}`
-    : 'Position will be set to map centre';
-  document.getElementById('f-customer').value = '';
-  document.getElementById('f-phone').value = '';
-  document.getElementById('f-address').value = '';
-  document.getElementById('f-type').value = 'Residential';
-  document.getElementById('f-status').value = 'quoted';
-  document.getElementById('f-notes').value = '';
-  document.getElementById('modal-overlay').classList.add('open');
-}
-
-function closeModal() {
-  document.getElementById('modal-overlay').classList.remove('open');
-  editingJobId = null;
-  pendingCell = null;
-}
-
-function saveJob() {
-  const customer = document.getElementById('f-customer').value.trim();
-  if (!customer) { alert('Please enter a customer name.'); return; }
-  const address = document.getElementById('f-address').value.trim();
-  const loc = pendingCell || { lat: map.getCenter().lat, lng: map.getCenter().lng };
-
-  if (editingJobId) {
-    const j = jobs.find(x => x.id === editingJobId);
-    if (j) {
-      j.customer = customer;
-      j.phone = document.getElementById('f-phone').value;
-      j.address = address;
-      j.type = document.getElementById('f-type').value;
-      j.status = document.getElementById('f-status').value;
-      j.notes = document.getElementById('f-notes').value;
-    }
-  } else {
-    jobs.push({
-      id: nextId++,
-      customer,
-      phone: document.getElementById('f-phone').value,
-      address,
-      type: document.getElementById('f-type').value,
-      status: document.getElementById('f-status').value,
-      notes: document.getElementById('f-notes').value,
-      lat: loc.lat,
-      lng: loc.lng,
-    });
-  }
-  closeModal();
-  refresh();
-}
-
-function toggleFilter(btn) {
-  const status = btn.dataset.status;
-  if (activeFilters.has(status)) {
-    activeFilters.delete(status);
-    btn.classList.remove('on');
-  } else {
-    activeFilters.add(status);
-    btn.classList.add('on');
-  }
-  refresh();
-}
-
-function renderSidebar(highlight) {
-  const list = document.getElementById('jobs-list');
-  const filtered = jobs.filter(j => activeFilters.has(j.status));
-  document.getElementById('stat-total').textContent = filtered.length;
-  document.getElementById('stat-active').textContent = filtered.filter(j => j.status === 'active').length;
-  document.getElementById('stat-urgent').textContent = filtered.filter(j => j.status === 'urgent').length;
-
-  if (filtered.length === 0) {
-    list.innerHTML = '<div class="sidebar-empty">No jobs match the current filters.</div>';
-    return;
-  }
-  const toShow = highlight || filtered;
-  list.innerHTML = toShow.map(j => `
-    <div class="job-item ${selectedJobId === j.id ? 'selected' : ''}" onclick="showJobDetail(${j.id})">
-      <div class="job-dot" style="background:${STATUS_COLORS[j.status]}"></div>
-      <div class="job-info">
-        <div class="job-name">${j.customer}</div>
-        <div class="job-meta">${j.address}</div>
-      </div>
-      <span class="job-status" style="background:${STATUS_BG[j.status]};color:${STATUS_COLORS[j.status]}">${j.status}</span>
-    </div>
-  `).join('');
-}
-
-function refresh() {
+function startAddJob(){
+  selCells.clear();
+  drawMode=true;
+  pendingCells=null;
+  const bar=document.getElementById('draw-bar');
+  bar.classList.add('show');
+  document.getElementById('draw-cnt').textContent='0 selected';
   drawGrid();
-  renderMarkers();
-  renderSidebar();
 }
 
-map.on('moveend zoomend', drawGrid);
-map.on('click', function(e) {
-  closeDetail();
-});
+function toggleDraw(){
+  drawMode=!drawMode;selCells.clear();
+  const bar=document.getElementById('draw-bar');
+  if(drawMode){bar.classList.add('show');}
+  else{bar.classList.remove('show');}
+  drawGrid();
+}
 
-refresh();
+function confirmDraw(){
+  pendingCells=selCells.size>0?Array.from(selCells):null;
+  const{la,lo}=getCellDims();
+  if(pendingCells){
+    const[row,col]=pendingCells[0].split('_').map(Number);
+    pendingLL={lat:row*la+la/2,lng:col*lo+lo/2};
+  } else {
+    pendingLL=map.getCenter();
+  }
+  drawMode=false;selCells.clear();
+  document.getElementById('draw-bar').classList.remove('show');
+  document.getElementById('m-title').textContent='Add job';
+  document.getElementById('pin-note').style.display='flex';
+  document.getElementById('pin-text').textContent=pendingCells
+    ?`${pendingCells.length} cell${pendingCells.length!==1?'s':''} selected as job footprint`
+    :'No area drawn — pinned to map centre';
+  ['f-cust','f-phone','f-addr','f-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-type').value='residential';
+  document.getElementById('f-status').value='quoted';
+  document.getElementById('overlay').classList.add('open');
+  drawGrid();
+}
+
+function cancelDraw(){
+  drawMode=false;selCells.clear();
+  document.getElementById('draw-bar').classList.remove('show');
+  drawGrid();
+}
+
+function showDetail(id){
+  const j=jobs.find(x=>x.id===id);if(!j)return;selId=id;
+  const stages=STAGES[j.type]||STAGES.residential,done=Math.min(j.stage||0,stages.length);
+  let sh='';
+  if(j.status==='active'){
+    const pct=Math.round(done/stages.length*100);
+    sh=`<div class="prog-wrap"><div class="dpl">Progress — ${pct}%</div><div class="prog-row">${stages.map((_,i)=>`<div class="prog-s ${i<done?'done':''}" title="${stages[i]}" onclick="setStage(${id},${i+1})"></div>`).join('')}</div><div class="prog-lbls"><span>${stages[0]}</span><span>${stages[stages.length-1]}</span></div></div>`;
+  }
+  document.getElementById('dp-title').textContent=j.customer;
+  document.getElementById('dp-body').innerHTML=`${sh}<div class="dpf"><div class="dpl">Address</div><div class="dpv">${j.address||'—'}</div></div><div class="dpf"><div class="dpl">Phone</div><div class="dpv">${j.phone||'—'}</div></div><div class="dpf"><div class="dpl">Type</div><div class="dpv" style="text-transform:capitalize">${j.type}</div></div><div class="dpf"><div class="dpl">Status</div><div class="dpv"><span style="color:${SC[j.status]};font-weight:500;text-transform:capitalize">${j.status}</span></div></div>${j.notes?`<div class="dpf"><div class="dpl">Notes</div><div class="dpv">${j.notes}</div></div>`:''}`;
+  document.getElementById('dpanel').classList.add('open');
+  map.panTo([j.lat,j.lng]);
+  renderSb();
+}
+
+function setStage(id,s){const j=jobs.find(x=>x.id===id);if(j){j.stage=s;showDetail(id);drawGrid();}}
+function closeDetail(){selId=null;document.getElementById('dpanel').classList.remove('open');renderSb();}
+
+function doEdit(){
+  if(!selId)return;const j=jobs.find(x=>x.id===selId);if(!j)return;
+  editId=selId;closeDetail();
+  document.getElementById('m-title').textContent='Edit job';
+  document.getElementById('pin-note').style.display='none';
+  document.getElementById('f-cust').value=j.customer;
+  document.getElementById('f-phone').value=j.phone;
+  document.getElementById('f-addr').value=j.address;
+  document.getElementById('f-type').value=j.type;
+  document.getElementById('f-status').value=j.status;
+  document.getElementById('f-notes').value=j.notes||'';
+  document.getElementById('overlay').classList.add('open');
+}
+
+function doDelete(){
+  if(!selId)return;
+  if(confirm('Remove this job?')){jobs=jobs.filter(j=>j.id!==selId);closeDetail();drawGrid();}
+}
+
+function openAdd(ll){
+  editId=null;pendingLL=ll;pendingCells=null;
+  document.getElementById('m-title').textContent='Add job to map';
+  document.getElementById('pin-note').style.display='flex';
+  document.getElementById('pin-text').textContent=ll?`Pinned: ${ll.lat.toFixed(5)}, ${ll.lng.toFixed(5)}`:'Pinned to map centre';
+  ['f-cust','f-phone','f-addr','f-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-type').value='residential';
+  document.getElementById('f-status').value='quoted';
+  document.getElementById('overlay').classList.add('open');
+}
+
+function closeModal(){document.getElementById('overlay').classList.remove('open');editId=null;pendingLL=null;pendingCells=null;}
+
+function saveJob(){
+  const cust=document.getElementById('f-cust').value.trim();
+  if(!cust){alert('Please enter a customer name.');return;}
+  const ll=pendingLL||map.getCenter();
+  if(editId){
+    const j=jobs.find(x=>x.id===editId);
+    if(j){j.customer=cust;j.phone=document.getElementById('f-phone').value;j.address=document.getElementById('f-addr').value;j.type=document.getElementById('f-type').value;j.status=document.getElementById('f-status').value;j.notes=document.getElementById('f-notes').value;}
+  } else {
+    jobs.push({id:nextId++,customer:cust,phone:document.getElementById('f-phone').value,address:document.getElementById('f-addr').value,type:document.getElementById('f-type').value,status:document.getElementById('f-status').value,notes:document.getElementById('f-notes').value,stage:0,lat:ll.lat,lng:ll.lng,cells:pendingCells||null});
+  }
+  closeModal();drawGrid();
+}
+
+function toggleF(btn){
+  const s=btn.dataset.s;
+  if(filters.has(s)){filters.delete(s);btn.classList.remove('on');}else{filters.add(s);btn.classList.add('on');}
+  drawGrid();
+}
+
+function renderSb(highlight){
+  const filtered=jobs.filter(j=>filters.has(j.status));
+  document.getElementById('st-total').textContent=filtered.length;
+  document.getElementById('st-active').textContent=filtered.filter(j=>j.status==='active').length;
+  document.getElementById('st-urgent').textContent=filtered.filter(j=>j.status==='urgent').length;
+  const list=document.getElementById('jlist'),show=highlight||filtered;
+  if(!show.length){list.innerHTML='<div class="sempty">No jobs yet.<br>Click any grid cell to add one.</div>';return;}
+  list.innerHTML=show.map(j=>`<div class="ji ${selId===j.id?'sel':''}" onclick="showDetail(${j.id})"><div class="jd" style="background:${SC[j.status]}"></div><div class="jinfo"><div class="jn">${j.customer}</div><div class="jm">${j.address||'No address'}</div></div><span class="jt" style="background:${SB[j.status]};color:${SC[j.status]}">${j.status}</span></div>`).join('');
+}
+
+const sinput=document.getElementById('sinput'),sclr=document.getElementById('sclr'),sr=document.getElementById('sr');
+sinput.addEventListener('input',()=>{
+  const q=sinput.value.trim();sclr.style.display=q?'block':'none';
+  clearTimeout(searchTO);
+  if(q.length<3){sr.classList.remove('show');return;}
+  searchTO=setTimeout(()=>doSearch(q),400);
+});
+sinput.addEventListener('keydown',e=>{if(e.key==='Escape')clearSearch();});
+document.addEventListener('click',e=>{if(!e.target.closest('.float-card'))sr.classList.remove('show');});
+
+async function doSearch(q){
+  sr.classList.add('show');sr.innerHTML='<div class="sr-msg"><div class="spinner"></div>Searching...</div>';
+  try{
+    const res=await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q+', Ontario, Canada')}&format=json&limit=5`,{headers:{'Accept-Language':'en'}});
+    const data=await res.json();
+    if(!data.length){sr.innerHTML='<div class="sr-msg">No results found</div>';return;}
+    sr.innerHTML=data.map(r=>{
+      const name=r.display_name.split(',').slice(0,2).join(',');
+      const sub=r.display_name.split(',').slice(2,4).join(',');
+      return`<div class="sri" onclick="flyTo(${r.lat},${r.lon},'${name.replace(/'/g,"\\'")}')"><i class="ti ti-map-pin"></i><div><div class="sri-n">${name}</div><div class="sri-s">${sub}</div></div></div>`;
+    }).join('');
+  }catch(e){sr.innerHTML='<div class="sr-msg">Search unavailable</div>';}
+}
+
+function flyTo(lat,lng,label){
+  sinput.value=label;sr.classList.remove('show');sclr.style.display='block';
+  if(searchPin)map.removeLayer(searchPin);
+  map.flyTo([lat,lng],19,{duration:1.2});
+  const icon=L.divIcon({className:'',html:`<div style="width:12px;height:12px;border-radius:50%;background:#1a6eff;border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3)"></div>`,iconSize:[12,12],iconAnchor:[6,6]});
+  searchPin=L.marker([lat,lng],{icon}).addTo(map);
+}
+
+function clearSearch(){
+  sinput.value='';sclr.style.display='none';sr.classList.remove('show');
+  if(searchPin){map.removeLayer(searchPin);searchPin=null;}
+}
+
+map.on('click',()=>{closeDetail();sr.classList.remove('show');});
+drawGrid();
 </script>
 </body>
 </html>
