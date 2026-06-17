@@ -181,17 +181,34 @@
 </div>
 
 <script>
-const SC={active:'#1a6eff',quoted:'#BA7517',scheduled:'#1e7e34',complete:'#888',urgent:'#dc3545'};
+const SUPABASE_URL='https://vojgddmlwakvhmbkzfld.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvamdkZG1sd2FrdmhtYmt6ZmxkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NDQ1MzAsImV4cCI6MjA5NzIyMDUzMH0.PGu1HeCZ3SsMgRyLC_s4xP8m3Qt73NlRyvzA-hFroEk';
+const TABLE='"Projects"';
+
+async function dbFetch(path,opts={}){
+  const res=await fetch(`${SUPABASE_URL}/rest/v1/${path}`,{
+    headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json','Prefer':'return=representation',...(opts.headers||{})},
+    ...opts
+  });
+  if(!res.ok){const e=await res.text();throw new Error(e);}
+  const text=await res.text();
+  return text?JSON.parse(text):[];
+}
+
+function dbToJob(r){
+  return{
+    id:r.id,customer:r.customer||'',address:r.address||'',phone:r.phone||'',
+    email:r.email||'',type:r.type||'residential',status:r.status||'quoted',
+    stage:r.stage||0,notes:r.notes||'',lat:r.lat,lng:r.lng,
+    cells:r.cells?JSON.parse(r.cells):null,
+    customStages:r.custom_stages?JSON.parse(r.custom_stages):null,
+    customFields:r.custom_fields?JSON.parse(r.custom_fields):{},
+  };
+}
 const SB={active:'rgba(26,110,255,0.12)',quoted:'rgba(186,117,23,0.12)',scheduled:'rgba(30,126,52,0.1)',complete:'rgba(136,136,136,0.1)',urgent:'rgba(220,53,69,0.12)'};
 const STAGES={residential:['Site visit','Rough-in','Inspection','Final'],commercial:['Design','Permit','Rough-in','Inspection','Final'],panel:['Permit','Rough-in','Inspection','Final'],lighting:['Design','Supply','Install','Commission'],service:['Permit','Disconnect','Install','Inspection']};
 
-let jobs=[
-  {id:1,customer:'Mike Tremblay',address:'14 Dundas St E, Belleville',phone:'(613) 555-0121',email:'',type:'panel',status:'active',stage:2,notes:'200A panel upgrade',customStages:null,customFields:{}},
-  {id:2,customer:'Sandra Kowalski',address:'88 Front St, Belleville',phone:'(613) 555-0188',email:'',type:'residential',status:'urgent',stage:1,notes:'No power to kitchen circuits',customStages:null,customFields:{}},
-  {id:3,customer:'Peterborough Dev Corp',address:'245 Water St, Peterborough',phone:'(705) 555-0199',email:'',type:'commercial',status:'quoted',stage:0,notes:'New commercial fit-out',customStages:null,customFields:{}},
-  {id:4,customer:'Janet Okafor',address:'7 Bridge St, Napanee',phone:'(613) 555-0143',email:'',type:'lighting',status:'scheduled',stage:0,notes:'Lighting upgrade throughout',customStages:null,customFields:{}},
-  {id:5,customer:'Trenton Marina',address:'Waterfront Dr, Trenton',phone:'(613) 555-0177',email:'',type:'service',status:'complete',stage:4,notes:'Dock electrical complete',customStages:null,customFields:{}},
-];
+let jobs=[];
 let nextId=6;
 let filters=new Set(['active','quoted','scheduled','complete','urgent']);
 let expandedId=null;
@@ -204,6 +221,27 @@ let customColumns=[
   {key:'type',label:'Type',core:true},
   {key:'progress',label:'Progress',core:true},
 ];
+
+async function loadJobs(){
+  try{
+    const rows=await dbFetch(`${TABLE}?select=*&order=created_at.desc`);
+    jobs=rows.map(dbToJob);
+  }catch(e){console.error('Load error:',e);}
+  renderTable();
+}
+
+async function persistJob(j){
+  const data={
+    customer:j.customer,address:j.address,phone:j.phone,email:j.email||'',
+    type:j.type,status:j.status,stage:j.stage,notes:j.notes,
+    lat:j.lat||null,lng:j.lng||null,
+    cells:j.cells?JSON.stringify(j.cells):null,
+    custom_stages:j.customStages?JSON.stringify(j.customStages):null,
+    custom_fields:j.customFields?JSON.stringify(j.customFields):null,
+  };
+  try{await dbFetch(`${TABLE}?id=eq.${j.id}`,{method:'PATCH',body:JSON.stringify(data)});}
+  catch(e){console.error('Save error:',e);}
+}
 
 function getStages(j){return j.customStages||(STAGES[j.type]||STAGES.residential);}
 
@@ -360,15 +398,15 @@ function setSort(col){
 }
 
 function updateField(id,field,value){
-  const j=jobs.find(x=>x.id===id);if(j)j[field]=value;
+  const j=jobs.find(x=>x.id===id);if(j){j[field]=value;persistJob(j);}
 }
 
 function updateCustomField(id,key,value){
-  const j=jobs.find(x=>x.id===id);if(j){if(!j.customFields)j.customFields={};j.customFields[key]=value;}
+  const j=jobs.find(x=>x.id===id);if(j){if(!j.customFields)j.customFields={};j.customFields[key]=value;persistJob(j);}
 }
 
 function resetStages(id){
-  const j=jobs.find(x=>x.id===id);if(j){j.customStages=null;j.stage=0;}
+  const j=jobs.find(x=>x.id===id);if(j){j.customStages=null;j.stage=0;persistJob(j);}
   renderTable();
 }
 
@@ -376,8 +414,8 @@ function toggleStage(id,idx){
   const j=jobs.find(x=>x.id===id);if(!j)return;
   const stages=getStages(j);
   const done=Math.min(j.stage||0,stages.length);
-  if(idx<done){j.stage=idx;}
-  else{j.stage=idx+1;}
+  if(idx<done){j.stage=idx;}else{j.stage=idx+1;}
+  persistJob(j);
   renderTable();
 }
 
@@ -385,12 +423,14 @@ function updateStageName(id,idx,value){
   const j=jobs.find(x=>x.id===id);if(!j)return;
   if(!j.customStages)j.customStages=[...getStages(j)];
   j.customStages[idx]=value;
+  persistJob(j);
 }
 
 function addStage(id){
   const j=jobs.find(x=>x.id===id);if(!j)return;
   if(!j.customStages)j.customStages=[...getStages(j)];
   j.customStages.push('New stage');
+  persistJob(j);
   renderTable();
 }
 
@@ -399,21 +439,26 @@ function deleteStage(id,idx){
   if(!j.customStages)j.customStages=[...getStages(j)];
   j.customStages.splice(idx,1);
   if(j.stage>j.customStages.length)j.stage=j.customStages.length;
+  persistJob(j);
   renderTable();
 }
 
-function deleteJob(id){
+async function deleteJob(id){
   if(!confirm('Delete this job permanently?'))return;
-  jobs=jobs.filter(j=>j.id!==id);
+  try{await dbFetch(`${TABLE}?id=eq.${id}`,{method:'DELETE'});}
+  catch(e){console.error(e);}
   expandedId=null;
-  renderTable();
+  await loadJobs();
 }
 
-function addJob(){
-  jobs.push({id:nextId++,customer:'New job',address:'',phone:'',email:'',type:'residential',status:'quoted',stage:0,notes:'',customStages:null,customFields:{}});
-  expandedId=jobs[jobs.length-1].id;
-  renderTable();
-  setTimeout(()=>document.querySelector('.exp-panel .exp-input')?.focus(),100);
+async function addJob(){
+  const data={customer:'New job',address:'',phone:'',email:'',type:'residential',status:'quoted',stage:0,notes:'',custom_fields:JSON.stringify({})};
+  try{
+    const rows=await dbFetch(TABLE,{method:'POST',body:JSON.stringify(data)});
+    if(rows&&rows[0])expandedId=rows[0].id;
+    await loadJobs();
+    setTimeout(()=>document.querySelector('.exp-panel .exp-input')?.focus(),100);
+  }catch(e){console.error(e);}
 }
 
 function openModal(){document.getElementById('overlay').classList.add('open');}
@@ -439,7 +484,7 @@ function removeCustomCol(key){
   renderTable();
 }
 
-renderTable();
+loadJobs();
 </script>
 </body>
 </html>

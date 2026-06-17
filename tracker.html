@@ -288,16 +288,65 @@ function cellMeters(z){
 }
 function mToDeg(m,lat){return{la:m/111320,lo:m/(111320*Math.cos(lat*Math.PI/180))};}
 
-let jobs=[
-  {id:1,customer:'Mike Tremblay',address:'14 Dundas St E, Belleville',phone:'(613) 555-0121',type:'panel',status:'active',stage:2,notes:'200A panel upgrade',lat:44.1634,lng:-77.3832,cells:null},
-  {id:2,customer:'Sandra Kowalski',address:'88 Front St, Belleville',phone:'(613) 555-0188',type:'residential',status:'urgent',stage:1,notes:'No power to kitchen circuits',lat:44.1598,lng:-77.3761,cells:null},
-  {id:3,customer:'Peterborough Dev Corp',address:'245 Water St, Peterborough',phone:'(705) 555-0199',type:'commercial',status:'quoted',stage:0,notes:'New commercial fit-out',lat:44.3001,lng:-78.3209,cells:null},
-  {id:4,customer:'Janet Okafor',address:'7 Bridge St, Napanee',phone:'(613) 555-0143',type:'lighting',status:'scheduled',stage:0,notes:'Lighting upgrade throughout',lat:44.2499,lng:-76.9502,cells:null},
-  {id:5,customer:'Trenton Marina',address:'Waterfront Dr, Trenton',phone:'(613) 555-0177',type:'service',status:'complete',stage:4,notes:'Dock electrical complete',lat:44.0965,lng:-77.5785,cells:null},
-];
-let nextId=6,filters=new Set(['active','quoted','scheduled','complete','urgent']);
+const SUPABASE_URL='https://vojgddmlwakvhmbkzfld.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvamdkZG1sd2FrdmhtYmt6ZmxkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NDQ1MzAsImV4cCI6MjA5NzIyMDUzMH0.PGu1HeCZ3SsMgRyLC_s4xP8m3Qt73NlRyvzA-hFroEk';
+const TABLE='"Projects"';
+
+async function dbFetch(path,opts={}){
+  const res=await fetch(`${SUPABASE_URL}/rest/v1/${path}`,{
+    headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json','Prefer':'return=representation',...(opts.headers||{})},
+    ...opts
+  });
+  if(!res.ok){const e=await res.text();throw new Error(e);}
+  const text=await res.text();
+  return text?JSON.parse(text):[];
+}
+
+function dbToJob(r){
+  return{
+    id:r.id,
+    customer:r.customer||'',
+    address:r.address||'',
+    phone:r.phone||'',
+    email:r.email||'',
+    type:r.type||'residential',
+    status:r.status||'quoted',
+    stage:r.stage||0,
+    notes:r.notes||'',
+    lat:r.lat||44.18,
+    lng:r.lng||-77.38,
+    cells:r.cells?JSON.parse(r.cells):null,
+    customStages:r.custom_stages?JSON.parse(r.custom_stages):null,
+    customFields:r.custom_fields?JSON.parse(r.custom_fields):{},
+  };
+}
+
+function jobToDb(j){
+  return{
+    customer:j.customer,address:j.address,phone:j.phone,email:j.email||'',
+    type:j.type,status:j.status,stage:j.stage,notes:j.notes,
+    lat:j.lat,lng:j.lng,
+    cells:j.cells?JSON.stringify(j.cells):null,
+    custom_stages:j.customStages?JSON.stringify(j.customStages):null,
+    custom_fields:j.customFields?JSON.stringify(j.customFields):null,
+  };
+}
+
+let jobs=[];
+let filters=new Set(['active','quoted','scheduled','complete','urgent']);
 let selId=null,pendingLL=null,editId=null,gridLayer=null,searchPin=null,searchTO=null;
 let drawMode=false,selCells=new Set(),pendingCells=null;
+
+async function loadJobs(){
+  try{
+    const rows=await dbFetch(`${TABLE}?select=*&order=created_at.desc`);
+    jobs=rows.map(dbToJob);
+  } catch(e){
+    console.error('Failed to load projects:',e);
+    jobs=[];
+  }
+  drawGrid();
+}
 
 const map=L.map('map',{center:[44.18,-77.38],zoom:13,zoomControl:true,scrollWheelZoom:false,touchZoom:false,doubleClickZoom:false});
 map.scrollWheelZoom.disable();
@@ -509,7 +558,6 @@ function showDetail(id){
   renderSb();
 }
 
-function setStage(id,s){const j=jobs.find(x=>x.id===id);if(j){j.stage=s;showDetail(id);drawGrid();}}
 function closeDetail(){selId=null;document.getElementById('dpanel').classList.remove('open');renderSb();}
 
 function doEdit(){
@@ -526,9 +574,14 @@ function doEdit(){
   document.getElementById('overlay').classList.add('open');
 }
 
-function doDelete(){
+async function doDelete(){
   if(!selId)return;
-  if(confirm('Remove this job?')){jobs=jobs.filter(j=>j.id!==selId);closeDetail();drawGrid();}
+  if(confirm('Remove this job?')){
+    try{await dbFetch(`${TABLE}?id=eq.${selId}`,{method:'DELETE'});}
+    catch(e){console.error(e);}
+    closeDetail();
+    await loadJobs();
+  }
 }
 
 function openAdd(ll){
@@ -544,18 +597,39 @@ function openAdd(ll){
 
 function closeModal(){document.getElementById('overlay').classList.remove('open');editId=null;pendingLL=null;pendingCells=null;}
 
-function saveJob(){
+async function saveJob(){
   const cust=document.getElementById('f-cust').value.trim();
   if(!cust){alert('Please enter a customer name.');return;}
   const ll=pendingLL||map.getCenter();
-  if(editId){
-    const j=jobs.find(x=>x.id===editId);
-    if(j){j.customer=cust;j.phone=document.getElementById('f-phone').value;j.address=document.getElementById('f-addr').value;j.type=document.getElementById('f-type').value;j.status=document.getElementById('f-status').value;j.notes=document.getElementById('f-notes').value;}
-  } else {
-    jobs.push({id:nextId++,customer:cust,phone:document.getElementById('f-phone').value,address:document.getElementById('f-addr').value,type:document.getElementById('f-type').value,status:document.getElementById('f-status').value,notes:document.getElementById('f-notes').value,stage:0,lat:ll.lat,lng:ll.lng,cells:pendingCells||null});
-  }
-  closeModal();drawGrid();
+  const data={
+    customer:cust,phone:document.getElementById('f-phone').value,
+    address:document.getElementById('f-addr').value,type:document.getElementById('f-type').value,
+    status:document.getElementById('f-status').value,notes:document.getElementById('f-notes').value,
+    stage:0,lat:ll.lat,lng:ll.lng,
+    cells:pendingCells?JSON.stringify(pendingCells):null,
+    custom_stages:null,custom_fields:JSON.stringify({})
+  };
+  try{
+    if(editId){
+      await dbFetch(`${TABLE}?id=eq.${editId}`,{method:'PATCH',body:JSON.stringify(data)});
+    } else {
+      await dbFetch(`${TABLE}`,{method:'POST',body:JSON.stringify(data)});
+    }
+    await loadJobs();
+  } catch(e){alert('Error saving: '+e.message);}
+  closeModal();
 }
+
+async function setStage(id,s){
+  const j=jobs.find(x=>x.id===id);if(!j)return;
+  j.stage=s;
+  try{await dbFetch(`${TABLE}?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({stage:s})});}
+  catch(e){console.error(e);}
+  showDetail(id);drawGrid();
+}
+
+map.on('click',()=>{closeDetail();sr.classList.remove('show');});
+loadJobs();
 
 function toggleF(btn){
   const s=btn.dataset.s;
@@ -661,9 +735,6 @@ function clearSearch(){
   sinput.value='';sclr.style.display='none';sr.classList.remove('show');
   if(searchPin){map.removeLayer(searchPin);searchPin=null;}
 }
-
-map.on('click',()=>{closeDetail();sr.classList.remove('show');});
-drawGrid();
 </script>
 </body>
 </html>
