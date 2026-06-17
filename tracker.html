@@ -401,20 +401,15 @@ function drawGrid(){
   const b=map.getBounds();
   const z=map.getZoom();
   const showProg=z>=18;
+  const isProperty=z>=17;
 
   const cellMap={};
   jobs.forEach(j=>{
     if(!filters.has(j.status))return;
+    if(!j.lat||!j.lng)return;
     const{k}=latLngToCell({lat:j.lat,lng:j.lng});
     if(!cellMap[k])cellMap[k]=[];
     cellMap[k].push(j);
-    if(j.cells&&j.cells.length>1){
-      j.cells.forEach(ck=>{
-        if(ck===k)return;
-        if(!cellMap[ck])cellMap[ck]=[];
-        if(!cellMap[ck].find(x=>x.id===j.id))cellMap[ck].push(j);
-      });
-    }
   });
 
   const sLat=Math.floor(b.getSouth()/la)*la;
@@ -500,6 +495,26 @@ function drawGrid(){
     }
   }
   gridLayer.addTo(map);
+
+  // At property zoom, draw actual cell footprints for jobs that have drawn areas
+  if(isProperty){
+    jobs.forEach(j=>{
+      if(!filters.has(j.status))return;
+      if(!j.cells||j.cells.length===0)return;
+      j.cells.forEach(ck=>{
+        const parts=ck.split('_');
+        if(parts.length!==2)return;
+        const row=parseInt(parts[0]),col=parseInt(parts[1]);
+        const s=row*la,n=s+la,w=col*lo,e=w+lo;
+        const fr=L.rectangle([[s,w],[n,e]],{
+          color:SC[j.status],weight:2,
+          fillColor:SB[j.status],fillOpacity:1,interactive:false
+        });
+        fr.addTo(map);
+      });
+    });
+  }
+
   renderSb();
 }
 
