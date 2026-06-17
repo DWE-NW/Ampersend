@@ -21,12 +21,11 @@
     .nsep{width:0.5px;height:18px;background:var(--border);}
     .ntitle{font-size:13px;font-weight:500;}
     .nr{display:flex;align-items:center;gap:8px;}
-    .nbtn{padding:6px 12px;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:var(--white);color:var(--black);display:flex;align-items:center;gap:5px;font-family:inherit;}
+    .nbtn{padding:6px 12px;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:var(--white);color:var(--black);display:flex;align-items:center;gap:5px;font-family:inherit;text-decoration:none;}
     .nbtn:hover{background:var(--surface);}
     .nbtn.primary{background:var(--black);color:#fff;border-color:var(--black);}
     .nbtn.primary:hover{background:#333;}
     .nbtn.drawing{background:var(--blue);color:#fff;border-color:var(--blue);}
-
     .body{display:flex;height:calc(100vh - 52px);}
     .sidebar{width:290px;flex-shrink:0;background:var(--white);border-right:0.5px solid var(--border);display:flex;flex-direction:column;overflow:hidden;z-index:500;}
     .sbh{padding:12px 14px;border-bottom:0.5px solid var(--border);}
@@ -53,7 +52,6 @@
     .jinfo{flex:1;min-width:0;}
     .jn{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .jm{font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .jt{font-size:10px;font-weight:500;text-transform:capitalize;padding:2px 6px;border-radius:3px;white-space:nowrap;flex-shrink:0;margin-top:2px;}
     .sempty{padding:2rem 1rem;text-align:center;color:var(--muted);font-size:13px;line-height:1.6;}
     .jgroup-header{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;cursor:pointer;border-bottom:0.5px solid var(--border);background:var(--surface);user-select:none;}
     .jgroup-header:hover{background:#efefed;}
@@ -64,11 +62,8 @@
     .jgroup-chevron{font-size:13px;color:var(--muted);transition:transform 0.2s;}
     .jgroup-chevron.open{transform:rotate(180deg);}
     .jgroup-body{overflow:hidden;}
-
     .mapwrap{flex:1;position:relative;}
     #map{width:100%;height:100%;}
-
-    /* FLOAT CARD */
     .float-card{position:absolute;top:1rem;right:4rem;z-index:900;background:var(--white);border:0.5px solid var(--border);border-radius:10px;width:310px;box-shadow:0 4px 16px rgba(0,0,0,0.08);overflow:visible;}
     .fc-search{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:0.5px solid var(--border);}
     .fc-search i{color:var(--muted);font-size:16px;flex-shrink:0;}
@@ -91,38 +86,32 @@
     .sr-msg{padding:10px 12px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px;}
     .spinner{width:12px;height:12px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0;}
     @keyframes spin{to{transform:rotate(360deg);}}
-
     .legend{position:absolute;bottom:1rem;left:1rem;z-index:900;background:var(--white);border:0.5px solid var(--border);border-radius:8px;padding:10px 12px;}
     .lt{font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
     .li{display:flex;align-items:center;gap:7px;font-size:11px;padding:2px 0;}
     .ld{width:10px;height:10px;border-radius:2px;}
-
     .draw-bar{position:absolute;bottom:1rem;right:1rem;z-index:900;background:var(--white);border:1.5px solid var(--blue);border-radius:8px;padding:10px 14px;display:none;align-items:center;gap:10px;box-shadow:0 4px 12px rgba(26,110,255,0.15);}
     .draw-bar.show{display:flex;}
     .draw-msg{font-size:12px;color:var(--blue);font-weight:500;}
     .draw-cnt{font-size:12px;color:var(--muted);}
-
     .dpanel{position:absolute;top:1rem;right:4rem;z-index:900;width:280px;background:var(--white);border:0.5px solid var(--border);border-radius:8px;display:none;margin-top:116px;}
     .dpanel.open{display:block;}
     .dph{padding:11px 14px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
     .dph-t{font-size:13px;font-weight:500;}
     .dph-x{background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;line-height:1;}
     .dpb{padding:12px 14px;}
-    .dpf{margin-bottom:9px;}
-    .dpl{font-size:10px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;}
+    .dpf{margin-bottom:10px;}
+    .dpl{font-size:10px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
     .dpv{font-size:13px;}
-    .prog-wrap{margin-bottom:10px;}
-    .prog-row{display:flex;gap:3px;margin-top:5px;}
-    .prog-s{flex:1;height:6px;border-radius:2px;background:var(--surface);border:0.5px solid var(--border);cursor:pointer;}
-    .prog-s.done{background:var(--sa);border-color:var(--sa);}
-    .prog-lbls{display:flex;justify-content:space-between;margin-top:3px;}
-    .prog-lbls span{font-size:10px;color:var(--muted);}
+    /* Current stage chip */
+    .stage-chip{display:inline-flex;align-items:center;gap:5px;background:var(--blue-light);color:var(--blue);font-size:12px;font-weight:500;padding:4px 10px;border-radius:4px;margin-bottom:4px;}
+    .stage-chip i{font-size:11px;}
+    .stage-progress{font-size:11px;color:var(--muted);margin-top:2px;}
     .dpa{padding:10px 14px;border-top:0.5px solid var(--border);display:flex;gap:7px;}
     .dbtn{flex:1;padding:7px 4px;border-radius:4px;font-size:11px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:var(--white);color:var(--black);font-family:inherit;display:flex;align-items:center;justify-content:center;gap:4px;}
     .dbtn:hover{background:var(--surface);}
     .dbtn.primary{background:var(--black);color:#fff;border-color:var(--black);}
     .dbtn.primary:hover{background:#333;}
-
     .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:2000;display:none;align-items:center;justify-content:center;}
     .overlay.open{display:flex;}
     .modal{background:var(--white);border-radius:8px;width:420px;max-width:95vw;border:0.5px solid var(--border);}
@@ -136,6 +125,14 @@
     .fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,110,255,0.1);}
     .fg textarea{resize:vertical;min-height:56px;}
     .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .addr-row{display:flex;gap:6px;align-items:flex-end;}
+    .addr-row .fg{flex:1;margin-bottom:0;}
+    .addr-row .nbtn{flex-shrink:0;height:36px;margin-bottom:11px;}
+    .addr-results{background:var(--white);border:0.5px solid var(--border);border-radius:4px;margin-bottom:11px;display:none;max-height:160px;overflow-y:auto;}
+    .addr-results.show{display:block;}
+    .addr-result-item{padding:8px 10px;font-size:12px;cursor:pointer;border-bottom:0.5px solid var(--border);}
+    .addr-result-item:last-child{border-bottom:none;}
+    .addr-result-item:hover{background:var(--surface);}
     .pin-note{font-size:11px;color:var(--blue);padding:6px 9px;background:var(--blue-light);border-radius:4px;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
     .mf{padding:10px 1.25rem;border-top:0.5px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
     .mbtn{padding:8px 18px;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:var(--white);color:var(--black);font-family:inherit;}
@@ -229,6 +226,7 @@
   </div>
 </div>
 
+<!-- ADD/EDIT JOB MODAL -->
 <div class="overlay" id="overlay">
   <div class="modal">
     <div class="mh"><span class="mh-t" id="m-title">Add job</span><button class="mh-x" onclick="closeModal()">×</button></div>
@@ -238,7 +236,14 @@
         <div class="fg"><label>Customer</label><input id="f-cust" placeholder="Jane Smith"/></div>
         <div class="fg"><label>Phone</label><input id="f-phone" placeholder="(705) 555-0100"/></div>
       </div>
-      <div class="fg"><label>Address</label><input id="f-addr" placeholder="31 Merryfield Cres, Belleville ON"/></div>
+      <!-- Address with geocode search -->
+      <div class="fg" style="margin-bottom:4px"><label>Address</label>
+        <div class="addr-row">
+          <div class="fg"><input id="f-addr" placeholder="31 Merryfield Cres, Belleville ON" oninput="onAddrInput()"/></div>
+          <button class="nbtn btn-sm" onclick="searchAddr()" style="margin-bottom:0;height:36px;flex-shrink:0"><i class="ti ti-search"></i> Locate</button>
+        </div>
+      </div>
+      <div class="addr-results" id="addr-results"></div>
       <div class="g2">
         <div class="fg"><label>Job type</label>
           <select id="f-type">
@@ -273,19 +278,12 @@
 const SC={active:'#1a6eff',quoted:'#BA7517',scheduled:'#1e7e34',complete:'#888',urgent:'#dc3545'};
 const SB={active:'rgba(26,110,255,0.15)',quoted:'rgba(186,117,23,0.15)',scheduled:'rgba(30,126,52,0.12)',complete:'rgba(136,136,136,0.1)',urgent:'rgba(220,53,69,0.15)'};
 const SF={active:'rgba(26,110,255,0.5)',quoted:'rgba(186,117,23,0.5)',scheduled:'rgba(30,126,52,0.45)',complete:'rgba(136,136,136,0.4)',urgent:'rgba(220,53,69,0.5)'};
-const STAGES={residential:['Site visit','Rough-in','Inspection','Final'],commercial:['Design','Permit','Rough-in','Inspection','Final'],panel:['Permit','Rough-in','Inspection','Final'],lighting:['Design','Supply','Install','Commission'],service:['Permit','Disconnect','Install','Inspection']};
-const VIEWS=[
-  {zoom:9, center:[44.3,-77.4]},
-  {zoom:13,center:[44.18,-77.38]},
-  {zoom:16,center:[44.18,-77.38]},
-  {zoom:19,center:[44.18,-77.38]},
-];
+const DEFAULT_STAGES={residential:['Site visit','Rough-in','Inspection','Final'],commercial:['Design','Permit','Rough-in','Inspection','Final'],panel:['Permit','Rough-in','Inspection','Final'],lighting:['Design','Supply','Install','Commission'],service:['Permit','Disconnect','Install','Inspection']};
+const VIEWS=[{zoom:9,center:[44.3,-77.4]},{zoom:13,center:[44.18,-77.38]},{zoom:16,center:[44.18,-77.38]},{zoom:19,center:[44.18,-77.38]}];
 
-function cellMeters(z){
-  if(z>=19)return 5;if(z>=18)return 10;if(z>=17)return 20;
-  if(z>=16)return 40;if(z>=14)return 200;if(z>=12)return 600;
-  if(z>=10)return 2000;return 8000;
-}
+function getStages(j){return j.customStages||(DEFAULT_STAGES[j.type]||DEFAULT_STAGES.residential);}
+
+function cellMeters(z){if(z>=19)return 5;if(z>=18)return 10;if(z>=17)return 20;if(z>=16)return 40;if(z>=14)return 200;if(z>=12)return 600;if(z>=10)return 2000;return 8000;}
 function mToDeg(m,lat){return{la:m/111320,lo:m/(111320*Math.cos(lat*Math.PI/180))};}
 
 const SUPABASE_URL='https://vojgddmlwakvhmbkzfld.supabase.co';
@@ -294,105 +292,46 @@ const TABLE='projects';
 
 async function dbFetch(path,opts={}){
   const isWrite=opts.method&&opts.method!=='GET';
-  const res=await fetch(`${SUPABASE_URL}/rest/v1/${path}`,{
-    headers:{
-      'apikey':SUPABASE_KEY,
-      'Authorization':`Bearer ${SUPABASE_KEY}`,
-      'Content-Type':'application/json',
-      ...(isWrite?{'Prefer':'return=representation'}:{}),
-      ...(opts.headers||{})
-    },
-    ...opts
-  });
+  const res=await fetch(`${SUPABASE_URL}/rest/v1/${path}`,{headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json',...(isWrite?{'Prefer':'return=representation'}:{}),...(opts.headers||{})},...opts});
   if(!res.ok){const e=await res.text();throw new Error(e);}
-  const text=await res.text();
-  return text?JSON.parse(text):[];
+  const text=await res.text();return text?JSON.parse(text):[];
 }
 
 function dbToJob(r){
   return{
-    id:r.id,
-    customer:r.customer||'',
-    address:r.address||'',
-    phone:r.phone||'',
-    email:r.email||'',
-    type:r.type||'residential',
-    status:r.status||'quoted',
-    stage:r.stage||0,
-    notes:r.notes||'',
-    lat:r.lat||44.18,
-    lng:r.lng||-77.38,
+    id:r.id,customer:r.customer||'',address:r.address||'',phone:r.phone||'',
+    email:r.email||'',type:r.type||'residential',status:r.status||'quoted',
+    stage:r.stage||0,notes:r.notes||'',
+    // FIX: don't default lat/lng — null means no map location
+    lat:r.lat||null,lng:r.lng||null,
     cells:r.cells?JSON.parse(r.cells):null,
+    // FIX: read custom_stages from database
     customStages:r.custom_stages?JSON.parse(r.custom_stages):null,
     customFields:r.custom_fields?JSON.parse(r.custom_fields):{},
   };
 }
 
-function jobToDb(j){
-  return{
-    customer:j.customer,address:j.address,phone:j.phone,email:j.email||'',
-    type:j.type,status:j.status,stage:j.stage,notes:j.notes,
-    lat:j.lat,lng:j.lng,
-    cells:j.cells?JSON.stringify(j.cells):null,
-    custom_stages:j.customStages?JSON.stringify(j.customStages):null,
-    custom_fields:j.customFields?JSON.stringify(j.customFields):null,
-  };
-}
-
-let jobs=[];
-let filters=new Set(['active','quoted','scheduled','complete','urgent']);
+let jobs=[],filters=new Set(['active','quoted','scheduled','complete','urgent']);
 let selId=null,pendingLL=null,editId=null,gridLayer=null,searchPin=null,searchTO=null;
 let drawMode=false,selCells=new Set(),pendingCells=null;
+let geocodedLL=null; // stores lat/lng from address geocode in modal
 
 async function loadJobs(){
-  try{
-    const rows=await dbFetch(`${TABLE}?select=*&order=created_at.desc`);
-    jobs=rows.map(dbToJob);
-  } catch(e){
-    console.error('Failed to load projects:',e);
-    jobs=[];
-  }
+  try{const rows=await dbFetch(`${TABLE}?select=*&order=created_at.desc`);jobs=rows.map(dbToJob);}
+  catch(e){console.error('Failed to load projects:',e);jobs=[];}
   drawGrid();
 }
 
 const map=L.map('map',{center:[44.18,-77.38],zoom:13,zoomControl:true,scrollWheelZoom:false,touchZoom:false,doubleClickZoom:false});
 map.scrollWheelZoom.disable();
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{
-  attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:20
-}).addTo(map);
-
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:20}).addTo(map);
 map.on('zoomend moveend',drawGrid);
 
-function currentLevel(){
-  const z=map.getZoom();
-  if(z>=18)return 3;
-  if(z>=15)return 2;
-  if(z>=12)return 1;
-  return 0;
-}
-
-function drillInto(cellCentreLL){
-  const next=Math.min(currentLevel()+1,3);
-  map.flyTo(cellCentreLL,VIEWS[next].zoom,{duration:0.6});
-}
-
-function goView(i){
-  const centre=selId
-    ? (()=>{const j=jobs.find(x=>x.id===selId);return j?[j.lat,j.lng]:map.getCenter();})()
-    : map.getCenter();
-  map.flyTo(centre,VIEWS[i].zoom,{duration:0.8});
-}
-
-function getCellDims(){
-  const z=map.getZoom(),lat=map.getCenter().lat;
-  return mToDeg(cellMeters(z),lat);
-}
-
-function latLngToCell(latlng){
-  const{la,lo}=getCellDims();
-  const row=Math.floor(latlng.lat/la),col=Math.floor(latlng.lng/lo);
-  return{k:`${row}_${col}`,row,col};
-}
+function currentLevel(){const z=map.getZoom();if(z>=18)return 3;if(z>=15)return 2;if(z>=12)return 1;return 0;}
+function drillInto(cellCentreLL){const next=Math.min(currentLevel()+1,3);map.flyTo(cellCentreLL,VIEWS[next].zoom,{duration:0.6});}
+function goView(i){const centre=selId?(()=>{const j=jobs.find(x=>x.id===selId);return j&&j.lat?[j.lat,j.lng]:map.getCenter();})():map.getCenter();map.flyTo(centre,VIEWS[i].zoom,{duration:0.8});}
+function getCellDims(){const z=map.getZoom(),lat=map.getCenter().lat;return mToDeg(cellMeters(z),lat);}
+function latLngToCell(latlng){const{la,lo}=getCellDims();const row=Math.floor(latlng.lat/la),col=Math.floor(latlng.lng/lo);return{k:`${row}_${col}`,row,col};}
 
 function drawGrid(){
   if(gridLayer)map.removeLayer(gridLayer);
@@ -401,110 +340,62 @@ function drawGrid(){
   const b=map.getBounds();
   const z=map.getZoom();
   const showProg=z>=18;
-  const isProperty=z>=17;
 
-  // Build cellMap using lat/lng snapped to current grid
   const cellMap={};
   jobs.forEach(j=>{
     if(!filters.has(j.status))return;
-    if(!j.lat||!j.lng)return;
-    const row=Math.floor(j.lat/la);
-    const col=Math.floor(j.lng/lo);
-    const k=`${row}_${col}`;
+    // FIX: skip jobs with no coordinates
+    if(j.lat===null||j.lng===null)return;
+    const row=Math.floor(j.lat/la),col=Math.floor(j.lng/lo),k=`${row}_${col}`;
     if(!cellMap[k])cellMap[k]=[];
     cellMap[k].push(j);
   });
 
-  const sLat=Math.floor(b.getSouth()/la)*la;
-  const sLng=Math.floor(b.getWest()/lo)*lo;
+  const sLat=Math.floor(b.getSouth()/la)*la,sLng=Math.floor(b.getWest()/lo)*lo;
   const placedIndicators=new Set();
 
   for(let lat=sLat;lat<=b.getNorth()+la;lat+=la){
     for(let lng=sLng;lng<=b.getEast()+lo;lng+=lo){
-      const row=Math.floor(lat/la);
-      const col=Math.floor(lng/lo);
-      const k=`${row}_${col}`;
+      const row=Math.floor(lat/la),col=Math.floor(lng/lo),k=`${row}_${col}`;
       const s=row*la,n=s+la,w=col*lo,e=w+lo;
       const cj=cellMap[k]||[];
       const hasJ=cj.length>0;
       const isSel=drawMode&&selCells.has(k);
       const priority=['urgent','active','quoted','scheduled','complete'];
-      let dom=null;
-      for(const st of priority)if(cj.some(j=>j.status===st)){dom=st;break;}
+      let dom=null;for(const st of priority)if(cj.some(j=>j.status===st)){dom=st;break;}
       const uCnt=cj.filter(j=>j.status==='urgent').length;
-
       let fc='transparent',c='rgba(26,110,255,0.15)',wt=0.5;
       if(isSel){fc='rgba(26,110,255,0.4)';c='#1a6eff';wt=2;}
       else if(hasJ){fc=SB[dom];c=SC[dom];wt=1.5;}
-
       const rect=L.rectangle([[s,w],[n,e]],{color:c,weight:wt,fillColor:fc,fillOpacity:1,interactive:true});
-
       if(drawMode){
-        rect.on('click',ev=>{
-          L.DomEvent.stopPropagation(ev);
-          if(selCells.has(k))selCells.delete(k);else selCells.add(k);
-          const cnt=selCells.size;
-          document.getElementById('draw-cnt').textContent=`${cnt} cell${cnt!==1?'s':''} selected`;
-          drawGrid();
-        });
+        rect.on('click',ev=>{L.DomEvent.stopPropagation(ev);if(selCells.has(k))selCells.delete(k);else selCells.add(k);const cnt=selCells.size;document.getElementById('draw-cnt').textContent=`${cnt} cell${cnt!==1?'s':''} selected`;drawGrid();});
       } else {
-        rect.on('click',ev=>{
-          L.DomEvent.stopPropagation(ev);
-          const level=currentLevel();
-          if(level<3){
-            drillInto([s+la/2,w+lo/2]);
-          } else {
-            if(cj.length>0){if(cj.length===1)showDetail(cj[0].id);else renderSb(cj);}
-          }
-        });
-        if(hasJ){
-          rect.on('mouseover',()=>rect.setStyle({weight:2.5}));
-          rect.on('mouseout',()=>rect.setStyle({weight:1.5}));
-        }
+        rect.on('click',ev=>{L.DomEvent.stopPropagation(ev);const level=currentLevel();if(level<3){drillInto([s+la/2,w+lo/2]);}else{if(cj.length>0){if(cj.length===1)showDetail(cj[0].id);else renderSb(cj);}}});
+        if(hasJ){rect.on('mouseover',()=>rect.setStyle({weight:2.5}));rect.on('mouseout',()=>rect.setStyle({weight:1.5}));}
       }
       gridLayer.addLayer(rect);
-
       if(hasJ&&!isSel){
         const cl=s+la/2,cg=w+lo/2;
         const uniqueJobs=[...new Map(cj.map(j=>[j.id,j])).values()];
         const unplacedJobs=uniqueJobs.filter(j=>!placedIndicators.has(j.id));
         if(unplacedJobs.length===0)continue;
         unplacedJobs.forEach(j=>placedIndicators.add(j.id));
-
         if(showProg&&uniqueJobs.length===1&&uniqueJobs[0].status==='active'){
-          const j=uniqueJobs[0],stages=STAGES[j.type]||STAGES.residential;
+          const j=uniqueJobs[0];
+          const stages=getStages(j);
           const total=stages.length,done=Math.min(j.stage||0,total);
-          const p1=map.latLngToContainerPoint([s,w]);
-          const p2=map.latLngToContainerPoint([n,e]);
+          const p1=map.latLngToContainerPoint([s,w]),p2=map.latLngToContainerPoint([n,e]);
           const cellW=Math.abs(p2.x-p1.x),cellH=Math.abs(p2.y-p1.y);
-          const barW=Math.max(8,cellW-4);
-          const fillW=Math.round(barW*(done/total));
-          const icon=L.divIcon({
-            className:'',
-            html:`<div style="width:${barW}px;pointer-events:none;"><div style="width:${barW}px;height:6px;background:rgba(26,110,255,0.2);border-radius:3px;overflow:hidden;"><div style="width:${fillW}px;height:6px;background:#1a6eff;border-radius:3px;"></div></div></div>`,
-            iconSize:[barW,6],
-            iconAnchor:[barW/2,-Math.round(cellH/2)+6]
-          });
+          const barW=Math.max(8,cellW-4),fillW=Math.round(barW*(done/total));
+          const icon=L.divIcon({className:'',html:`<div style="width:${barW}px;pointer-events:none;"><div style="width:${barW}px;height:6px;background:rgba(26,110,255,0.2);border-radius:3px;overflow:hidden;"><div style="width:${fillW}px;height:6px;background:#1a6eff;border-radius:3px;"></div></div></div>`,iconSize:[barW,6],iconAnchor:[barW/2,-Math.round(cellH/2)+6]});
           L.marker([s+la*0.05,cg],{icon,interactive:false}).addTo(gridLayer);
         } else if(z<18){
-          const cnt=uniqueJobs.length;
-          const bg=uCnt>0?'#dc3545':SC[dom];
-          // Build status breakdown bar
+          const cnt=uniqueJobs.length,bg=uCnt>0?'#dc3545':SC[dom];
           const statusOrder=['urgent','active','quoted','scheduled','complete'];
           const barW=Math.max(24,cnt*8);
-          const segments=statusOrder.map(st=>{
-            const n=uniqueJobs.filter(j=>j.status===st).length;
-            return n>0?`<div style="flex:${n};background:${SC[st]};height:3px;"></div>`:'';
-          }).join('');
-          const icon=L.divIcon({
-            className:'',
-            html:`<div style="display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none;">
-              <div style="background:${bg};color:#fff;border-radius:99px;min-width:18px;height:18px;padding:0 5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:-apple-system,sans-serif;border:2px solid #fff;white-space:nowrap;">${cnt}</div>
-              <div style="display:flex;width:${barW}px;height:3px;border-radius:2px;overflow:hidden;gap:1px;">${segments}</div>
-            </div>`,
-            iconSize:[barW,24],
-            iconAnchor:[barW/2,-2]
-          });
+          const segments=statusOrder.map(st=>{const n=uniqueJobs.filter(j=>j.status===st).length;return n>0?`<div style="flex:${n};background:${SC[st]};height:3px;"></div>`:''}).join('');
+          const icon=L.divIcon({className:'',html:`<div style="display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none;"><div style="background:${bg};color:#fff;border-radius:99px;min-width:18px;height:18px;padding:0 5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:-apple-system,sans-serif;border:2px solid #fff;white-space:nowrap;">${cnt}</div><div style="display:flex;width:${barW}px;height:3px;border-radius:2px;overflow:hidden;gap:1px;">${segments}</div></div>`,iconSize:[barW,24],iconAnchor:[barW/2,-2]});
           L.marker([cl,cg],{icon,interactive:false}).addTo(gridLayer);
         }
       }
@@ -514,65 +405,82 @@ function drawGrid(){
   renderSb();
 }
 
-function startAddJob(){
-  selCells.clear();
-  drawMode=true;
-  pendingCells=null;
-  const bar=document.getElementById('draw-bar');
-  bar.classList.add('show');
-  document.getElementById('draw-cnt').textContent='0 selected';
-  drawGrid();
-}
-
-function toggleDraw(){
-  drawMode=!drawMode;selCells.clear();
-  const bar=document.getElementById('draw-bar');
-  if(drawMode){bar.classList.add('show');}
-  else{bar.classList.remove('show');}
-  drawGrid();
-}
-
+function startAddJob(){selCells.clear();drawMode=true;pendingCells=null;document.getElementById('draw-bar').classList.add('show');document.getElementById('draw-cnt').textContent='0 selected';drawGrid();}
 function confirmDraw(){
   pendingCells=selCells.size>0?Array.from(selCells):null;
   const{la,lo}=getCellDims();
-  if(pendingCells){
-    const[row,col]=pendingCells[0].split('_').map(Number);
-    pendingLL={lat:row*la+la/2,lng:col*lo+lo/2};
-  } else {
-    pendingLL=map.getCenter();
-  }
+  if(pendingCells){const[row,col]=pendingCells[0].split('_').map(Number);pendingLL={lat:row*la+la/2,lng:col*lo+lo/2};}
+  else{pendingLL=null;}
   drawMode=false;selCells.clear();
   document.getElementById('draw-bar').classList.remove('show');
   document.getElementById('m-title').textContent='Add job';
-  document.getElementById('pin-note').style.display='flex';
-  document.getElementById('pin-text').textContent=pendingCells
-    ?`${pendingCells.length} cell${pendingCells.length!==1?'s':''} selected as job footprint`
-    :'No area drawn — pinned to map centre';
+  document.getElementById('pin-note').style.display=pendingCells?'flex':'none';
+  if(pendingCells)document.getElementById('pin-text').textContent=`${pendingCells.length} cell${pendingCells.length!==1?'s':''} selected as job footprint`;
   ['f-cust','f-phone','f-addr','f-notes'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('f-type').value='residential';
-  document.getElementById('f-status').value='quoted';
-  document.getElementById('overlay').classList.add('open');
-  drawGrid();
+  document.getElementById('f-type').value='residential';document.getElementById('f-status').value='quoted';
+  geocodedLL=pendingLL;
+  document.getElementById('overlay').classList.add('open');drawGrid();
 }
+function cancelDraw(){drawMode=false;selCells.clear();document.getElementById('draw-bar').classList.remove('show');drawGrid();}
 
-function cancelDraw(){
-  drawMode=false;selCells.clear();
-  document.getElementById('draw-bar').classList.remove('show');
-  drawGrid();
+// Address geocoding in modal
+let addrSearchTO=null;
+function onAddrInput(){
+  clearTimeout(addrSearchTO);
+  const q=document.getElementById('f-addr').value.trim();
+  if(q.length<4){document.getElementById('addr-results').classList.remove('show');return;}
+  addrSearchTO=setTimeout(()=>searchAddr(),600);
+}
+async function searchAddr(){
+  const q=document.getElementById('f-addr').value.trim();
+  if(!q)return;
+  const res=document.getElementById('addr-results');
+  res.innerHTML='<div style="padding:8px 10px;font-size:12px;color:var(--muted)">Searching…</div>';
+  res.classList.add('show');
+  try{
+    const data=await(await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q+', Ontario, Canada')}&format=json&limit=4`,{headers:{'Accept-Language':'en'}})).json();
+    if(!data.length){res.innerHTML='<div style="padding:8px 10px;font-size:12px;color:var(--muted)">No results</div>';return;}
+    res.innerHTML=data.map(r=>{
+      const name=r.display_name.split(',').slice(0,3).join(', ');
+      return`<div class="addr-result-item" onclick="pickAddr('${name.replace(/'/g,"\\'")}',${r.lat},${r.lon})">${name}</div>`;
+    }).join('');
+  }catch(e){res.innerHTML='<div style="padding:8px 10px;font-size:12px;color:var(--muted)">Search unavailable</div>';}
+}
+function pickAddr(name,lat,lng){
+  document.getElementById('f-addr').value=name;
+  geocodedLL={lat:parseFloat(lat),lng:parseFloat(lng)};
+  document.getElementById('addr-results').classList.remove('show');
+  // Update pin note
+  document.getElementById('pin-note').style.display='flex';
+  document.getElementById('pin-text').textContent=`Located: ${name.split(',')[0]}`;
 }
 
 function showDetail(id){
   const j=jobs.find(x=>x.id===id);if(!j)return;selId=id;
-  const stages=STAGES[j.type]||STAGES.residential,done=Math.min(j.stage||0,stages.length);
-  let sh='';
-  if(j.status==='active'){
-    const pct=Math.round(done/stages.length*100);
-    sh=`<div class="prog-wrap"><div class="dpl">Progress — ${pct}%</div><div class="prog-row">${stages.map((_,i)=>`<div class="prog-s ${i<done?'done':''}" title="${stages[i]}" onclick="setStage(${id},${i+1})"></div>`).join('')}</div><div class="prog-lbls"><span>${stages[0]}</span><span>${stages[stages.length-1]}</span></div></div>`;
+  const stages=getStages(j);
+  const total=stages.length,done=Math.min(j.stage||0,total);
+  const pct=Math.round(done/total*100);
+  // FIX: show current stage name instead of first/last labels
+  const currentStageName=done<total?stages[done]:stages[total-1];
+  const isComplete=done>=total;
+  let stageHtml='';
+  if(j.status==='active'||j.status==='scheduled'){
+    stageHtml=`<div class="dpf">
+      <div class="dpl">Current stage</div>
+      <div class="stage-chip"><i class="ti ti-${isComplete?'check':'loader'}"></i>${isComplete?'Complete':currentStageName}</div>
+      <div class="stage-progress">${pct}% · step ${Math.min(done+1,total)} of ${total}</div>
+    </div>`;
   }
   document.getElementById('dp-title').textContent=j.customer;
-  document.getElementById('dp-body').innerHTML=`${sh}<div class="dpf"><div class="dpl">Address</div><div class="dpv">${j.address||'—'}</div></div><div class="dpf"><div class="dpl">Phone</div><div class="dpv">${j.phone||'—'}</div></div><div class="dpf"><div class="dpl">Type</div><div class="dpv" style="text-transform:capitalize">${j.type}</div></div><div class="dpf"><div class="dpl">Status</div><div class="dpv"><span style="color:${SC[j.status]};font-weight:500;text-transform:capitalize">${j.status}</span></div></div>${j.notes?`<div class="dpf"><div class="dpl">Notes</div><div class="dpv">${j.notes}</div></div>`:''}`;
+  document.getElementById('dp-body').innerHTML=`
+    ${stageHtml}
+    <div class="dpf"><div class="dpl">Address</div><div class="dpv">${j.address||'—'}</div></div>
+    <div class="dpf"><div class="dpl">Phone</div><div class="dpv">${j.phone||'—'}</div></div>
+    <div class="dpf"><div class="dpl">Type</div><div class="dpv" style="text-transform:capitalize">${j.type}</div></div>
+    <div class="dpf"><div class="dpl">Status</div><div class="dpv"><span style="color:${SC[j.status]};font-weight:500;text-transform:capitalize">${j.status}</span></div></div>
+    ${j.notes?`<div class="dpf"><div class="dpl">Notes</div><div class="dpv">${j.notes}</div></div>`:''}`;
   document.getElementById('dpanel').classList.add('open');
-  map.panTo([j.lat,j.lng]);
+  if(j.lat&&j.lng)map.panTo([j.lat,j.lng]);
   renderSb();
 }
 
@@ -589,81 +497,69 @@ function doEdit(){
   document.getElementById('f-type').value=j.type;
   document.getElementById('f-status').value=j.status;
   document.getElementById('f-notes').value=j.notes||'';
+  geocodedLL=j.lat?{lat:j.lat,lng:j.lng}:null;
   document.getElementById('overlay').classList.add('open');
 }
 
 async function doDelete(){
   if(!selId)return;
   if(confirm('Remove this job?')){
-    try{await dbFetch(`${TABLE}?id=eq.${selId}`,{method:'DELETE'});}
-    catch(e){console.error(e);}
-    closeDetail();
-    await loadJobs();
+    try{await dbFetch(`${TABLE}?id=eq.${selId}`,{method:'DELETE'});}catch(e){console.error(e);}
+    closeDetail();await loadJobs();
   }
 }
 
-function openAdd(ll){
-  editId=null;pendingLL=ll;pendingCells=null;
-  document.getElementById('m-title').textContent='Add job to map';
-  document.getElementById('pin-note').style.display='flex';
-  document.getElementById('pin-text').textContent=ll?`Pinned: ${ll.lat.toFixed(5)}, ${ll.lng.toFixed(5)}`:'Pinned to map centre';
-  ['f-cust','f-phone','f-addr','f-notes'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('f-type').value='residential';
-  document.getElementById('f-status').value='quoted';
-  document.getElementById('overlay').classList.add('open');
+function closeModal(){
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('addr-results').classList.remove('show');
+  editId=null;pendingLL=null;pendingCells=null;geocodedLL=null;
 }
-
-function closeModal(){document.getElementById('overlay').classList.remove('open');editId=null;pendingLL=null;pendingCells=null;}
 
 async function saveJob(){
   const cust=document.getElementById('f-cust').value.trim();
   if(!cust){alert('Please enter a customer name.');return;}
-  const ll=pendingLL||map.getCenter();
+  const addrVal=document.getElementById('f-addr').value.trim();
+  // Use geocoded coords if available, else pendingLL from draw, else null
+  const ll=geocodedLL||pendingLL||null;
+  if(!ll&&!editId){
+    // For new jobs, require address search
+    if(!addrVal){alert('Please enter an address and click Locate to place this job on the map.');return;}
+  }
   const data={
     customer:cust,phone:document.getElementById('f-phone').value,
-    address:document.getElementById('f-addr').value,type:document.getElementById('f-type').value,
+    address:addrVal,type:document.getElementById('f-type').value,
     status:document.getElementById('f-status').value,notes:document.getElementById('f-notes').value,
-    stage:0,lat:ll.lat,lng:ll.lng,
+    stage:0,
+    lat:ll?ll.lat:null,
+    lng:ll?ll.lng:null,
     cells:pendingCells?JSON.stringify(pendingCells):null,
     custom_stages:null,custom_fields:JSON.stringify({})
   };
   try{
-    if(editId){
-      await dbFetch(`${TABLE}?id=eq.${editId}`,{method:'PATCH',body:JSON.stringify(data)});
-    } else {
-      await dbFetch(`${TABLE}`,{method:'POST',body:JSON.stringify(data)});
-    }
+    if(editId){await dbFetch(`${TABLE}?id=eq.${editId}`,{method:'PATCH',body:JSON.stringify(data)});}
+    else{await dbFetch(`${TABLE}`,{method:'POST',body:JSON.stringify(data)});}
     await loadJobs();
-  } catch(e){alert('Error saving: '+e.message);}
+  }catch(e){alert('Error saving: '+e.message);}
   closeModal();
 }
 
 async function setStage(id,s){
   const j=jobs.find(x=>x.id===id);if(!j)return;
   j.stage=s;
-  try{await dbFetch(`${TABLE}?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({stage:s})});}
-  catch(e){console.error(e);}
+  try{await dbFetch(`${TABLE}?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({stage:s})});}catch(e){console.error(e);}
   showDetail(id);drawGrid();
 }
 
 map.on('click',()=>{closeDetail();sr.classList.remove('show');});
 loadJobs();
 
-function toggleF(btn){
-  const s=btn.dataset.s;
-  if(filters.has(s)){filters.delete(s);btn.classList.remove('on');}else{filters.add(s);btn.classList.add('on');}
-  drawGrid();
-}
+function toggleF(btn){const s=btn.dataset.s;if(filters.has(s)){filters.delete(s);btn.classList.remove('on');}else{filters.add(s);btn.classList.add('on');}drawGrid();}
 
 const GROUP_ORDER=['urgent','active','quoted','scheduled','complete'];
 const GROUP_LABELS={urgent:'Urgent',active:'Active',quoted:'Quoted',scheduled:'Scheduled',complete:'Complete'};
 const collapsedGroups=new Set(['complete']);
 
-function toggleGroup(status){
-  if(collapsedGroups.has(status))collapsedGroups.delete(status);
-  else collapsedGroups.add(status);
-  renderSb();
-}
+function toggleGroup(status){if(collapsedGroups.has(status))collapsedGroups.delete(status);else collapsedGroups.add(status);renderSb();}
 
 function renderSb(highlight){
   const filtered=jobs.filter(j=>filters.has(j.status));
@@ -673,86 +569,45 @@ function renderSb(highlight){
   const list=document.getElementById('jlist');
   const show=highlight||filtered;
   if(!show.length){list.innerHTML='<div class="sempty">No jobs yet.<br>Press Add job to get started.</div>';return;}
-
-  const grouped={};
-  GROUP_ORDER.forEach(s=>grouped[s]=[]);
+  const grouped={};GROUP_ORDER.forEach(s=>grouped[s]=[]);
   show.forEach(j=>{if(grouped[j.status])grouped[j.status].push(j);});
-
   list.innerHTML=GROUP_ORDER.map(status=>{
-    const groupJobs=grouped[status];
-    if(!groupJobs.length)return'';
+    const groupJobs=grouped[status];if(!groupJobs.length)return'';
     const isOpen=!collapsedGroups.has(status);
     const jobRows=groupJobs.map(j=>{
-      const stages=STAGES[j.type]||STAGES.residential;
+      const stages=getStages(j);
       const done=Math.min(j.stage||0,stages.length);
       const pct=Math.round(done/stages.length*100);
-      const progBar=j.status==='active'?`
-        <div style="margin-top:5px;display:flex;align-items:center;gap:6px;">
-          <div style="flex:1;height:3px;background:rgba(26,110,255,0.15);border-radius:2px;overflow:hidden;">
-            <div style="width:${pct}%;height:3px;background:#1a6eff;border-radius:2px;"></div>
-          </div>
-          <span style="font-size:10px;color:var(--muted);flex-shrink:0">${pct}%</span>
-        </div>`:'';
+      const noLocation=j.lat===null||j.lng===null;
+      const progBar=j.status==='active'?`<div style="margin-top:5px;display:flex;align-items:center;gap:6px;"><div style="flex:1;height:3px;background:rgba(26,110,255,0.15);border-radius:2px;overflow:hidden;"><div style="width:${pct}%;height:3px;background:#1a6eff;border-radius:2px;"></div></div><span style="font-size:10px;color:var(--muted);flex-shrink:0">${pct}%</span></div>`:'';
       return`<div class="ji ${selId===j.id?'sel':''}" onclick="showDetail(${j.id})">
         <div class="jd" style="background:${SC[j.status]}"></div>
         <div class="jinfo">
           <div class="jn">${j.customer}</div>
-          <div class="jm">${j.address||'No address'}</div>
+          <div class="jm">${noLocation?'<span style="color:#f0a500">⚠ No map location</span>':j.address||'No address'}</div>
           ${progBar}
         </div>
       </div>`;
     }).join('');
-    return`
-      <div>
-        <div class="jgroup-header" onclick="toggleGroup('${status}')">
-          <div class="jgroup-left">
-            <div class="jgroup-dot" style="background:${SC[status]}"></div>
-            <span class="jgroup-name">${GROUP_LABELS[status]}</span>
-            <span class="jgroup-count">${groupJobs.length}</span>
-          </div>
-          <i class="ti ti-chevron-down jgroup-chevron ${isOpen?'open':''}" aria-hidden="true"></i>
-        </div>
-        <div class="jgroup-body" style="display:${isOpen?'block':'none'}">${jobRows}</div>
-      </div>`;
+    return`<div><div class="jgroup-header" onclick="toggleGroup('${status}')"><div class="jgroup-left"><div class="jgroup-dot" style="background:${SC[status]}"></div><span class="jgroup-name">${GROUP_LABELS[status]}</span><span class="jgroup-count">${groupJobs.length}</span></div><i class="ti ti-chevron-down jgroup-chevron ${isOpen?'open':''}" aria-hidden="true"></i></div><div class="jgroup-body" style="display:${isOpen?'block':'none'}">${jobRows}</div></div>`;
   }).join('');
 }
 
 const sinput=document.getElementById('sinput'),sclr=document.getElementById('sclr'),sr=document.getElementById('sr');
-sinput.addEventListener('input',()=>{
-  const q=sinput.value.trim();sclr.style.display=q?'block':'none';
-  clearTimeout(searchTO);
-  if(q.length<3){sr.classList.remove('show');return;}
-  searchTO=setTimeout(()=>doSearch(q),400);
-});
+sinput.addEventListener('input',()=>{const q=sinput.value.trim();sclr.style.display=q?'block':'none';clearTimeout(searchTO);if(q.length<3){sr.classList.remove('show');return;}searchTO=setTimeout(()=>doSearch(q),400);});
 sinput.addEventListener('keydown',e=>{if(e.key==='Escape')clearSearch();});
-document.addEventListener('click',e=>{if(!e.target.closest('.float-card'))sr.classList.remove('show');});
+document.addEventListener('click',e=>{if(!e.target.closest('.float-card')&&!e.target.closest('#addr-results'))sr.classList.remove('show');});
 
 async function doSearch(q){
   sr.classList.add('show');sr.innerHTML='<div class="sr-msg"><div class="spinner"></div>Searching...</div>';
   try{
-    const res=await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q+', Ontario, Canada')}&format=json&limit=5`,{headers:{'Accept-Language':'en'}});
-    const data=await res.json();
+    const data=await(await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q+', Ontario, Canada')}&format=json&limit=5`,{headers:{'Accept-Language':'en'}})).json();
     if(!data.length){sr.innerHTML='<div class="sr-msg">No results found</div>';return;}
-    sr.innerHTML=data.map(r=>{
-      const name=r.display_name.split(',').slice(0,2).join(',');
-      const sub=r.display_name.split(',').slice(2,4).join(',');
-      return`<div class="sri" onclick="flyTo(${r.lat},${r.lon},'${name.replace(/'/g,"\\'")}')"><i class="ti ti-map-pin"></i><div><div class="sri-n">${name}</div><div class="sri-s">${sub}</div></div></div>`;
-    }).join('');
+    sr.innerHTML=data.map(r=>{const name=r.display_name.split(',').slice(0,2).join(',');const sub=r.display_name.split(',').slice(2,4).join(',');return`<div class="sri" onclick="flyTo(${r.lat},${r.lon},'${name.replace(/'/g,"\\'")}')"><i class="ti ti-map-pin"></i><div><div class="sri-n">${name}</div><div class="sri-s">${sub}</div></div></div>`;}).join('');
   }catch(e){sr.innerHTML='<div class="sr-msg">Search unavailable</div>';}
 }
-
-function flyTo(lat,lng,label){
-  sinput.value=label;sr.classList.remove('show');sclr.style.display='block';
-  if(searchPin)map.removeLayer(searchPin);
-  map.flyTo([lat,lng],19,{duration:1.2});
-  const icon=L.divIcon({className:'',html:`<div style="width:12px;height:12px;border-radius:50%;background:#1a6eff;border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3)"></div>`,iconSize:[12,12],iconAnchor:[6,6]});
-  searchPin=L.marker([lat,lng],{icon}).addTo(map);
-}
-
-function clearSearch(){
-  sinput.value='';sclr.style.display='none';sr.classList.remove('show');
-  if(searchPin){map.removeLayer(searchPin);searchPin=null;}
-}
+function flyTo(lat,lng,label){sinput.value=label;sr.classList.remove('show');sclr.style.display='block';if(searchPin)map.removeLayer(searchPin);map.flyTo([lat,lng],19,{duration:1.2});const icon=L.divIcon({className:'',html:`<div style="width:12px;height:12px;border-radius:50%;background:#1a6eff;border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3)"></div>`,iconSize:[12,12],iconAnchor:[6,6]});searchPin=L.marker([lat,lng],{icon}).addTo(map);}
+function clearSearch(){sinput.value='';sclr.style.display='none';sr.classList.remove('show');if(searchPin){map.removeLayer(searchPin);searchPin=null;}}
 </script>
 </body>
 </html>
