@@ -290,7 +290,7 @@ function mToDeg(m,lat){return{la:m/111320,lo:m/(111320*Math.cos(lat*Math.PI/180)
 
 const SUPABASE_URL='https://vojgddmlwakvhmbkzfld.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvamdkZG1sd2FrdmhtYmt6ZmxkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NDQ1MzAsImV4cCI6MjA5NzIyMDUzMH0.PGu1HeCZ3SsMgRyLC_s4xP8m3Qt73NlRyvzA-hFroEk';
-const TABLE='"Projects"';
+const TABLE='projects';
 
 async function dbFetch(path,opts={}){
   const res=await fetch(`${SUPABASE_URL}/rest/v1/${path}`,{
