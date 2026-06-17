@@ -403,11 +403,14 @@ function drawGrid(){
   const showProg=z>=18;
   const isProperty=z>=17;
 
+  // Build cellMap using lat/lng snapped to current grid
   const cellMap={};
   jobs.forEach(j=>{
     if(!filters.has(j.status))return;
     if(!j.lat||!j.lng)return;
-    const{k}=latLngToCell({lat:j.lat,lng:j.lng});
+    const row=Math.floor(j.lat/la);
+    const col=Math.floor(j.lng/lo);
+    const k=`${row}_${col}`;
     if(!cellMap[k])cellMap[k]=[];
     cellMap[k].push(j);
   });
@@ -418,7 +421,8 @@ function drawGrid(){
 
   for(let lat=sLat;lat<=b.getNorth()+la;lat+=la){
     for(let lng=sLng;lng<=b.getEast()+lo;lng+=lo){
-      const row=Math.floor((lat+la*0.5)/la),col=Math.floor((lng+lo*0.5)/lo);
+      const row=Math.floor(lat/la);
+      const col=Math.floor(lng/lo);
       const k=`${row}_${col}`;
       const s=row*la,n=s+la,w=col*lo,e=w+lo;
       const cj=cellMap[k]||[];
@@ -462,7 +466,6 @@ function drawGrid(){
 
       if(hasJ&&!isSel){
         const cl=s+la/2,cg=w+lo/2;
-        const bg=uCnt>0?'#dc3545':SC[dom];
         const uniqueJobs=[...new Map(cj.map(j=>[j.id,j])).values()];
         const unplacedJobs=uniqueJobs.filter(j=>!placedIndicators.has(j.id));
         if(unplacedJobs.length===0)continue;
@@ -471,7 +474,6 @@ function drawGrid(){
         if(showProg&&uniqueJobs.length===1&&uniqueJobs[0].status==='active'){
           const j=uniqueJobs[0],stages=STAGES[j.type]||STAGES.residential;
           const total=stages.length,done=Math.min(j.stage||0,total);
-          const pct=Math.round(done/total*100);
           const p1=map.latLngToContainerPoint([s,w]);
           const p2=map.latLngToContainerPoint([n,e]);
           const cellW=Math.abs(p2.x-p1.x),cellH=Math.abs(p2.y-p1.y);
@@ -484,37 +486,31 @@ function drawGrid(){
             iconAnchor:[barW/2,-Math.round(cellH/2)+6]
           });
           L.marker([s+la*0.05,cg],{icon,interactive:false}).addTo(gridLayer);
-        } else {
+        } else if(z<18){
           const cnt=uniqueJobs.length;
-          const z=map.getZoom();
-          if(z>=18)return;
-          const icon=L.divIcon({className:'',html:`<div style="background:${bg};color:#fff;border-radius:50%;min-width:18px;height:18px;padding:0 4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:-apple-system,sans-serif;border:2px solid #fff;">${cnt}</div>`,iconSize:[18,18],iconAnchor:[9,9]});
+          const bg=uCnt>0?'#dc3545':SC[dom];
+          // Build status breakdown bar
+          const statusOrder=['urgent','active','quoted','scheduled','complete'];
+          const barW=Math.max(24,cnt*8);
+          const segments=statusOrder.map(st=>{
+            const n=uniqueJobs.filter(j=>j.status===st).length;
+            return n>0?`<div style="flex:${n};background:${SC[st]};height:3px;"></div>`:'';
+          }).join('');
+          const icon=L.divIcon({
+            className:'',
+            html:`<div style="display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none;">
+              <div style="background:${bg};color:#fff;border-radius:99px;min-width:18px;height:18px;padding:0 5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:-apple-system,sans-serif;border:2px solid #fff;white-space:nowrap;">${cnt}</div>
+              <div style="display:flex;width:${barW}px;height:3px;border-radius:2px;overflow:hidden;gap:1px;">${segments}</div>
+            </div>`,
+            iconSize:[barW,24],
+            iconAnchor:[barW/2,-2]
+          });
           L.marker([cl,cg],{icon,interactive:false}).addTo(gridLayer);
         }
       }
     }
   }
   gridLayer.addTo(map);
-
-  // At property zoom, draw actual cell footprints for jobs that have drawn areas
-  if(isProperty){
-    jobs.forEach(j=>{
-      if(!filters.has(j.status))return;
-      if(!j.cells||j.cells.length===0)return;
-      j.cells.forEach(ck=>{
-        const parts=ck.split('_');
-        if(parts.length!==2)return;
-        const row=parseInt(parts[0]),col=parseInt(parts[1]);
-        const s=row*la,n=s+la,w=col*lo,e=w+lo;
-        const fr=L.rectangle([[s,w],[n,e]],{
-          color:SC[j.status],weight:2,
-          fillColor:SB[j.status],fillOpacity:1,interactive:false
-        });
-        fr.addTo(map);
-      });
-    });
-  }
-
   renderSb();
 }
 
