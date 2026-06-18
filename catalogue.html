@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ampersend — Catalogue</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --blue:#1a6eff;--black:#1a1a1a;--white:#fff;--surface:#f5f5f3;
+      --border:#e2e2e2;--muted:#888;--blue-light:#e8f0ff;
+      --green:#1e7e34;--green-light:#e6f4ea;
+      --red:#dc3545;--red-light:#fff0f0;
+      --amber:#BA7517;--amber-light:#fff8e1;
+    }
+    html,body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--black);background:var(--surface);min-height:100vh;}
+
+    nav{height:52px;background:var(--white);border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;position:sticky;top:0;z-index:100;}
+    .nl{display:flex;align-items:center;gap:12px;}
+    .logo{font-size:16px;font-weight:600;letter-spacing:-0.03em;color:var(--black);text-decoration:none;}
+    .logo span{color:var(--blue);}
+    .nsep{width:0.5px;height:18px;background:var(--border);}
+    .ntitle{font-size:13px;font-weight:500;}
+    .nr{display:flex;align-items:center;gap:8px;}
+    .nbtn{padding:6px 12px;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:var(--white);color:var(--black);display:flex;align-items:center;gap:5px;font-family:inherit;text-decoration:none;}
+    .nbtn:hover{background:var(--surface);}
+    .nbtn.primary{background:var(--black);color:#fff;border-color:var(--black);}
+    .nbtn.primary:hover{background:#333;}
+    .nbtn.danger{color:var(--red);}
+    .nbtn.danger:hover{background:var(--red-light);border-color:var(--red);}
+
+    .body{display:flex;height:calc(100vh - 52px);}
+
+    /* SIDEBAR */
+    .sidebar{width:210px;flex-shrink:0;background:var(--white);border-right:0.5px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;}
+    .sb-section{padding:14px 12px 6px;}
+    .sb-label{font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;padding:0 4px;}
+    .sb-item{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:5px;cursor:pointer;font-size:13px;font-weight:500;color:var(--black);margin-bottom:1px;user-select:none;}
+    .sb-item:hover{background:var(--surface);}
+    .sb-item.active{background:var(--blue-light);color:var(--blue);}
+    .sb-item i{font-size:15px;flex-shrink:0;}
+    .sb-count{margin-left:auto;font-size:10px;background:var(--border);color:var(--muted);padding:1px 6px;border-radius:99px;font-weight:400;}
+    .sb-item.active .sb-count{background:rgba(26,110,255,0.2);color:var(--blue);}
+
+    /* MAIN */
+    .main{flex:1;overflow-y:auto;padding:1.5rem;}
+    .view{display:none;}
+    .view.active{display:block;}
+
+    /* TOOLBAR */
+    .toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;gap:10px;flex-wrap:wrap;}
+    .toolbar-left{display:flex;align-items:center;gap:8px;}
+    .page-title{font-size:18px;font-weight:600;letter-spacing:-0.02em;}
+    .page-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+    .search-wrap{display:flex;align-items:center;gap:7px;background:var(--white);border:0.5px solid var(--border);border-radius:6px;padding:7px 10px;width:200px;}
+    .search-wrap i{color:var(--muted);font-size:14px;}
+    .search-wrap input{border:none;background:transparent;font-size:13px;color:var(--black);font-family:inherit;outline:none;width:100%;}
+    .search-wrap input::placeholder{color:var(--muted);}
+
+    /* TABLE */
+    .tbl-wrap{background:var(--white);border:0.5px solid var(--border);border-radius:8px;overflow:hidden;}
+    .tbl{width:100%;border-collapse:collapse;font-size:13px;}
+    .tbl th{font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);padding:9px 14px;border-bottom:0.5px solid var(--border);text-align:left;background:var(--surface);}
+    .tbl td{padding:0;border-bottom:0.5px solid var(--border);vertical-align:middle;}
+    .tbl tr:last-child td{border-bottom:none;}
+    .tbl tr:hover td{background:#fafafa;}
+    .td-inner{padding:9px 14px;display:flex;align-items:center;gap:8px;min-height:42px;}
+    .tbl-input{font-size:13px;padding:5px 8px;border:0.5px solid transparent;border-radius:4px;background:transparent;color:var(--black);font-family:inherit;width:100%;}
+    .tbl-input:hover{border-color:var(--border);}
+    .tbl-input:focus{outline:none;border-color:var(--blue);background:var(--white);box-shadow:0 0 0 3px rgba(26,110,255,0.08);}
+    .tbl-select{font-size:13px;padding:5px 8px;border:0.5px solid transparent;border-radius:4px;background:transparent;color:var(--black);font-family:inherit;width:100%;}
+    .tbl-select:hover{border-color:var(--border);}
+    .tbl-select:focus{outline:none;border-color:var(--blue);background:var(--white);}
+    .del-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;padding:4px;border-radius:4px;display:flex;align-items:center;}
+    .del-btn:hover{color:var(--red);background:var(--red-light);}
+    .add-row-btn{display:flex;align-items:center;gap:7px;padding:10px 14px;font-size:12px;color:var(--muted);cursor:pointer;border-top:0.5px solid var(--border);background:var(--white);width:100%;border:none;font-family:inherit;border-top:0.5px solid var(--border);}
+    .add-row-btn:hover{color:var(--blue);background:var(--blue-light);}
+
+    /* PROTOASSEMBLY CARDS */
+    .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px;}
+    .proto-card{background:var(--white);border:0.5px solid var(--border);border-radius:8px;overflow:hidden;}
+    .proto-card-header{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
+    .proto-card-header:hover{background:var(--surface);}
+    .proto-card-title{font-size:13px;font-weight:600;}
+    .proto-card-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+    .proto-card-right{display:flex;align-items:center;gap:10px;}
+    .proto-total{font-size:14px;font-weight:600;color:var(--blue);}
+    .proto-chevron{font-size:14px;color:var(--muted);transition:transform 0.2s;}
+    .proto-chevron.open{transform:rotate(180deg);}
+    .proto-body{display:none;border-top:0.5px solid var(--border);}
+    .proto-body.open{display:block;}
+    .proto-name-row{padding:10px 14px;border-bottom:0.5px solid var(--border);display:flex;gap:8px;align-items:center;}
+    .proto-name-input{flex:1;font-size:13px;padding:7px 9px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;}
+    .proto-name-input:focus{outline:none;border-color:var(--blue);}
+    .proto-branch-select{font-size:13px;padding:7px 9px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;width:180px;}
+    .proto-branch-select:focus{outline:none;border-color:var(--blue);}
+    .comp-table-wrap{padding:10px 14px;}
+    .comp-head{display:grid;grid-template-columns:2fr 70px 80px 28px;gap:8px;font-size:10px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);padding-bottom:7px;border-bottom:0.5px solid var(--border);margin-bottom:4px;}
+    .comp-row{display:grid;grid-template-columns:2fr 70px 80px 28px;gap:8px;align-items:center;padding:4px 0;border-bottom:0.5px solid var(--surface);}
+    .comp-name{font-size:13px;}
+    .comp-qty-input{font-size:13px;padding:4px 7px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;width:100%;text-align:right;}
+    .comp-qty-input:focus{outline:none;border-color:var(--blue);}
+    .comp-cost{font-size:13px;color:var(--muted);text-align:right;}
+    .comp-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;padding:2px;display:flex;align-items:center;border-radius:3px;}
+    .comp-del:hover{color:var(--red);}
+    .proto-add-comp{padding:8px 14px;border-top:0.5px solid var(--border);display:flex;gap:8px;align-items:center;}
+    .comp-select{flex:1;font-size:13px;padding:6px 9px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;}
+    .comp-select:focus{outline:none;border-color:var(--blue);}
+    .proto-footer{padding:10px 14px;border-top:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+    .proto-footer-total{font-size:13px;}
+    .proto-footer-total strong{color:var(--blue);}
+    .proto-foot-btns{display:flex;gap:6px;}
+
+    /* ASSEMBLY CARDS */
+    .asm-card{background:var(--white);border:0.5px solid var(--border);border-radius:8px;overflow:hidden;}
+    .asm-header{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
+    .asm-header:hover{background:var(--surface);}
+    .asm-title{font-size:13px;font-weight:600;}
+    .asm-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+    .asm-right{display:flex;align-items:center;gap:10px;}
+    .asm-chevron{font-size:14px;color:var(--muted);transition:transform 0.2s;}
+    .asm-chevron.open{transform:rotate(180deg);}
+    .asm-body{display:none;border-top:0.5px solid var(--border);}
+    .asm-body.open{display:block;}
+    .asm-name-row{padding:10px 14px;border-bottom:0.5px solid var(--border);display:flex;gap:8px;align-items:center;}
+    .asm-name-input{flex:1;font-size:13px;padding:7px 9px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;}
+    .asm-name-input:focus{outline:none;border-color:var(--blue);}
+    .asm-type-select{font-size:13px;padding:7px 9px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;width:180px;}
+    .asm-type-select:focus{outline:none;border-color:var(--blue);}
+
+    /* RULES */
+    .rules-section{padding:10px 14px;border-bottom:0.5px solid var(--border);}
+    .rules-label{font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+    .rule-row{display:grid;grid-template-columns:2fr 120px 1fr 28px;gap:8px;align-items:center;padding:5px 0;border-bottom:0.5px solid var(--surface);}
+    .rule-row:last-child{border-bottom:none;}
+    .rule-input{font-size:13px;padding:5px 8px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;width:100%;}
+    .rule-input:focus{outline:none;border-color:var(--blue);}
+    .rule-select{font-size:13px;padding:5px 8px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;width:100%;}
+    .rule-select:focus{outline:none;border-color:var(--blue);}
+    .rule-formula{font-size:12px;padding:5px 8px;border:0.5px solid var(--border);border-radius:4px;background:var(--surface);color:var(--black);font-family:monospace;width:100%;}
+    .rule-formula:focus{outline:none;border-color:var(--blue);background:var(--white);}
+    .rule-hint{font-size:10px;color:var(--muted);margin-top:6px;line-height:1.5;}
+
+    /* FIXED COMPONENTS IN ASSEMBLY */
+    .fixed-section{padding:10px 14px;border-bottom:0.5px solid var(--border);}
+    .fixed-label{font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+    .fixed-row{display:grid;grid-template-columns:2fr 80px 28px;gap:8px;align-items:center;padding:5px 0;border-bottom:0.5px solid var(--surface);}
+    .fixed-name{font-size:13px;}
+    .fixed-qty{font-size:13px;padding:4px 7px;border:0.5px solid var(--border);border-radius:4px;font-family:inherit;width:100%;text-align:right;}
+    .fixed-qty:focus{outline:none;border-color:var(--blue);}
+    .asm-add-row{padding:8px 14px;border-top:0.5px solid var(--border);display:flex;gap:8px;align-items:center;}
+    .asm-footer{padding:10px 14px;border-top:0.5px solid var(--border);display:flex;align-items:center;justify-content:flex-end;gap:6px;}
+
+    /* BRANCH CARDS */
+    .branch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;}
+    .branch-card{background:var(--white);border:0.5px solid var(--border);border-radius:8px;padding:14px 16px;}
+    .branch-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+    .branch-card-name{font-size:13px;font-weight:600;}
+    .dedicated-badge{font-size:10px;font-weight:500;padding:2px 7px;border-radius:3px;background:var(--amber-light);color:var(--amber);}
+    .general-badge{font-size:10px;font-weight:500;padding:2px 7px;border-radius:3px;background:var(--blue-light);color:var(--blue);}
+    .branch-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+    .branch-field{display:flex;flex-direction:column;gap:3px;}
+    .branch-label{font-size:10px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);}
+    .branch-input{font-size:13px;padding:6px 8px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;width:100%;}
+    .branch-input:focus{outline:none;border-color:var(--blue);}
+    .branch-select{font-size:13px;padding:6px 8px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;width:100%;}
+    .branch-select:focus{outline:none;border-color:var(--blue);}
+    .branch-actions{display:flex;gap:6px;padding-top:10px;border-top:0.5px solid var(--border);}
+    .branch-save{padding:5px 14px;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:var(--black);color:#fff;font-family:inherit;}
+    .branch-save:hover{background:#333;}
+
+    /* EMPTY */
+    .empty-state{padding:4rem 2rem;text-align:center;color:var(--muted);font-size:13px;line-height:1.8;}
+    .empty-state i{font-size:36px;display:block;margin-bottom:12px;opacity:0.2;}
+    .empty-state strong{display:block;font-size:15px;color:var(--black);margin-bottom:6px;opacity:0.6;}
+
+    /* MODAL */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:2000;display:none;align-items:center;justify-content:center;}
+    .overlay.open{display:flex;}
+    .modal{background:var(--white);border-radius:8px;width:400px;max-width:95vw;border:0.5px solid var(--border);}
+    .mh{padding:1rem 1.25rem;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+    .mh-t{font-size:15px;font-weight:500;}
+    .mh-x{background:none;border:none;cursor:pointer;color:var(--muted);font-size:20px;line-height:1;}
+    .mb{padding:1rem 1.25rem;}
+    .fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
+    .fg label{font-size:11px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);}
+    .fg input,.fg select{font-size:13px;padding:8px 10px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);width:100%;font-family:inherit;}
+    .fg input:focus,.fg select:focus{outline:none;border-color:var(--blue);}
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .mf{padding:10px 1.25rem;border-top:0.5px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
+    .mbtn{padding:8px 18px;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:var(--white);color:var(--black);font-family:inherit;}
+    .mbtn:hover{background:var(--surface);}
+    .mbtn.primary{background:var(--black);color:#fff;border-color:var(--black);}
+    .mbtn.primary:hover{background:#333;}
+
+    .toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9000;background:var(--black);color:#fff;padding:10px 16px;border-radius:6px;font-size:13px;display:none;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,0.2);}
+    .toast.show{display:flex;}
+  </style>
+</head>
+<body>
+<nav>
+  <div class="nl">
+    <a href="/index.html" class="logo">Ampers<span>&</span>nd</a>
+    <div class="nsep"></div>
+    <span class="ntitle">Catalogue</span>
+  </div>
+  <div class="nr">
+    <a href="/estimator.html" class="nbtn"><i class="ti ti-file-dollar"></i> Assessment</a>
+    <a href="/projects.html" class="nbtn"><i class="ti ti-list"></i> Projects</a>
+    <button class="nbtn primary" id="add-btn" onclick="handleAdd()"><i class="ti ti-plus"></i> <span id="add-label">Add component</span></button>
+  </div>
+</nav>
+
+<div class="body">
+  <div class="sidebar">
+    <div class="sb-section">
+      <div class="sb-label">Catalogue</div>
+      <div class="sb-item active" data-view="components" onclick="switchView('components',this)">
+        <i class="ti ti-box"></i> Components
+        <span class="sb-count" id="cnt-components">0</span>
+      </div>
+      <div class="sb-item" data-view="branches" onclick="switchView('branches',this)">
+        <i class="ti ti-git-branch"></i> Branches
+        <span class="sb-count" id="cnt-branches">0</span>
+      </div>
+      <div class="sb-item" data-view="protoassemblies" onclick="switchView('protoassemblies',this)">
+        <i class="ti ti-atom"></i> Protoassemblies
+        <span class="sb-count" id="cnt-proto">0</span>
+      </div>
+      <div class="sb-item" data-view="assemblies" onclick="switchView('assemblies',this)">
+        <i class="ti ti-stack-2"></i> Assemblies
+        <span class="sb-count" id="cnt-asm">0</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- COMPONENTS -->
+    <div class="view active" id="view-components">
+      <div class="toolbar">
+        <div><div class="page-title">Components</div><div class="page-sub">Individual physical items — the raw building blocks</div></div>
+        <div class="toolbar-left">
+          <div class="search-wrap"><i class="ti ti-search"></i><input type="text" id="comp-search" placeholder="Search…" oninput="renderComponents()"/></div>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>Name</th><th style="width:90px">Unit</th><th style="width:110px">Unit price ($)</th><th style="width:36px"></th></tr></thead>
+          <tbody id="comp-tbody"></tbody>
+        </table>
+        <button class="add-row-btn" onclick="addComponentRow()"><i class="ti ti-plus"></i> Add component</button>
+      </div>
+    </div>
+
+    <!-- BRANCHES -->
+    <div class="view" id="view-branches">
+      <div class="toolbar">
+        <div><div class="page-title">Branches</div><div class="page-sub">Circuit types — wire gauge, breaker size, device capacity</div></div>
+      </div>
+      <div class="branch-grid" id="branch-grid"></div>
+    </div>
+
+    <!-- PROTOASSEMBLIES -->
+    <div class="view" id="view-protoassemblies">
+      <div class="toolbar">
+        <div><div class="page-title">Protoassemblies</div><div class="page-sub">Assembled units built from components</div></div>
+        <div class="toolbar-left">
+          <div class="search-wrap"><i class="ti ti-search"></i><input type="text" id="proto-search" placeholder="Search…" oninput="renderProtos()"/></div>
+        </div>
+      </div>
+      <div class="cards-grid" id="proto-grid"></div>
+    </div>
+
+    <!-- ASSEMBLIES -->
+    <div class="view" id="view-assemblies">
+      <div class="toolbar">
+        <div><div class="page-title">Assemblies</div><div class="page-sub">Room and job assemblies with fixed and rule-driven quantities</div></div>
+        <div class="toolbar-left">
+          <div class="search-wrap"><i class="ti ti-search"></i><input type="text" id="asm-search" placeholder="Search…" oninput="renderAssemblies()"/></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px" id="asm-list"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ADD PROTOASSEMBLY MODAL -->
+<div class="overlay" id="proto-overlay">
+  <div class="modal">
+    <div class="mh"><span class="mh-t">Add protoassembly</span><button class="mh-x" onclick="closeProtoModal()">×</button></div>
+    <div class="mb">
+      <div class="fg"><label>Name</label><input id="pf-name" placeholder="e.g. 15A receptacle install, Stove connection…"/></div>
+      <div class="fg"><label>Branch (circuit type)</label><select id="pf-branch"><option value="">None / not assigned</option></select></div>
+    </div>
+    <div class="mf">
+      <button class="mbtn" onclick="closeProtoModal()">Cancel</button>
+      <button class="mbtn primary" onclick="saveNewProto()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD ASSEMBLY MODAL -->
+<div class="overlay" id="asm-overlay">
+  <div class="modal">
+    <div class="mh"><span class="mh-t">Add assembly</span><button class="mh-x" onclick="closeAsmModal()">×</button></div>
+    <div class="mb">
+      <div class="fg"><label>Name</label><input id="af-name" placeholder="e.g. Bedroom, Kitchen, Garage…"/></div>
+      <div class="fg"><label>Room / job type</label>
+        <select id="af-type">
+          <option value="">General</option>
+          <option value="bedroom">Bedroom</option>
+          <option value="kitchen">Kitchen</option>
+          <option value="bathroom">Bathroom</option>
+          <option value="garage">Garage</option>
+          <option value="laundry">Laundry</option>
+          <option value="mechanical">Mechanical room</option>
+          <option value="general">General purpose / finished area</option>
+          <option value="service">Service call</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="mbtn" onclick="closeAsmModal()">Cancel</button>
+      <button class="mbtn primary" onclick="saveNewAsm()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD BRANCH MODAL -->
+<div class="overlay" id="branch-overlay">
+  <div class="modal">
+    <div class="mh"><span class="mh-t">Add branch</span><button class="mh-x" onclick="closeBranchModal()">×</button></div>
+    <div class="mb">
+      <div class="fg"><label>Name</label><input id="bf-name" placeholder="e.g. 15A general, 20A kitchen, 50A stove…"/></div>
+      <div class="g2">
+        <div class="fg"><label>Wire gauge</label>
+          <select id="bf-wire">
+            <option value="">—</option>
+            <option value="14/2">14/2 NMD90</option>
+            <option value="14/3">14/3 NMD90</option>
+            <option value="12/2">12/2 NMD90</option>
+            <option value="12/3">12/3 NMD90</option>
+            <option value="10/2">10/2 NMD90</option>
+            <option value="10/3">10/3 NMD90</option>
+            <option value="8/3">8/3 NMD90</option>
+            <option value="6/2">6/2 NMD90</option>
+          </select>
+        </div>
+        <div class="fg"><label>Breaker size</label>
+          <select id="bf-breaker">
+            <option value="">—</option>
+            <option value="15A">15A</option>
+            <option value="20A">20A</option>
+            <option value="30A">30A</option>
+            <option value="40A">40A</option>
+            <option value="50A">50A</option>
+            <option value="60A">60A</option>
+            <option value="100A">100A</option>
+            <option value="200A">200A</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg"><label>Max devices per circuit</label><input type="number" id="bf-max" placeholder="e.g. 12" min="1"/></div>
+      <div class="fg"><label>Type</label>
+        <select id="bf-dedicated">
+          <option value="false">General (shared circuit)</option>
+          <option value="true">Dedicated (one device per circuit)</option>
+        </select>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="mbtn" onclick="closeBranchModal()">Cancel</button>
+      <button class="mbtn primary" onclick="saveNewBranch()">Create</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SB_URL='https://vojgddmlwakvhmbkzfld.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvamdkZG1sd2FrdmhtYmt6ZmxkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NDQ1MzAsImV4cCI6MjA5NzIyMDUzMH0.PGu1HeCZ3SsMgRyLC_s4xP8m3Qt73NlRyvzA-hFroEk';
+
+async function db(path,opts={}){
+  const isWrite=opts.method&&opts.method!=='GET';
+  const res=await fetch(`${SB_URL}/rest/v1/${path}`,{
+    headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Content-Type':'application/json',...(isWrite?{'Prefer':'return=representation'}:{})},
+    ...opts
+  });
+  if(!res.ok){const e=await res.text();throw new Error(e);}
+  const t=await res.text();return t?JSON.parse(t):[];
+}
+
+function toast(msg,d=2500){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d);}
+
+const ROOM_TYPES={bedroom:'Bedroom',kitchen:'Kitchen',bathroom:'Bathroom',garage:'Garage',laundry:'Laundry',mechanical:'Mechanical',general:'General purpose',service:'Service call',other:'Other','':"General"};
+const UNITS=['ea','ft','hr','lot'];
+
+let components=[], branches=[], protoassemblies=[], assemblies=[];
+let currentView='components';
+let expandedProtoId=null, expandedAsmId=null;
+// track unsaved component row edits
+let compEdits={};
+
+async function loadAll(){
+  try{
+    [components,branches,protoassemblies,assemblies]=await Promise.all([
+      db('components?select=*&order=name'),
+      db('branches?select=*&order=name'),
+      db('protoassemblies?select=*&order=name'),
+      db('assemblies?select=*&order=name'),
+    ]);
+    protoassemblies=protoassemblies.map(p=>({...p,components:p.components?JSON.parse(p.components):[]}));
+    assemblies=assemblies.map(a=>({...a,fixed_components:a.fixed_components?JSON.parse(a.fixed_components):[],rules:a.rules?JSON.parse(a.rules):[]}));
+  }catch(e){toast('Load failed: '+e.message);}
+  updateCounts();
+  renderComponents();
+  renderBranches();
+  renderProtos();
+  renderAssemblies();
+}
+
+function updateCounts(){
+  document.getElementById('cnt-components').textContent=components.length;
+  document.getElementById('cnt-branches').textContent=branches.length;
+  document.getElementById('cnt-proto').textContent=protoassemblies.length;
+  document.getElementById('cnt-asm').textContent=assemblies.length;
+}
+
+function switchView(view,el){
+  currentView=view;
+  document.querySelectorAll('.sb-item[data-view]').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+  const labels={components:'Add component',branches:'Add branch',protoassemblies:'Add protoassembly',assemblies:'Add assembly'};
+  document.getElementById('add-label').textContent=labels[view];
+}
+
+function handleAdd(){
+  const actions={components:addComponentRow,branches:openBranchModal,protoassemblies:openProtoModal,assemblies:openAsmModal};
+  (actions[currentView]||openProtoModal)();
+}
+
+// ── COMPONENTS ────────────────────────────────────────────────
+
+function renderComponents(){
+  const q=(document.getElementById('comp-search').value||'').toLowerCase();
+  const filtered=components.filter(c=>!q||c.name.toLowerCase().includes(q));
+  const tbody=document.getElementById('comp-tbody');
+  if(!filtered.length&&!q){tbody.innerHTML=`<tr><td colspan="4"><div class="empty-state"><i class="ti ti-box"></i><strong>No components yet</strong>Add your first component below.</div></td></tr>`;return;}
+  tbody.innerHTML='';
+  filtered.forEach(c=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td><div class="td-inner"><input class="tbl-input" value="${(c.name||'').replace(/"/g,'&quot;')}" onchange="updateComp(${c.id},'name',this.value)" style="min-width:180px"/></div></td>
+      <td><div class="td-inner">
+        <select class="tbl-select" onchange="updateComp(${c.id},'unit',this.value)">
+          ${UNITS.map(u=>`<option value="${u}" ${c.unit===u?'selected':''}>${u}</option>`).join('')}
+        </select>
+      </div></td>
+      <td><div class="td-inner"><input class="tbl-input" type="number" step="0.01" min="0" value="${c.unit_price||0}" onchange="updateComp(${c.id},'unit_price',this.value)" style="text-align:right"/></div></td>
+      <td><div class="td-inner"><button class="del-btn" onclick="deleteComp(${c.id})"><i class="ti ti-x"></i></button></div></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function updateComp(id,field,value){
+  const c=components.find(x=>x.id===id);
+  if(!c)return;
+  c[field]=field==='unit_price'?parseFloat(value)||0:value;
+  clearTimeout(c._saveTO);
+  c._saveTO=setTimeout(()=>persistComp(c),800);
+}
+
+async function persistComp(c){
+  try{await db(`components?id=eq.${c.id}`,{method:'PATCH',body:JSON.stringify({name:c.name,unit:c.unit,unit_price:c.unit_price})});}
+  catch(e){toast('Save failed: '+e.message);}
+}
+
+async function addComponentRow(){
+  try{
+    const rows=await db('components',{method:'POST',body:JSON.stringify({name:'New component',unit:'ea',unit_price:0})});
+    if(rows&&rows[0])components.push(rows[0]);
+    updateCounts();renderComponents();
+    // focus the new row name input
+    setTimeout(()=>{const inputs=document.querySelectorAll('#comp-tbody .tbl-input');if(inputs.length)inputs[inputs.length-1].focus();},100);
+  }catch(e){toast('Failed: '+e.message);}
+}
+
+async function deleteComp(id){
+  if(!confirm('Delete this component?'))return;
+  try{await db(`components?id=eq.${id}`,{method:'DELETE'});}catch(e){toast('Delete failed: '+e.message);return;}
+  components=components.filter(x=>x.id!==id);
+  updateCounts();renderComponents();toast('Component deleted');
+}
+
+// ── BRANCHES ──────────────────────────────────────────────────
+
+function renderBranches(){
+  const grid=document.getElementById('branch-grid');
+  if(!branches.length){
+    grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><i class="ti ti-git-branch"></i><strong>No branches yet</strong>Add your circuit types — 15A general, 20A kitchen, 50A stove, etc.</div>`;
+    return;
+  }
+  grid.innerHTML='';
+  branches.forEach(b=>{
+    const card=document.createElement('div');
+    card.className='branch-card';
+    card.innerHTML=`
+      <div class="branch-card-header">
+        <div class="branch-card-name">${b.name}</div>
+        <span class="${b.dedicated?'dedicated-badge':'general-badge'}">${b.dedicated?'Dedicated':'General'}</span>
+      </div>
+      <div class="branch-fields">
+        <div class="branch-field"><div class="branch-label">Wire gauge</div>
+          <select class="branch-select" onchange="updateBranch(${b.id},'wire_gauge',this.value)">
+            <option value="">—</option>
+            ${['14/2','14/3','12/2','12/3','10/2','10/3','8/3','6/2'].map(w=>`<option value="${w}" ${b.wire_gauge===w?'selected':''}>${w} NMD90</option>`).join('')}
+          </select>
+        </div>
+        <div class="branch-field"><div class="branch-label">Breaker</div>
+          <select class="branch-select" onchange="updateBranch(${b.id},'breaker_size',this.value)">
+            <option value="">—</option>
+            ${['15A','20A','30A','40A','50A','60A','100A','200A'].map(s=>`<option value="${s}" ${b.breaker_size===s?'selected':''}>${s}</option>`).join('')}
+          </select>
+        </div>
+        <div class="branch-field"><div class="branch-label">Max devices</div>
+          <input class="branch-input" type="number" min="1" value="${b.max_devices||''}" placeholder="e.g. 12" onchange="updateBranch(${b.id},'max_devices',this.value)"/>
+        </div>
+        <div class="branch-field"><div class="branch-label">Type</div>
+          <select class="branch-select" onchange="updateBranch(${b.id},'dedicated',this.value==='true')">
+            <option value="false" ${!b.dedicated?'selected':''}>General</option>
+            <option value="true" ${b.dedicated?'selected':''}>Dedicated</option>
+          </select>
+        </div>
+        <div class="branch-field" style="grid-column:1/-1"><div class="branch-label">Name</div>
+          <input class="branch-input" value="${(b.name||'').replace(/"/g,'&quot;')}" onchange="updateBranch(${b.id},'name',this.value)"/>
+        </div>
+      </div>
+      <div class="branch-actions">
+        <button class="branch-save" onclick="saveBranch(${b.id})">Save</button>
+        <button class="nbtn danger" onclick="deleteBranch(${b.id})"><i class="ti ti-trash"></i> Delete</button>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function updateBranch(id,field,value){const b=branches.find(x=>x.id===id);if(b)b[field]=value;}
+
+async function saveBranch(id){
+  const b=branches.find(x=>x.id===id);if(!b)return;
+  try{
+    await db(`branches?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({name:b.name,wire_gauge:b.wire_gauge||null,breaker_size:b.breaker_size||null,max_devices:parseInt(b.max_devices)||null,dedicated:b.dedicated||false})});
+    toast('Branch saved ✓');renderBranches();
+  }catch(e){toast('Save failed: '+e.message);}
+}
+
+async function deleteBranch(id){
+  if(!confirm('Delete this branch?'))return;
+  try{await db(`branches?id=eq.${id}`,{method:'DELETE'});}catch(e){toast('Delete failed: '+e.message);return;}
+  branches=branches.filter(x=>x.id!==id);
+  updateCounts();renderBranches();toast('Branch deleted');
+}
+
+function openBranchModal(){
+  ['bf-name','bf-max'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('bf-wire').value='';
+  document.getElementById('bf-breaker').value='';
+  document.getElementById('bf-dedicated').value='false';
+  document.getElementById('branch-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('bf-name').focus(),100);
+}
+function closeBranchModal(){document.getElementById('branch-overlay').classList.remove('open');}
+
+async function saveNewBranch(){
+  const name=document.getElementById('bf-name').value.trim();
+  if(!name){toast('Please enter a name.');return;}
+  const data={name,wire_gauge:document.getElementById('bf-wire').value||null,breaker_size:document.getElementById('bf-breaker').value||null,max_devices:parseInt(document.getElementById('bf-max').value)||null,dedicated:document.getElementById('bf-dedicated').value==='true'};
+  try{
+    const rows=await db('branches',{method:'POST',body:JSON.stringify(data)});
+    if(rows&&rows[0])branches.push(rows[0]);
+    updateCounts();renderBranches();closeBranchModal();toast('Branch added ✓');
+    populateBranchSelects();
+  }catch(e){toast('Save failed: '+e.message);}
+}
+
+// ── PROTOASSEMBLIES ───────────────────────────────────────────
+
+function populateBranchSelects(){
+  const opts='<option value="">None</option>'+branches.map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
+  document.getElementById('pf-branch').innerHTML=opts;
+}
+
+function renderProtos(){
+  const q=(document.getElementById('proto-search').value||'').toLowerCase();
+  const filtered=protoassemblies.filter(p=>!q||p.name.toLowerCase().includes(q));
+  const grid=document.getElementById('proto-grid');
+  if(!filtered.length){
+    grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><i class="ti ti-atom"></i><strong>No protoassemblies yet</strong>Create components first, then build protoassemblies from them.</div>`;
+    return;
+  }
+  grid.innerHTML='';
+  filtered.forEach(p=>{
+    const isOpen=expandedProtoId===p.id;
+    const comps=p.components||[];
+    const total=comps.reduce((s,c)=>{const comp=components.find(x=>x.id===c.comp_id);return s+(comp?(parseFloat(comp.unit_price)||0)*(parseFloat(c.qty)||1):0);},0);
+    const branch=branches.find(x=>x.id===p.branch_id);
+    const compOpts=components.map(c=>`<option value="${c.id}">${c.name} (${c.unit})</option>`).join('');
+    const branchOpts='<option value="">None</option>'+branches.map(b=>`<option value="${b.id}" ${p.branch_id===b.id?'selected':''}>${b.name}</option>`).join('');
+
+    const compRows=comps.map(c=>{
+      const comp=components.find(x=>x.id===c.comp_id);
+      if(!comp)return'';
+      const lineTotal=(parseFloat(comp.unit_price)||0)*(parseFloat(c.qty)||1);
+      return`<div class="comp-row">
+        <div class="comp-name">${comp.name}</div>
+        <input class="comp-qty-input" type="number" min="0" step="0.5" value="${c.qty}" onchange="updateProtoCompQty(${p.id},${c.comp_id},this.value)"/>
+        <div class="comp-cost">$${lineTotal.toFixed(2)}</div>
+        <button class="comp-del" onclick="removeProtoComp(${p.id},${c.comp_id})"><i class="ti ti-x"></i></button>
+      </div>`;
+    }).join('');
+
+    const card=document.createElement('div');
+    card.className='proto-card';
+    card.innerHTML=`
+      <div class="proto-card-header" onclick="toggleProto(${p.id})">
+        <div>
+          <div class="proto-card-title">${p.name}</div>
+          <div class="proto-card-sub">${branch?branch.name:'No branch'} · ${comps.length} component${comps.length!==1?'s':''}</div>
+        </div>
+        <div class="proto-card-right">
+          <div class="proto-total">$${total.toFixed(2)}</div>
+          <i class="ti ti-chevron-down proto-chevron ${isOpen?'open':''}"></i>
+        </div>
+      </div>
+      <div class="proto-body ${isOpen?'open':''}">
+        <div class="proto-name-row">
+          <input class="proto-name-input" value="${(p.name||'').replace(/"/g,'&quot;')}" placeholder="Name" onchange="updateProtoField(${p.id},'name',this.value)"/>
+          <select class="proto-branch-select" onchange="updateProtoField(${p.id},'branch_id',parseInt(this.value)||null)">${branchOpts}</select>
+        </div>
+        <div class="comp-table-wrap">
+          ${comps.length?`<div class="comp-head"><span>Component</span><span>Qty</span><span>Cost</span><span></span></div>${compRows}`:'<div style="padding:8px 0;font-size:13px;color:var(--muted)">No components yet.</div>'}
+        </div>
+        <div class="proto-add-comp">
+          <select class="comp-select" id="csel-${p.id}"><option value="">Add component…</option>${compOpts}</select>
+          <button class="nbtn" onclick="addProtoComp(${p.id})"><i class="ti ti-plus"></i> Add</button>
+        </div>
+        <div class="proto-footer">
+          <div class="proto-footer-total">Total: <strong>$${total.toFixed(2)}</strong></div>
+          <div class="proto-foot-btns">
+            <button class="nbtn" onclick="saveProto(${p.id})"><i class="ti ti-device-floppy"></i> Save</button>
+            <button class="nbtn danger" onclick="deleteProto(${p.id})"><i class="ti ti-trash"></i></button>
+          </div>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function toggleProto(id){expandedProtoId=expandedProtoId===id?null:id;renderProtos();}
+function updateProtoField(id,field,value){const p=protoassemblies.find(x=>x.id===id);if(p)p[field]=value;}
+function updateProtoCompQty(pid,cid,value){const p=protoassemblies.find(x=>x.id===pid);if(!p)return;const c=p.components.find(x=>x.comp_id===cid);if(c)c.qty=parseFloat(value)||1;renderProtos();}
+function removeProtoComp(pid,cid){const p=protoassemblies.find(x=>x.id===pid);if(!p)return;p.components=p.components.filter(x=>x.comp_id!==cid);renderProtos();}
+function addProtoComp(pid){
+  const sel=document.getElementById(`csel-${pid}`);
+  const cid=parseInt(sel.value);if(!cid)return;
+  const p=protoassemblies.find(x=>x.id===pid);if(!p)return;
+  if(p.components.find(x=>x.comp_id===cid)){toast('Already in this protoassembly.');return;}
+  p.components.push({comp_id:cid,qty:1});renderProtos();
+}
+
+async function saveProto(id){
+  const p=protoassemblies.find(x=>x.id===id);if(!p)return;
+  try{
+    await db(`protoassemblies?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({name:p.name,branch_id:p.branch_id||null,components:JSON.stringify(p.components)})});
+    toast('Protoassembly saved ✓');renderProtos();
+  }catch(e){toast('Save failed: '+e.message);}
+}
+
+async function deleteProto(id){
+  if(!confirm('Delete this protoassembly?'))return;
+  try{await db(`protoassemblies?id=eq.${id}`,{method:'DELETE'});}catch(e){toast('Delete failed: '+e.message);return;}
+  protoassemblies=protoassemblies.filter(x=>x.id!==id);
+  expandedProtoId=null;updateCounts();renderProtos();toast('Protoassembly deleted');
+}
+
+function openProtoModal(){
+  document.getElementById('pf-name').value='';
+  populateBranchSelects();
+  document.getElementById('proto-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('pf-name').focus(),100);
+}
+function closeProtoModal(){document.getElementById('proto-overlay').classList.remove('open');}
+
+async function saveNewProto(){
+  const name=document.getElementById('pf-name').value.trim();
+  if(!name){toast('Please enter a name.');return;}
+  const bid=parseInt(document.getElementById('pf-branch').value)||null;
+  try{
+    const rows=await db('protoassemblies',{method:'POST',body:JSON.stringify({name,branch_id:bid,components:JSON.stringify([])})});
+    if(rows&&rows[0])protoassemblies.push({...rows[0],components:[]});
+    expandedProtoId=rows[0]?.id||null;
+    updateCounts();renderProtos();closeProtoModal();toast('Protoassembly created ✓');
+  }catch(e){toast('Save failed: '+e.message);}
+}
+
+// ── ASSEMBLIES ────────────────────────────────────────────────
+
+function renderAssemblies(){
+  const q=(document.getElementById('asm-search').value||'').toLowerCase();
+  const filtered=assemblies.filter(a=>!q||a.name.toLowerCase().includes(q));
+  const list=document.getElementById('asm-list');
+  if(!filtered.length){
+    list.innerHTML=`<div class="empty-state"><i class="ti ti-stack-2"></i><strong>No assemblies yet</strong>Build room assemblies from protoassemblies.</div>`;
+    return;
+  }
+  list.innerHTML='';
+  filtered.forEach(a=>list.appendChild(buildAsmCard(a)));
+}
+
+function buildAsmCard(a){
+  const isOpen=expandedAsmId===a.id;
+  const fixed=a.fixed_components||[];
+  const rules=a.rules||[];
+  const protoOpts=protoassemblies.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+
+  const fixedRows=fixed.map(f=>{
+    const p=protoassemblies.find(x=>x.id===f.proto_id);
+    if(!p)return'';
+    return`<div class="fixed-row">
+      <div class="fixed-name">${p.name}</div>
+      <input class="fixed-qty" type="number" min="0" step="1" value="${f.qty}" onchange="updateFixedQty(${a.id},${f.proto_id},this.value)"/>
+      <button class="comp-del" onclick="removeFixed(${a.id},${f.proto_id})"><i class="ti ti-x"></i></button>
+    </div>`;
+  }).join('');
+
+  const ruleRows=rules.map((r,i)=>{
+    const p=protoassemblies.find(x=>x.id===r.proto_id);
+    return`<div class="rule-row">
+      <select class="rule-select" onchange="updateRule(${a.id},${i},'proto_id',parseInt(this.value))">
+        ${protoassemblies.map(p=>`<option value="${p.id}" ${r.proto_id===p.id?'selected':''}>${p.name}</option>`).join('')}
+      </select>
+      <select class="rule-select" onchange="updateRule(${a.id},${i},'basis',this.value)">
+        <option value="perimeter" ${r.basis==='perimeter'?'selected':''}>Perimeter</option>
+        <option value="area" ${r.basis==='area'?'selected':''}>Area</option>
+        <option value="width" ${r.basis==='width'?'selected':''}>Width</option>
+        <option value="length" ${r.basis==='length'?'selected':''}>Length</option>
+      </select>
+      <input class="rule-formula" value="${r.formula||''}" placeholder="e.g. ceil(x/12)+1" onchange="updateRule(${a.id},${i},'formula',this.value)"/>
+      <button class="comp-del" onclick="removeRule(${a.id},${i})"><i class="ti ti-x"></i></button>
+    </div>`;
+  }).join('');
+
+  const card=document.createElement('div');
+  card.className='asm-card';
+  card.innerHTML=`
+    <div class="asm-header" onclick="toggleAsm(${a.id})">
+      <div>
+        <div class="asm-title">${a.name}</div>
+        <div class="asm-sub">${ROOM_TYPES[a.room_type||'']||'General'} · ${fixed.length} fixed, ${rules.length} rule${rules.length!==1?'s':''}</div>
+      </div>
+      <div class="asm-right">
+        <i class="ti ti-chevron-down asm-chevron ${isOpen?'open':''}"></i>
+      </div>
+    </div>
+    <div class="asm-body ${isOpen?'open':''}">
+      <div class="asm-name-row">
+        <input class="asm-name-input" value="${(a.name||'').replace(/"/g,'&quot;')}" onchange="updateAsmField(${a.id},'name',this.value)"/>
+        <select class="asm-type-select" onchange="updateAsmField(${a.id},'room_type',this.value)">
+          ${Object.entries(ROOM_TYPES).map(([v,l])=>`<option value="${v}" ${(a.room_type||'')=== v?'selected':''}>${l}</option>`).join('')}
+        </select>
+      </div>
+
+      <div class="fixed-section">
+        <div class="fixed-label">
+          <span>Fixed components <span style="font-weight:400;color:var(--muted)">(always added regardless of dimensions)</span></span>
+        </div>
+        ${fixed.length?`<div style="margin-bottom:6px">${fixedRows}</div>`:'<div style="font-size:13px;color:var(--muted);margin-bottom:8px">None yet.</div>'}
+        <div style="display:flex;gap:8px;align-items:center">
+          <select class="comp-select" id="fsel-${a.id}"><option value="">Add protoassembly…</option>${protoOpts}</select>
+          <button class="nbtn" onclick="addFixed(${a.id})"><i class="ti ti-plus"></i> Add</button>
+        </div>
+      </div>
+
+      <div class="rules-section">
+        <div class="rules-label">
+          <span>Rules <span style="font-weight:400;color:var(--muted)">(quantity calculated from room dimensions)</span></span>
+          <button class="nbtn" style="padding:3px 10px;font-size:11px" onclick="addRule(${a.id})"><i class="ti ti-plus"></i> Add rule</button>
+        </div>
+        ${rules.length?`<div class="comp-head" style="grid-template-columns:2fr 120px 1fr 28px"><span>Protoassembly</span><span>Based on</span><span>Formula (x = dimension in ft)</span><span></span></div>${ruleRows}<div class="rule-hint">Formulas use x as the dimension value. Examples: <code>ceil(x/12)+1</code> for receptacles per perimeter, <code>round(x*1.2)</code> for wire with buffer.</div>`:'<div style="font-size:13px;color:var(--muted)">No rules yet. Rules calculate quantities automatically from room dimensions.</div>'}
+      </div>
+
+      <div class="asm-footer">
+        <button class="nbtn danger" onclick="deleteAsm(${a.id})"><i class="ti ti-trash"></i> Delete</button>
+        <button class="nbtn primary" onclick="saveAsm(${a.id})"><i class="ti ti-device-floppy"></i> Save assembly</button>
+      </div>
+    </div>`;
+  return card;
+}
+
+function toggleAsm(id){expandedAsmId=expandedAsmId===id?null:id;renderAssemblies();}
+function updateAsmField(id,field,value){const a=assemblies.find(x=>x.id===id);if(a)a[field]=value;}
+function updateFixedQty(aid,pid,value){const a=assemblies.find(x=>x.id===aid);if(!a)return;const f=a.fixed_components.find(x=>x.proto_id===pid);if(f)f.qty=parseFloat(value)||1;renderAssemblies();}
+function removeFixed(aid,pid){const a=assemblies.find(x=>x.id===aid);if(!a)return;a.fixed_components=a.fixed_components.filter(x=>x.proto_id!==pid);renderAssemblies();}
+function addFixed(aid){
+  const sel=document.getElementById(`fsel-${aid}`);
+  const pid=parseInt(sel.value);if(!pid)return;
+  const a=assemblies.find(x=>x.id===aid);if(!a)return;
+  if(a.fixed_components.find(x=>x.proto_id===pid)){toast('Already added.');return;}
+  a.fixed_components.push({proto_id:pid,qty:1});renderAssemblies();
+}
+function updateRule(aid,idx,field,value){const a=assemblies.find(x=>x.id===aid);if(!a||!a.rules[idx])return;a.rules[idx][field]=value;renderAssemblies();}
+function removeRule(aid,idx){const a=assemblies.find(x=>x.id===aid);if(!a)return;a.rules.splice(idx,1);renderAssemblies();}
+function addRule(aid){
+  const a=assemblies.find(x=>x.id===aid);if(!a)return;
+  const firstProto=protoassemblies[0];
+  a.rules.push({proto_id:firstProto?firstProto.id:null,basis:'perimeter',formula:'ceil(x/12)'});
+  renderAssemblies();
+}
+
+async function saveAsm(id){
+  const a=assemblies.find(x=>x.id===id);if(!a)return;
+  try{
+    await db(`assemblies?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({name:a.name,room_type:a.room_type||null,fixed_components:JSON.stringify(a.fixed_components),rules:JSON.stringify(a.rules)})});
+    toast('Assembly saved ✓');renderAssemblies();
+  }catch(e){toast('Save failed: '+e.message);}
+}
+
+async function deleteAsm(id){
+  if(!confirm('Delete this assembly?'))return;
+  try{await db(`assemblies?id=eq.${id}`,{method:'DELETE'});}catch(e){toast('Delete failed: '+e.message);return;}
+  assemblies=assemblies.filter(x=>x.id!==id);
+  expandedAsmId=null;updateCounts();renderAssemblies();toast('Assembly deleted');
+}
+
+function openAsmModal(){
+  document.getElementById('af-name').value='';
+  document.getElementById('af-type').value='';
+  document.getElementById('asm-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('af-name').focus(),100);
+}
+function closeAsmModal(){document.getElementById('asm-overlay').classList.remove('open');}
+
+async function saveNewAsm(){
+  const name=document.getElementById('af-name').value.trim();
+  if(!name){toast('Please enter a name.');return;}
+  try{
+    const rows=await db('assemblies',{method:'POST',body:JSON.stringify({name,room_type:document.getElementById('af-type').value||null,fixed_components:JSON.stringify([]),rules:JSON.stringify([])})});
+    if(rows&&rows[0])assemblies.push({...rows[0],fixed_components:[],rules:[]});
+    expandedAsmId=rows[0]?.id||null;
+    updateCounts();renderAssemblies();closeAsmModal();toast('Assembly created ✓');
+  }catch(e){toast('Save failed: '+e.message);}
+}
+
+loadAll();
+</script>
+</body>
+</html>
