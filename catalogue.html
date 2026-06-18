@@ -130,8 +130,8 @@
     .sub-select:focus{outline:none;border-color:var(--blue);}
 
     /* RULES */
-    .rule-head{display:grid;grid-template-columns:2fr 110px 1.2fr 28px;gap:8px;font-size:10px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);padding-bottom:6px;border-bottom:0.5px solid var(--border);margin-bottom:4px;}
-    .rule-row{display:grid;grid-template-columns:2fr 110px 1.2fr 28px;gap:8px;align-items:center;padding:5px 0;border-bottom:0.5px solid var(--surface);}
+    .rule-head{display:grid;grid-template-columns:90px 2fr 110px 1.2fr 28px;gap:8px;font-size:10px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);padding-bottom:6px;border-bottom:0.5px solid var(--border);margin-bottom:4px;}
+    .rule-row{display:grid;grid-template-columns:90px 2fr 110px 1.2fr 28px;gap:8px;align-items:center;padding:5px 0;border-bottom:0.5px solid var(--surface);}
     .rule-row:last-child{border-bottom:none;}
     .rule-select{font-size:12px;padding:4px 6px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;width:100%;}
     .rule-select:focus{outline:none;border-color:var(--blue);}
@@ -681,10 +681,18 @@ function buildAsmCard(a){
     </div>`;
   }).join('');
 
-  const ruleRows=rules.map((r,i)=>`
-    <div class="rule-row">
-      <select class="rule-select" onchange="updateRule(${a.id},${i},'proto_id',parseInt(this.value))">
-        ${protoassemblies.map(p=>`<option value="${p.id}" ${r.proto_id===p.id?'selected':''}>${p.name}</option>`).join('')}
+  const ruleRows=rules.map((r,i)=>{
+    const isComp=(r.type||'protoassembly')==='component';
+    const refOpts=isComp
+      ?components.map(c=>`<option value="${c.id}" ${r.ref_id===c.id?'selected':''}>${c.description||c.technical_name||'Unnamed'} (${c.unit})</option>`).join('')
+      :protoassemblies.map(p=>`<option value="${p.id}" ${r.ref_id===p.id?'selected':''}>${p.name}</option>`).join('');
+    return`<div class="rule-row">
+      <select class="rule-select" onchange="updateRuleType(${a.id},${i},this.value)">
+        <option value="protoassembly" ${!isComp?'selected':''}>Proto</option>
+        <option value="component" ${isComp?'selected':''}>Component</option>
+      </select>
+      <select class="rule-select" onchange="updateRule(${a.id},${i},'ref_id',parseInt(this.value))">
+        <option value="">Select…</option>${refOpts}
       </select>
       <select class="rule-select" onchange="updateRule(${a.id},${i},'basis',this.value)">
         <option value="perimeter" ${r.basis==='perimeter'?'selected':''}>Perimeter (ft)</option>
@@ -694,7 +702,8 @@ function buildAsmCard(a){
       </select>
       <input class="rule-formula" value="${esc(r.formula||'')}" placeholder="e.g. ceil(x/12)+1" onchange="updateRule(${a.id},${i},'formula',this.value)"/>
       <button class="sub-del" onclick="removeRule(${a.id},${i})"><i class="ti ti-x"></i></button>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 
   const card=document.createElement('div');
   card.className='exp-card'+(isOpen?' open':'');
@@ -735,7 +744,7 @@ function buildAsmCard(a){
           <button class="nbtn" style="padding:3px 10px;font-size:11px" onclick="addRule(${a.id})"><i class="ti ti-plus"></i> Add rule</button>
         </div>
         ${rules.length
-          ?`<div class="rule-head"><span>Protoassembly</span><span>Based on</span><span>Formula — x = dimension value</span><span></span></div>${ruleRows}
+          ?`<div class="rule-head"><span>Type</span><span>Protoassembly or component</span><span>Based on</span><span>Formula — x = dimension value</span><span></span></div>${ruleRows}
             <div class="rule-hint">Formula examples: <code>ceil(x/12)</code> receptacles from perimeter · <code>round(x*1.2)</code> wire with 20% buffer · <code>floor(x/100)+1</code> pot lights from area</div>`
           :'<div style="font-size:13px;color:var(--muted);padding:4px 0">No rules yet. Rules auto-calculate quantities when you enter room dimensions in the assessment.</div>'
         }
@@ -759,12 +768,16 @@ function addFixed(aid){
   if(a.fixed_components.find(x=>x.proto_id===pid)){toast('Already added.');return;}
   a.fixed_components.push({proto_id:pid,qty:1});renderAssemblies();
 }
-function updateRule(aid,idx,field,value){const a=assemblies.find(x=>x.id===aid);if(!a||!a.rules[idx])return;a.rules[idx][field]=value;renderAssemblies();}
+function updateRule(aid,idx,field,value){const a=assemblies.find(x=>x.id===aid);if(!a||!a.rules[idx])return;a.rules[idx][field]=field==='ref_id'?parseInt(value)||null:value;}
+function updateRuleType(aid,idx,value){
+  const a=assemblies.find(x=>x.id===aid);if(!a||!a.rules[idx])return;
+  a.rules[idx].type=value;a.rules[idx].ref_id=null;renderAssemblies();
+}
 function removeRule(aid,idx){const a=assemblies.find(x=>x.id===aid);if(!a)return;a.rules.splice(idx,1);renderAssemblies();}
 function addRule(aid){
   const a=assemblies.find(x=>x.id===aid);if(!a)return;
   const first=protoassemblies[0];
-  a.rules.push({proto_id:first?first.id:null,basis:'perimeter',formula:'ceil(x/12)'});
+  a.rules.push({type:'protoassembly',ref_id:first?first.id:null,basis:'perimeter',formula:'ceil(x/12)'});
   renderAssemblies();
 }
 async function saveAsm(id){
