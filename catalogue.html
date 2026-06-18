@@ -231,7 +231,7 @@
               <th style="min-width:140px">Description</th>
               <th style="width:80px">Unit</th>
               <th style="width:110px">Unit price ($)</th>
-              <th style="width:36px"></th>
+              <th style="width:70px"></th>
             </tr>
           </thead>
           <tbody id="comp-tbody"></tbody>
@@ -374,7 +374,7 @@ async function db(path,opts={}){
 function toast(msg,d=2500){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d);}
 
 const ROOM_TYPES={bedroom:'Bedroom',kitchen:'Kitchen',bathroom:'Bathroom',garage:'Garage',laundry:'Laundry',mechanical:'Mechanical',general:'General purpose',service:'Service call',other:'Other','':"General"};
-const UNITS=['ea','ft','hr','lot'];
+const UNITS=['ea','ft','m','hr','lot'];
 
 let components=[],branches=[],protoassemblies=[],assemblies=[];
 let currentView='components';
@@ -383,7 +383,7 @@ let expandedProtoId=null,expandedAsmId=null;
 async function loadAll(){
   try{
     [components,branches,protoassemblies,assemblies]=await Promise.all([
-      db('components?select=*&order=description'),
+      db('components?select=*&order=created_at'),
       db('branches?select=*&order=name'),
       db('protoassemblies?select=*&order=name'),
       db('assemblies?select=*&order=name'),
@@ -441,7 +441,10 @@ function renderComponents(){
         </select>
       </div></td>
       <td><div class="td-inner"><input class="tbl-input" type="number" step="0.01" min="0" value="${c.unit_price||0}" onchange="updateComp(${c.id},'unit_price',this.value)" style="text-align:right"/></div></td>
-      <td><div class="td-inner"><button class="del-btn" onclick="deleteComp(${c.id})"><i class="ti ti-x"></i></button></div></td>`;
+      <td><div class="td-inner" style="display:flex;gap:4px">
+        <button class="del-btn" id="save-btn-${c.id}" onclick="saveComp(${c.id})" title="Save" style="color:var(--blue)"><i class="ti ti-device-floppy"></i></button>
+        <button class="del-btn" id="del-btn-${c.id}" onclick="confirmDel('comp',${c.id})" title="Delete"><i class="ti ti-x"></i></button>
+      </div></td>`;
     tbody.appendChild(tr);
   });
 }
@@ -451,26 +454,37 @@ function esc(v){return(v||'').replace(/"/g,'&quot;');}
 function updateComp(id,field,value){
   const c=components.find(x=>x.id===id);if(!c)return;
   c[field]=field==='unit_price'?parseFloat(value)||0:value;
-  clearTimeout(c._t);
-  c._t=setTimeout(()=>persistComp(c),700);
+  const btn=document.getElementById('save-btn-'+id);
+  if(btn){btn.style.color='var(--amber)';btn.title='Unsaved — click to save';}
 }
 
-async function persistComp(c){
-  try{await db(`components?id=eq.${c.id}`,{method:'PATCH',body:JSON.stringify({manufacturer:c.manufacturer||null,technical_name:c.technical_name||null,description:c.description||null,unit:c.unit,unit_price:c.unit_price})});}
-  catch(e){toast('Save failed: '+e.message);}
+async function saveComp(id){
+  const c=components.find(x=>x.id===id);if(!c)return;
+  const btn=document.getElementById('save-btn-'+id);
+  if(btn){btn.style.color='var(--muted)';btn.title='Saving…';}
+  try{
+    await db(`components?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({manufacturer:c.manufacturer||null,technical_name:c.technical_name||null,description:c.description||null,unit:c.unit,unit_price:c.unit_price})});
+    if(btn){btn.style.color='var(--green)';btn.title='Saved ✓';setTimeout(()=>{if(btn){btn.style.color='var(--blue)';btn.title='Save';}},1500);}
+    toast('Saved ✓');
+  }catch(e){
+    if(btn){btn.style.color='var(--red)';btn.title='Save failed';}
+    toast('Save failed: '+e.message);
+  }
 }
 
 async function addComponentRow(){
+  const btn=document.querySelector('.add-row-btn');
+  if(btn){btn.disabled=true;btn.innerHTML='<i class="ti ti-loader"></i> Adding…';}
   try{
     const rows=await db('components',{method:'POST',body:JSON.stringify({description:'New component',unit:'ea',unit_price:0})});
     if(rows&&rows[0])components.push(rows[0]);
     updateCounts();renderComponents();
     setTimeout(()=>{const inputs=document.querySelectorAll('#comp-tbody input');if(inputs.length)inputs[inputs.length-5]?.focus();},80);
   }catch(e){toast('Failed: '+e.message);}
+  finally{if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-plus"></i> Add component';}}
 }
 
 async function deleteComp(id){
-  if(!confirm('Delete this component?'))return;
   try{await db(`components?id=eq.${id}`,{method:'DELETE'});}catch(e){toast('Delete failed: '+e.message);return;}
   components=components.filter(x=>x.id!==id);updateCounts();renderComponents();toast('Deleted');
 }
@@ -516,7 +530,7 @@ function renderBranches(){
       </div>
       <div class="branch-actions">
         <button class="nbtn primary" style="padding:5px 14px;font-size:12px" onclick="saveBranch(${b.id})"><i class="ti ti-device-floppy"></i> Save</button>
-        <button class="nbtn danger" style="padding:5px 12px;font-size:12px" onclick="deleteBranch(${b.id})"><i class="ti ti-trash"></i></button>
+        <button class="nbtn danger" id="del-btn-branch-${b.id}" style="padding:5px 12px;font-size:12px" onclick="confirmDel('branch',${b.id})"><i class="ti ti-trash"></i></button>
       </div>`;
     grid.appendChild(card);
   });
@@ -529,7 +543,6 @@ async function saveBranch(id){
   catch(e){toast('Save failed: '+e.message);}
 }
 async function deleteBranch(id){
-  if(!confirm('Delete this branch?'))return;
   try{await db(`branches?id=eq.${id}`,{method:'DELETE'});}catch(e){toast('Delete failed: '+e.message);return;}
   branches=branches.filter(x=>x.id!==id);updateCounts();renderBranches();toast('Deleted');
 }
@@ -610,7 +623,7 @@ function buildProtoCard(p){
         <div class="card-footer-total">Material total: <strong>$${total.toFixed(2)}</strong></div>
         <div class="card-footer-btns">
           <button class="nbtn primary" onclick="saveProto(${p.id})"><i class="ti ti-device-floppy"></i> Save</button>
-          <button class="nbtn danger" onclick="deleteProto(${p.id})"><i class="ti ti-trash"></i></button>
+          <button class="nbtn danger" id="del-btn-proto-${p.id}" onclick="confirmDel('proto',${p.id})"><i class="ti ti-trash"></i></button>
         </div>
       </div>
     </div>`;
@@ -633,7 +646,6 @@ async function saveProto(id){
   catch(e){toast('Save failed: '+e.message);}
 }
 async function deleteProto(id){
-  if(!confirm('Delete this protoassembly?'))return;
   try{await db(`protoassemblies?id=eq.${id}`,{method:'DELETE'});}catch(e){toast('Delete failed: '+e.message);return;}
   protoassemblies=protoassemblies.filter(x=>x.id!==id);expandedProtoId=null;updateCounts();renderProtos();toast('Deleted');
 }
@@ -751,7 +763,7 @@ function buildAsmCard(a){
       </div>
 
       <div class="card-footer">
-        <button class="nbtn danger" onclick="deleteAsm(${a.id})"><i class="ti ti-trash"></i> Delete</button>
+        <button class="nbtn danger" id="del-btn-asm-${a.id}" onclick="confirmDel('asm',${a.id})"><i class="ti ti-trash"></i> Delete</button>
         <button class="nbtn primary" onclick="saveAsm(${a.id})"><i class="ti ti-device-floppy"></i> Save assembly</button>
       </div>
     </div>`;
@@ -786,7 +798,6 @@ async function saveAsm(id){
   catch(e){toast('Save failed: '+e.message);}
 }
 async function deleteAsm(id){
-  if(!confirm('Delete this assembly?'))return;
   try{await db(`assemblies?id=eq.${id}`,{method:'DELETE'});}catch(e){toast('Delete failed: '+e.message);return;}
   assemblies=assemblies.filter(x=>x.id!==id);expandedAsmId=null;updateCounts();renderAssemblies();toast('Deleted');
 }
@@ -802,6 +813,40 @@ async function saveNewAsm(){
     setTimeout(()=>{const el=document.querySelector('#asm-list .exp-card.open');if(el)el.scrollIntoView({behavior:'smooth',block:'center'});},100);
   }catch(e){toast('Save failed: '+e.message);}
 }
+
+// ── INLINE DELETE CONFIRM ─────────────────────────────────────
+let _delPending=null;
+function confirmDel(type,id){
+  const btnId=type==='comp'?`del-btn-${id}`:`del-btn-${type}-${id}`;
+  const btn=document.getElementById(btnId);
+  if(!btn)return;
+  // If already in confirm state for this button, execute delete
+  if(_delPending&&_delPending.type===type&&_delPending.id===id){
+    clearTimeout(_delPending.timer);_delPending=null;
+    if(type==='comp')deleteComp(id);
+    else if(type==='branch')deleteBranch(id);
+    else if(type==='proto')deleteProto(id);
+    else if(type==='asm')deleteAsm(id);
+    return;
+  }
+  // Cancel any previous pending confirm
+  if(_delPending)_cancelDel();
+  // Enter confirm state
+  btn.dataset._origHtml=btn.innerHTML;
+  btn.dataset._origStyle=btn.getAttribute('style')||'';
+  btn.innerHTML='<i class="ti ti-trash"></i> Sure?';
+  btn.style.background='var(--red)';btn.style.color='#fff';btn.style.borderColor='var(--red)';
+  _delPending={type,id,btn,timer:setTimeout(_cancelDel,3000)};
+}
+function _cancelDel(){
+  if(!_delPending)return;
+  const{btn}=_delPending;
+  if(btn){btn.innerHTML=btn.dataset._origHtml||btn.innerHTML;btn.setAttribute('style',btn.dataset._origStyle||'');}
+  clearTimeout(_delPending.timer);_delPending=null;
+}
+document.addEventListener('click',e=>{
+  if(_delPending&&!e.target.closest(`#${_delPending.type==='comp'?'del-btn-'+_delPending.id:'del-btn-'+_delPending.type+'-'+_delPending.id}`))_cancelDel();
+});
 
 loadAll();
 </script>
