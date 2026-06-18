@@ -15,7 +15,6 @@
       --amber:#BA7517;--amber-light:#fff8e1;
     }
     html,body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--black);background:var(--surface);min-height:100vh;}
-
     nav{height:52px;background:var(--white);border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;position:sticky;top:0;z-index:100;}
     .nl{display:flex;align-items:center;gap:12px;}
     .logo{font-size:16px;font-weight:600;letter-spacing:-0.03em;color:var(--black);text-decoration:none;}
@@ -43,12 +42,10 @@
     .sb-count{margin-left:auto;font-size:10px;background:var(--border);color:var(--muted);padding:1px 6px;border-radius:99px;font-weight:400;}
     .sb-item.active .sb-count{background:rgba(26,110,255,0.2);color:var(--blue);}
 
-    /* MAIN */
     .main{flex:1;overflow-y:auto;padding:1.5rem;}
     .view{display:none;}
     .view.active{display:block;}
 
-    /* TOOLBAR */
     .toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;gap:10px;flex-wrap:wrap;}
     .toolbar-left{display:flex;align-items:center;gap:8px;}
     .page-title{font-size:18px;font-weight:600;letter-spacing:-0.02em;}
@@ -56,134 +53,113 @@
     .search-wrap{display:flex;align-items:center;gap:7px;background:var(--white);border:0.5px solid var(--border);border-radius:6px;padding:7px 10px;width:200px;}
     .search-wrap i{color:var(--muted);font-size:14px;}
     .search-wrap input{border:none;background:transparent;font-size:13px;color:var(--black);font-family:inherit;outline:none;width:100%;}
-    .search-wrap input::placeholder{color:var(--muted);}
 
-    /* TABLE */
+    /* COMPONENTS TABLE */
     .tbl-wrap{background:var(--white);border:0.5px solid var(--border);border-radius:8px;overflow:hidden;}
     .tbl{width:100%;border-collapse:collapse;font-size:13px;}
-    .tbl th{font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);padding:9px 14px;border-bottom:0.5px solid var(--border);text-align:left;background:var(--surface);}
+    .tbl th{font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);padding:9px 12px;border-bottom:0.5px solid var(--border);text-align:left;background:var(--surface);white-space:nowrap;}
     .tbl td{padding:0;border-bottom:0.5px solid var(--border);vertical-align:middle;}
     .tbl tr:last-child td{border-bottom:none;}
     .tbl tr:hover td{background:#fafafa;}
-    .td-inner{padding:9px 14px;display:flex;align-items:center;gap:8px;min-height:42px;}
-    .tbl-input{font-size:13px;padding:5px 8px;border:0.5px solid transparent;border-radius:4px;background:transparent;color:var(--black);font-family:inherit;width:100%;}
-    .tbl-input:hover{border-color:var(--border);}
-    .tbl-input:focus{outline:none;border-color:var(--blue);background:var(--white);box-shadow:0 0 0 3px rgba(26,110,255,0.08);}
-    .tbl-select{font-size:13px;padding:5px 8px;border:0.5px solid transparent;border-radius:4px;background:transparent;color:var(--black);font-family:inherit;width:100%;}
-    .tbl-select:hover{border-color:var(--border);}
+    .td-inner{padding:6px 8px;display:flex;align-items:center;}
+    .tbl-input{font-size:13px;padding:5px 7px;border:0.5px solid transparent;border-radius:4px;background:transparent;color:var(--black);font-family:inherit;width:100%;}
+    .tbl-input:hover{border-color:var(--border);background:var(--white);}
+    .tbl-input:focus{outline:none;border-color:var(--blue);background:var(--white);box-shadow:0 0 0 2px rgba(26,110,255,0.08);}
+    .tbl-select{font-size:13px;padding:5px 7px;border:0.5px solid transparent;border-radius:4px;background:transparent;color:var(--black);font-family:inherit;width:100%;}
+    .tbl-select:hover{border-color:var(--border);background:var(--white);}
     .tbl-select:focus{outline:none;border-color:var(--blue);background:var(--white);}
-    .del-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;padding:4px;border-radius:4px;display:flex;align-items:center;}
+    .del-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;padding:5px;border-radius:4px;display:flex;align-items:center;}
     .del-btn:hover{color:var(--red);background:var(--red-light);}
-    .add-row-btn{display:flex;align-items:center;gap:7px;padding:10px 14px;font-size:12px;color:var(--muted);cursor:pointer;border-top:0.5px solid var(--border);background:var(--white);width:100%;border:none;font-family:inherit;border-top:0.5px solid var(--border);}
+    .add-row-btn{display:flex;align-items:center;gap:7px;padding:10px 14px;font-size:12px;color:var(--muted);cursor:pointer;background:var(--white);width:100%;border:none;font-family:inherit;border-top:0.5px solid var(--border);}
     .add-row-btn:hover{color:var(--blue);background:var(--blue-light);}
-
-    /* PROTOASSEMBLY CARDS */
-    .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px;}
-    .proto-card{background:var(--white);border:0.5px solid var(--border);border-radius:8px;overflow:hidden;}
-    .proto-card-header{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
-    .proto-card-header:hover{background:var(--surface);}
-    .proto-card-title{font-size:13px;font-weight:600;}
-    .proto-card-sub{font-size:11px;color:var(--muted);margin-top:2px;}
-    .proto-card-right{display:flex;align-items:center;gap:10px;}
-    .proto-total{font-size:14px;font-weight:600;color:var(--blue);}
-    .proto-chevron{font-size:14px;color:var(--muted);transition:transform 0.2s;}
-    .proto-chevron.open{transform:rotate(180deg);}
-    .proto-body{display:none;border-top:0.5px solid var(--border);}
-    .proto-body.open{display:block;}
-    .proto-name-row{padding:10px 14px;border-bottom:0.5px solid var(--border);display:flex;gap:8px;align-items:center;}
-    .proto-name-input{flex:1;font-size:13px;padding:7px 9px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;}
-    .proto-name-input:focus{outline:none;border-color:var(--blue);}
-    .proto-branch-select{font-size:13px;padding:7px 9px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;width:180px;}
-    .proto-branch-select:focus{outline:none;border-color:var(--blue);}
-    .comp-table-wrap{padding:10px 14px;}
-    .comp-head{display:grid;grid-template-columns:2fr 70px 80px 28px;gap:8px;font-size:10px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);padding-bottom:7px;border-bottom:0.5px solid var(--border);margin-bottom:4px;}
-    .comp-row{display:grid;grid-template-columns:2fr 70px 80px 28px;gap:8px;align-items:center;padding:4px 0;border-bottom:0.5px solid var(--surface);}
-    .comp-name{font-size:13px;}
-    .comp-qty-input{font-size:13px;padding:4px 7px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;width:100%;text-align:right;}
-    .comp-qty-input:focus{outline:none;border-color:var(--blue);}
-    .comp-cost{font-size:13px;color:var(--muted);text-align:right;}
-    .comp-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;padding:2px;display:flex;align-items:center;border-radius:3px;}
-    .comp-del:hover{color:var(--red);}
-    .proto-add-comp{padding:8px 14px;border-top:0.5px solid var(--border);display:flex;gap:8px;align-items:center;}
-    .comp-select{flex:1;font-size:13px;padding:6px 9px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;}
-    .comp-select:focus{outline:none;border-color:var(--blue);}
-    .proto-footer{padding:10px 14px;border-top:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-    .proto-footer-total{font-size:13px;}
-    .proto-footer-total strong{color:var(--blue);}
-    .proto-foot-btns{display:flex;gap:6px;}
-
-    /* ASSEMBLY CARDS */
-    .asm-card{background:var(--white);border:0.5px solid var(--border);border-radius:8px;overflow:hidden;}
-    .asm-header{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
-    .asm-header:hover{background:var(--surface);}
-    .asm-title{font-size:13px;font-weight:600;}
-    .asm-sub{font-size:11px;color:var(--muted);margin-top:2px;}
-    .asm-right{display:flex;align-items:center;gap:10px;}
-    .asm-chevron{font-size:14px;color:var(--muted);transition:transform 0.2s;}
-    .asm-chevron.open{transform:rotate(180deg);}
-    .asm-body{display:none;border-top:0.5px solid var(--border);}
-    .asm-body.open{display:block;}
-    .asm-name-row{padding:10px 14px;border-bottom:0.5px solid var(--border);display:flex;gap:8px;align-items:center;}
-    .asm-name-input{flex:1;font-size:13px;padding:7px 9px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;}
-    .asm-name-input:focus{outline:none;border-color:var(--blue);}
-    .asm-type-select{font-size:13px;padding:7px 9px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;width:180px;}
-    .asm-type-select:focus{outline:none;border-color:var(--blue);}
-
-    /* RULES */
-    .rules-section{padding:10px 14px;border-bottom:0.5px solid var(--border);}
-    .rules-label{font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
-    .rule-row{display:grid;grid-template-columns:2fr 120px 1fr 28px;gap:8px;align-items:center;padding:5px 0;border-bottom:0.5px solid var(--surface);}
-    .rule-row:last-child{border-bottom:none;}
-    .rule-input{font-size:13px;padding:5px 8px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;width:100%;}
-    .rule-input:focus{outline:none;border-color:var(--blue);}
-    .rule-select{font-size:13px;padding:5px 8px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;width:100%;}
-    .rule-select:focus{outline:none;border-color:var(--blue);}
-    .rule-formula{font-size:12px;padding:5px 8px;border:0.5px solid var(--border);border-radius:4px;background:var(--surface);color:var(--black);font-family:monospace;width:100%;}
-    .rule-formula:focus{outline:none;border-color:var(--blue);background:var(--white);}
-    .rule-hint{font-size:10px;color:var(--muted);margin-top:6px;line-height:1.5;}
-
-    /* FIXED COMPONENTS IN ASSEMBLY */
-    .fixed-section{padding:10px 14px;border-bottom:0.5px solid var(--border);}
-    .fixed-label{font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
-    .fixed-row{display:grid;grid-template-columns:2fr 80px 28px;gap:8px;align-items:center;padding:5px 0;border-bottom:0.5px solid var(--surface);}
-    .fixed-name{font-size:13px;}
-    .fixed-qty{font-size:13px;padding:4px 7px;border:0.5px solid var(--border);border-radius:4px;font-family:inherit;width:100%;text-align:right;}
-    .fixed-qty:focus{outline:none;border-color:var(--blue);}
-    .asm-add-row{padding:8px 14px;border-top:0.5px solid var(--border);display:flex;gap:8px;align-items:center;}
-    .asm-footer{padding:10px 14px;border-top:0.5px solid var(--border);display:flex;align-items:center;justify-content:flex-end;gap:6px;}
 
     /* BRANCH CARDS */
     .branch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;}
     .branch-card{background:var(--white);border:0.5px solid var(--border);border-radius:8px;padding:14px 16px;}
-    .branch-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+    .branch-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
     .branch-card-name{font-size:13px;font-weight:600;}
     .dedicated-badge{font-size:10px;font-weight:500;padding:2px 7px;border-radius:3px;background:var(--amber-light);color:var(--amber);}
     .general-badge{font-size:10px;font-weight:500;padding:2px 7px;border-radius:3px;background:var(--blue-light);color:var(--blue);}
     .branch-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
     .branch-field{display:flex;flex-direction:column;gap:3px;}
-    .branch-label{font-size:10px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);}
-    .branch-input{font-size:13px;padding:6px 8px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;width:100%;}
-    .branch-input:focus{outline:none;border-color:var(--blue);}
-    .branch-select{font-size:13px;padding:6px 8px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;width:100%;}
-    .branch-select:focus{outline:none;border-color:var(--blue);}
+    .bf-label{font-size:10px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);}
+    .bf-input{font-size:13px;padding:6px 8px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;width:100%;}
+    .bf-input:focus{outline:none;border-color:var(--blue);}
+    .bf-select{font-size:13px;padding:6px 8px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;width:100%;}
+    .bf-select:focus{outline:none;border-color:var(--blue);}
     .branch-actions{display:flex;gap:6px;padding-top:10px;border-top:0.5px solid var(--border);}
-    .branch-save{padding:5px 14px;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:var(--black);color:#fff;font-family:inherit;}
-    .branch-save:hover{background:#333;}
+
+    /* EXPANDABLE CARDS (proto + assembly) */
+    .exp-card{background:var(--white);border:0.5px solid var(--border);border-radius:8px;overflow:hidden;transition:border-color 0.15s;}
+    .exp-card.open{border-color:var(--blue);}
+    .exp-header{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
+    .exp-header:hover{background:var(--surface);}
+    .exp-card.open .exp-header{background:var(--blue-light);}
+    .exp-title{font-size:13px;font-weight:600;}
+    .exp-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+    .exp-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+    .exp-total{font-size:14px;font-weight:600;color:var(--blue);}
+    .exp-chevron{font-size:14px;color:var(--muted);transition:transform 0.2s;}
+    .exp-chevron.open{transform:rotate(180deg);}
+    .exp-body{display:none;border-top:0.5px solid var(--border);}
+    .exp-body.open{display:block;}
+
+    /* INNER FIELDS */
+    .inner-row{padding:10px 14px;border-bottom:0.5px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+    .inner-field{display:flex;flex-direction:column;gap:3px;flex:1;min-width:120px;}
+    .inner-label{font-size:10px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);}
+    .inner-input{font-size:13px;padding:6px 8px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;width:100%;}
+    .inner-input:focus{outline:none;border-color:var(--blue);}
+    .inner-select{font-size:13px;padding:6px 8px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;width:100%;}
+    .inner-select:focus{outline:none;border-color:var(--blue);}
+
+    /* SUB-ITEM TABLE inside cards */
+    .sub-section{padding:10px 14px;border-bottom:0.5px solid var(--border);}
+    .sub-section-label{font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+    .sub-head{display:grid;gap:8px;font-size:10px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);padding-bottom:6px;border-bottom:0.5px solid var(--border);margin-bottom:4px;}
+    .sub-row{display:grid;gap:8px;align-items:center;padding:5px 0;border-bottom:0.5px solid var(--surface);}
+    .sub-row:last-child{border-bottom:none;}
+    .sub-name{font-size:13px;}
+    .sub-qty{font-size:13px;padding:4px 7px;border:0.5px solid var(--border);border-radius:4px;font-family:inherit;width:100%;text-align:right;}
+    .sub-qty:focus{outline:none;border-color:var(--blue);}
+    .sub-cost{font-size:13px;color:var(--muted);text-align:right;}
+    .sub-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:13px;padding:2px;display:flex;align-items:center;border-radius:3px;}
+    .sub-del:hover{color:var(--red);}
+    .sub-add-row{display:flex;gap:8px;align-items:center;margin-top:8px;}
+    .sub-select{flex:1;font-size:13px;padding:6px 9px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;}
+    .sub-select:focus{outline:none;border-color:var(--blue);}
+
+    /* RULES */
+    .rule-head{display:grid;grid-template-columns:2fr 110px 1.2fr 28px;gap:8px;font-size:10px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);padding-bottom:6px;border-bottom:0.5px solid var(--border);margin-bottom:4px;}
+    .rule-row{display:grid;grid-template-columns:2fr 110px 1.2fr 28px;gap:8px;align-items:center;padding:5px 0;border-bottom:0.5px solid var(--surface);}
+    .rule-row:last-child{border-bottom:none;}
+    .rule-select{font-size:12px;padding:4px 6px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;width:100%;}
+    .rule-select:focus{outline:none;border-color:var(--blue);}
+    .rule-formula{font-size:12px;padding:4px 7px;border:0.5px solid var(--border);border-radius:4px;background:var(--surface);color:var(--black);font-family:monospace;width:100%;}
+    .rule-formula:focus{outline:none;border-color:var(--blue);background:var(--white);}
+    .rule-hint{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5;padding:6px 8px;background:var(--surface);border-radius:4px;}
+    .rule-hint code{font-family:monospace;background:var(--border);padding:1px 4px;border-radius:2px;font-size:11px;}
+
+    /* CARD FOOTER */
+    .card-footer{padding:10px 14px;border-top:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+    .card-footer-total{font-size:13px;}
+    .card-footer-total strong{color:var(--blue);}
+    .card-footer-btns{display:flex;gap:6px;}
 
     /* EMPTY */
-    .empty-state{padding:4rem 2rem;text-align:center;color:var(--muted);font-size:13px;line-height:1.8;}
-    .empty-state i{font-size:36px;display:block;margin-bottom:12px;opacity:0.2;}
-    .empty-state strong{display:block;font-size:15px;color:var(--black);margin-bottom:6px;opacity:0.6;}
+    .empty-state{padding:3rem 2rem;text-align:center;color:var(--muted);font-size:13px;line-height:1.8;}
+    .empty-state i{font-size:32px;display:block;margin-bottom:10px;opacity:0.2;}
+    .empty-state strong{display:block;font-size:14px;color:var(--black);margin-bottom:4px;opacity:0.5;}
 
     /* MODAL */
     .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:2000;display:none;align-items:center;justify-content:center;}
     .overlay.open{display:flex;}
-    .modal{background:var(--white);border-radius:8px;width:400px;max-width:95vw;border:0.5px solid var(--border);}
+    .modal{background:var(--white);border-radius:8px;width:420px;max-width:95vw;border:0.5px solid var(--border);}
     .mh{padding:1rem 1.25rem;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
     .mh-t{font-size:15px;font-weight:500;}
     .mh-x{background:none;border:none;cursor:pointer;color:var(--muted);font-size:20px;line-height:1;}
     .mb{padding:1rem 1.25rem;}
-    .fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
+    .fg{display:flex;flex-direction:column;gap:4px;margin-bottom:11px;}
     .fg label{font-size:11px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);}
     .fg input,.fg select{font-size:13px;padding:8px 10px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);width:100%;font-family:inherit;}
     .fg input:focus,.fg select:focus{outline:none;border-color:var(--blue);}
@@ -196,6 +172,7 @@
 
     .toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9000;background:var(--black);color:#fff;padding:10px 16px;border-radius:6px;font-size:13px;display:none;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,0.2);}
     .toast.show{display:flex;}
+    .cards-col{display:flex;flex-direction:column;gap:10px;}
   </style>
 </head>
 <body>
@@ -240,14 +217,23 @@
     <!-- COMPONENTS -->
     <div class="view active" id="view-components">
       <div class="toolbar">
-        <div><div class="page-title">Components</div><div class="page-sub">Individual physical items — the raw building blocks</div></div>
+        <div><div class="page-title">Components</div><div class="page-sub">Individual physical items — the raw building blocks of protoassemblies</div></div>
         <div class="toolbar-left">
           <div class="search-wrap"><i class="ti ti-search"></i><input type="text" id="comp-search" placeholder="Search…" oninput="renderComponents()"/></div>
         </div>
       </div>
       <div class="tbl-wrap">
         <table class="tbl">
-          <thead><tr><th>Name</th><th style="width:90px">Unit</th><th style="width:110px">Unit price ($)</th><th style="width:36px"></th></tr></thead>
+          <thead>
+            <tr>
+              <th style="min-width:120px">Manufacturer</th>
+              <th style="min-width:180px">Technical name</th>
+              <th style="min-width:140px">Description</th>
+              <th style="width:80px">Unit</th>
+              <th style="width:110px">Unit price ($)</th>
+              <th style="width:36px"></th>
+            </tr>
+          </thead>
           <tbody id="comp-tbody"></tbody>
         </table>
         <button class="add-row-btn" onclick="addComponentRow()"><i class="ti ti-plus"></i> Add component</button>
@@ -257,52 +243,91 @@
     <!-- BRANCHES -->
     <div class="view" id="view-branches">
       <div class="toolbar">
-        <div><div class="page-title">Branches</div><div class="page-sub">Circuit types — wire gauge, breaker size, device capacity</div></div>
+        <div><div class="page-title">Branches</div><div class="page-sub">Circuit types — define wire gauge, breaker size, and device capacity</div></div>
       </div>
-      <div class="branch-grid" id="branch-grid"></div>
+      <div class="branch-grid" id="branch-grid">
+        <div class="empty-state" style="grid-column:1/-1"><i class="ti ti-git-branch"></i><strong>No branches yet</strong>Add your circuit types — 15A general, 20A kitchen, 50A stove, etc.</div>
+      </div>
     </div>
 
     <!-- PROTOASSEMBLIES -->
     <div class="view" id="view-protoassemblies">
       <div class="toolbar">
-        <div><div class="page-title">Protoassemblies</div><div class="page-sub">Assembled units built from components</div></div>
+        <div><div class="page-title">Protoassemblies</div><div class="page-sub">Units built from components — e.g. 15A receptacle install, stove connection</div></div>
         <div class="toolbar-left">
           <div class="search-wrap"><i class="ti ti-search"></i><input type="text" id="proto-search" placeholder="Search…" oninput="renderProtos()"/></div>
         </div>
       </div>
-      <div class="cards-grid" id="proto-grid"></div>
+      <div class="cards-col" id="proto-list"></div>
     </div>
 
     <!-- ASSEMBLIES -->
     <div class="view" id="view-assemblies">
       <div class="toolbar">
-        <div><div class="page-title">Assemblies</div><div class="page-sub">Room and job assemblies with fixed and rule-driven quantities</div></div>
+        <div><div class="page-title">Assemblies</div><div class="page-sub">Room and job assemblies built from protoassemblies, with fixed and rule-driven quantities</div></div>
         <div class="toolbar-left">
           <div class="search-wrap"><i class="ti ti-search"></i><input type="text" id="asm-search" placeholder="Search…" oninput="renderAssemblies()"/></div>
         </div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:10px" id="asm-list"></div>
+      <div class="cards-col" id="asm-list"></div>
     </div>
 
   </div>
 </div>
 
-<!-- ADD PROTOASSEMBLY MODAL -->
+<!-- BRANCH MODAL -->
+<div class="overlay" id="branch-overlay">
+  <div class="modal">
+    <div class="mh"><span class="mh-t">Add branch</span><button class="mh-x" onclick="closeBranchModal()">×</button></div>
+    <div class="mb">
+      <div class="fg"><label>Name</label><input id="bf-name" placeholder="e.g. 15A general, 20A kitchen, 50A stove…"/></div>
+      <div class="g2">
+        <div class="fg"><label>Wire gauge</label>
+          <select id="bf-wire">
+            <option value="">—</option>
+            <option>14/2</option><option>14/3</option><option>12/2</option><option>12/3</option>
+            <option>10/2</option><option>10/3</option><option>8/3</option><option>6/2</option>
+          </select>
+        </div>
+        <div class="fg"><label>Breaker size</label>
+          <select id="bf-breaker">
+            <option value="">—</option>
+            <option>15A</option><option>20A</option><option>30A</option><option>40A</option>
+            <option>50A</option><option>60A</option><option>100A</option><option>200A</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg"><label>Max devices per circuit</label><input type="number" id="bf-max" placeholder="e.g. 12" min="1"/></div>
+      <div class="fg"><label>Type</label>
+        <select id="bf-dedicated">
+          <option value="false">General (shared circuit)</option>
+          <option value="true">Dedicated (one device per circuit)</option>
+        </select>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="mbtn" onclick="closeBranchModal()">Cancel</button>
+      <button class="mbtn primary" onclick="saveNewBranch()">Create branch</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROTO MODAL -->
 <div class="overlay" id="proto-overlay">
   <div class="modal">
     <div class="mh"><span class="mh-t">Add protoassembly</span><button class="mh-x" onclick="closeProtoModal()">×</button></div>
     <div class="mb">
       <div class="fg"><label>Name</label><input id="pf-name" placeholder="e.g. 15A receptacle install, Stove connection…"/></div>
-      <div class="fg"><label>Branch (circuit type)</label><select id="pf-branch"><option value="">None / not assigned</option></select></div>
+      <div class="fg"><label>Branch (circuit type)</label><select id="pf-branch"><option value="">None</option></select></div>
     </div>
     <div class="mf">
       <button class="mbtn" onclick="closeProtoModal()">Cancel</button>
-      <button class="mbtn primary" onclick="saveNewProto()">Create</button>
+      <button class="mbtn primary" onclick="saveNewProto()">Create & add components</button>
     </div>
   </div>
 </div>
 
-<!-- ADD ASSEMBLY MODAL -->
+<!-- ASSEMBLY MODAL -->
 <div class="overlay" id="asm-overlay">
   <div class="modal">
     <div class="mh"><span class="mh-t">Add assembly</span><button class="mh-x" onclick="closeAsmModal()">×</button></div>
@@ -325,56 +350,7 @@
     </div>
     <div class="mf">
       <button class="mbtn" onclick="closeAsmModal()">Cancel</button>
-      <button class="mbtn primary" onclick="saveNewAsm()">Create</button>
-    </div>
-  </div>
-</div>
-
-<!-- ADD BRANCH MODAL -->
-<div class="overlay" id="branch-overlay">
-  <div class="modal">
-    <div class="mh"><span class="mh-t">Add branch</span><button class="mh-x" onclick="closeBranchModal()">×</button></div>
-    <div class="mb">
-      <div class="fg"><label>Name</label><input id="bf-name" placeholder="e.g. 15A general, 20A kitchen, 50A stove…"/></div>
-      <div class="g2">
-        <div class="fg"><label>Wire gauge</label>
-          <select id="bf-wire">
-            <option value="">—</option>
-            <option value="14/2">14/2 NMD90</option>
-            <option value="14/3">14/3 NMD90</option>
-            <option value="12/2">12/2 NMD90</option>
-            <option value="12/3">12/3 NMD90</option>
-            <option value="10/2">10/2 NMD90</option>
-            <option value="10/3">10/3 NMD90</option>
-            <option value="8/3">8/3 NMD90</option>
-            <option value="6/2">6/2 NMD90</option>
-          </select>
-        </div>
-        <div class="fg"><label>Breaker size</label>
-          <select id="bf-breaker">
-            <option value="">—</option>
-            <option value="15A">15A</option>
-            <option value="20A">20A</option>
-            <option value="30A">30A</option>
-            <option value="40A">40A</option>
-            <option value="50A">50A</option>
-            <option value="60A">60A</option>
-            <option value="100A">100A</option>
-            <option value="200A">200A</option>
-          </select>
-        </div>
-      </div>
-      <div class="fg"><label>Max devices per circuit</label><input type="number" id="bf-max" placeholder="e.g. 12" min="1"/></div>
-      <div class="fg"><label>Type</label>
-        <select id="bf-dedicated">
-          <option value="false">General (shared circuit)</option>
-          <option value="true">Dedicated (one device per circuit)</option>
-        </select>
-      </div>
-    </div>
-    <div class="mf">
-      <button class="mbtn" onclick="closeBranchModal()">Cancel</button>
-      <button class="mbtn primary" onclick="saveNewBranch()">Create</button>
+      <button class="mbtn primary" onclick="saveNewAsm()">Create & build</button>
     </div>
   </div>
 </div>
@@ -400,36 +376,32 @@ function toast(msg,d=2500){const t=document.getElementById('toast');t.textConten
 const ROOM_TYPES={bedroom:'Bedroom',kitchen:'Kitchen',bathroom:'Bathroom',garage:'Garage',laundry:'Laundry',mechanical:'Mechanical',general:'General purpose',service:'Service call',other:'Other','':"General"};
 const UNITS=['ea','ft','hr','lot'];
 
-let components=[], branches=[], protoassemblies=[], assemblies=[];
+let components=[],branches=[],protoassemblies=[],assemblies=[];
 let currentView='components';
-let expandedProtoId=null, expandedAsmId=null;
-// track unsaved component row edits
-let compEdits={};
+let expandedProtoId=null,expandedAsmId=null;
 
 async function loadAll(){
   try{
     [components,branches,protoassemblies,assemblies]=await Promise.all([
-      db('components?select=*&order=name'),
+      db('components?select=*&order=description'),
       db('branches?select=*&order=name'),
       db('protoassemblies?select=*&order=name'),
       db('assemblies?select=*&order=name'),
     ]);
-    protoassemblies=protoassemblies.map(p=>({...p,components:p.components?JSON.parse(p.components):[]}));
-    assemblies=assemblies.map(a=>({...a,fixed_components:a.fixed_components?JSON.parse(a.fixed_components):[],rules:a.rules?JSON.parse(a.rules):[]}));
+    protoassemblies=protoassemblies.map(p=>({...p,components:safeJson(p.components,[])}));
+    assemblies=assemblies.map(a=>({...a,fixed_components:safeJson(a.fixed_components,[]),rules:safeJson(a.rules,[])}));
   }catch(e){toast('Load failed: '+e.message);}
-  updateCounts();
-  renderComponents();
-  renderBranches();
-  renderProtos();
-  renderAssemblies();
+  updateCounts();renderAll();
 }
 
+function safeJson(str,def){try{return str?JSON.parse(str):def;}catch{return def;}}
 function updateCounts(){
   document.getElementById('cnt-components').textContent=components.length;
   document.getElementById('cnt-branches').textContent=branches.length;
   document.getElementById('cnt-proto').textContent=protoassemblies.length;
   document.getElementById('cnt-asm').textContent=assemblies.length;
 }
+function renderAll(){renderComponents();renderBranches();renderProtos();renderAssemblies();}
 
 function switchView(view,el){
   currentView=view;
@@ -450,14 +422,19 @@ function handleAdd(){
 
 function renderComponents(){
   const q=(document.getElementById('comp-search').value||'').toLowerCase();
-  const filtered=components.filter(c=>!q||c.name.toLowerCase().includes(q));
+  const filtered=components.filter(c=>!q||(c.description||'').toLowerCase().includes(q)||(c.technical_name||'').toLowerCase().includes(q)||(c.manufacturer||'').toLowerCase().includes(q));
   const tbody=document.getElementById('comp-tbody');
-  if(!filtered.length&&!q){tbody.innerHTML=`<tr><td colspan="4"><div class="empty-state"><i class="ti ti-box"></i><strong>No components yet</strong>Add your first component below.</div></td></tr>`;return;}
+  if(!filtered.length){
+    tbody.innerHTML=`<tr><td colspan="6"><div class="empty-state"><i class="ti ti-box"></i><strong>No components yet</strong>Add your first component below.</div></td></tr>`;
+    return;
+  }
   tbody.innerHTML='';
   filtered.forEach(c=>{
     const tr=document.createElement('tr');
     tr.innerHTML=`
-      <td><div class="td-inner"><input class="tbl-input" value="${(c.name||'').replace(/"/g,'&quot;')}" onchange="updateComp(${c.id},'name',this.value)" style="min-width:180px"/></div></td>
+      <td><div class="td-inner"><input class="tbl-input" value="${esc(c.manufacturer)}" placeholder="e.g. Leviton" onchange="updateComp(${c.id},'manufacturer',this.value)"/></div></td>
+      <td><div class="td-inner"><input class="tbl-input" value="${esc(c.technical_name)}" placeholder="e.g. T5320-W 15A TR Duplex" onchange="updateComp(${c.id},'technical_name',this.value)"/></div></td>
+      <td><div class="td-inner"><input class="tbl-input" value="${esc(c.description)}" placeholder="e.g. 15A receptacle" onchange="updateComp(${c.id},'description',this.value)"/></div></td>
       <td><div class="td-inner">
         <select class="tbl-select" onchange="updateComp(${c.id},'unit',this.value)">
           ${UNITS.map(u=>`<option value="${u}" ${c.unit===u?'selected':''}>${u}</option>`).join('')}
@@ -469,34 +446,33 @@ function renderComponents(){
   });
 }
 
+function esc(v){return(v||'').replace(/"/g,'&quot;');}
+
 function updateComp(id,field,value){
-  const c=components.find(x=>x.id===id);
-  if(!c)return;
+  const c=components.find(x=>x.id===id);if(!c)return;
   c[field]=field==='unit_price'?parseFloat(value)||0:value;
-  clearTimeout(c._saveTO);
-  c._saveTO=setTimeout(()=>persistComp(c),800);
+  clearTimeout(c._t);
+  c._t=setTimeout(()=>persistComp(c),700);
 }
 
 async function persistComp(c){
-  try{await db(`components?id=eq.${c.id}`,{method:'PATCH',body:JSON.stringify({name:c.name,unit:c.unit,unit_price:c.unit_price})});}
+  try{await db(`components?id=eq.${c.id}`,{method:'PATCH',body:JSON.stringify({manufacturer:c.manufacturer||null,technical_name:c.technical_name||null,description:c.description||null,unit:c.unit,unit_price:c.unit_price})});}
   catch(e){toast('Save failed: '+e.message);}
 }
 
 async function addComponentRow(){
   try{
-    const rows=await db('components',{method:'POST',body:JSON.stringify({name:'New component',unit:'ea',unit_price:0})});
+    const rows=await db('components',{method:'POST',body:JSON.stringify({description:'New component',unit:'ea',unit_price:0})});
     if(rows&&rows[0])components.push(rows[0]);
     updateCounts();renderComponents();
-    // focus the new row name input
-    setTimeout(()=>{const inputs=document.querySelectorAll('#comp-tbody .tbl-input');if(inputs.length)inputs[inputs.length-1].focus();},100);
+    setTimeout(()=>{const inputs=document.querySelectorAll('#comp-tbody input');if(inputs.length)inputs[inputs.length-5]?.focus();},80);
   }catch(e){toast('Failed: '+e.message);}
 }
 
 async function deleteComp(id){
   if(!confirm('Delete this component?'))return;
   try{await db(`components?id=eq.${id}`,{method:'DELETE'});}catch(e){toast('Delete failed: '+e.message);return;}
-  components=components.filter(x=>x.id!==id);
-  updateCounts();renderComponents();toast('Component deleted');
+  components=components.filter(x=>x.id!==id);updateCounts();renderComponents();toast('Deleted');
 }
 
 // ── BRANCHES ──────────────────────────────────────────────────
@@ -504,7 +480,7 @@ async function deleteComp(id){
 function renderBranches(){
   const grid=document.getElementById('branch-grid');
   if(!branches.length){
-    grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><i class="ti ti-git-branch"></i><strong>No branches yet</strong>Add your circuit types — 15A general, 20A kitchen, 50A stove, etc.</div>`;
+    grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><i class="ti ti-git-branch"></i><strong>No branches yet</strong>Add circuit types — 15A general, 20A kitchen, 50A stove, etc.</div>`;
     return;
   }
   grid.innerHTML='';
@@ -512,81 +488,58 @@ function renderBranches(){
     const card=document.createElement('div');
     card.className='branch-card';
     card.innerHTML=`
-      <div class="branch-card-header">
+      <div class="branch-card-top">
         <div class="branch-card-name">${b.name}</div>
         <span class="${b.dedicated?'dedicated-badge':'general-badge'}">${b.dedicated?'Dedicated':'General'}</span>
       </div>
       <div class="branch-fields">
-        <div class="branch-field"><div class="branch-label">Wire gauge</div>
-          <select class="branch-select" onchange="updateBranch(${b.id},'wire_gauge',this.value)">
-            <option value="">—</option>
-            ${['14/2','14/3','12/2','12/3','10/2','10/3','8/3','6/2'].map(w=>`<option value="${w}" ${b.wire_gauge===w?'selected':''}>${w} NMD90</option>`).join('')}
-          </select>
-        </div>
-        <div class="branch-field"><div class="branch-label">Breaker</div>
-          <select class="branch-select" onchange="updateBranch(${b.id},'breaker_size',this.value)">
-            <option value="">—</option>
-            ${['15A','20A','30A','40A','50A','60A','100A','200A'].map(s=>`<option value="${s}" ${b.breaker_size===s?'selected':''}>${s}</option>`).join('')}
-          </select>
-        </div>
-        <div class="branch-field"><div class="branch-label">Max devices</div>
-          <input class="branch-input" type="number" min="1" value="${b.max_devices||''}" placeholder="e.g. 12" onchange="updateBranch(${b.id},'max_devices',this.value)"/>
-        </div>
-        <div class="branch-field"><div class="branch-label">Type</div>
-          <select class="branch-select" onchange="updateBranch(${b.id},'dedicated',this.value==='true')">
+        <div class="branch-field"><div class="bf-label">Name</div><input class="bf-input" value="${esc(b.name)}" onchange="updateBranch(${b.id},'name',this.value)"/></div>
+        <div class="branch-field"><div class="bf-label">Type</div>
+          <select class="bf-select" onchange="updateBranch(${b.id},'dedicated',this.value==='true')">
             <option value="false" ${!b.dedicated?'selected':''}>General</option>
             <option value="true" ${b.dedicated?'selected':''}>Dedicated</option>
           </select>
         </div>
-        <div class="branch-field" style="grid-column:1/-1"><div class="branch-label">Name</div>
-          <input class="branch-input" value="${(b.name||'').replace(/"/g,'&quot;')}" onchange="updateBranch(${b.id},'name',this.value)"/>
+        <div class="branch-field"><div class="bf-label">Wire gauge</div>
+          <select class="bf-select" onchange="updateBranch(${b.id},'wire_gauge',this.value)">
+            <option value="">—</option>
+            ${['14/2','14/3','12/2','12/3','10/2','10/3','8/3','6/2'].map(w=>`<option value="${w}" ${b.wire_gauge===w?'selected':''}>${w} NMD90</option>`).join('')}
+          </select>
         </div>
+        <div class="branch-field"><div class="bf-label">Breaker</div>
+          <select class="bf-select" onchange="updateBranch(${b.id},'breaker_size',this.value)">
+            <option value="">—</option>
+            ${['15A','20A','30A','40A','50A','60A','100A','200A'].map(s=>`<option value="${s}" ${b.breaker_size===s?'selected':''}>${s}</option>`).join('')}
+          </select>
+        </div>
+        <div class="branch-field"><div class="bf-label">Max devices</div><input class="bf-input" type="number" min="1" value="${b.max_devices||''}" placeholder="e.g. 12" onchange="updateBranch(${b.id},'max_devices',parseInt(this.value)||null)"/></div>
       </div>
       <div class="branch-actions">
-        <button class="branch-save" onclick="saveBranch(${b.id})">Save</button>
-        <button class="nbtn danger" onclick="deleteBranch(${b.id})"><i class="ti ti-trash"></i> Delete</button>
+        <button class="nbtn primary" style="padding:5px 14px;font-size:12px" onclick="saveBranch(${b.id})"><i class="ti ti-device-floppy"></i> Save</button>
+        <button class="nbtn danger" style="padding:5px 12px;font-size:12px" onclick="deleteBranch(${b.id})"><i class="ti ti-trash"></i></button>
       </div>`;
     grid.appendChild(card);
   });
 }
 
 function updateBranch(id,field,value){const b=branches.find(x=>x.id===id);if(b)b[field]=value;}
-
 async function saveBranch(id){
   const b=branches.find(x=>x.id===id);if(!b)return;
-  try{
-    await db(`branches?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({name:b.name,wire_gauge:b.wire_gauge||null,breaker_size:b.breaker_size||null,max_devices:parseInt(b.max_devices)||null,dedicated:b.dedicated||false})});
-    toast('Branch saved ✓');renderBranches();
-  }catch(e){toast('Save failed: '+e.message);}
+  try{await db(`branches?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({name:b.name,wire_gauge:b.wire_gauge||null,breaker_size:b.breaker_size||null,max_devices:b.max_devices||null,dedicated:!!b.dedicated})});toast('Branch saved ✓');renderBranches();}
+  catch(e){toast('Save failed: '+e.message);}
 }
-
 async function deleteBranch(id){
   if(!confirm('Delete this branch?'))return;
   try{await db(`branches?id=eq.${id}`,{method:'DELETE'});}catch(e){toast('Delete failed: '+e.message);return;}
-  branches=branches.filter(x=>x.id!==id);
-  updateCounts();renderBranches();toast('Branch deleted');
+  branches=branches.filter(x=>x.id!==id);updateCounts();renderBranches();toast('Deleted');
 }
-
-function openBranchModal(){
-  ['bf-name','bf-max'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('bf-wire').value='';
-  document.getElementById('bf-breaker').value='';
-  document.getElementById('bf-dedicated').value='false';
-  document.getElementById('branch-overlay').classList.add('open');
-  setTimeout(()=>document.getElementById('bf-name').focus(),100);
-}
+function openBranchModal(){['bf-name','bf-max'].forEach(i=>document.getElementById(i).value='');document.getElementById('bf-wire').value='';document.getElementById('bf-breaker').value='';document.getElementById('bf-dedicated').value='false';document.getElementById('branch-overlay').classList.add('open');setTimeout(()=>document.getElementById('bf-name').focus(),80);}
 function closeBranchModal(){document.getElementById('branch-overlay').classList.remove('open');}
-
 async function saveNewBranch(){
-  const name=document.getElementById('bf-name').value.trim();
-  if(!name){toast('Please enter a name.');return;}
+  const name=document.getElementById('bf-name').value.trim();if(!name){toast('Enter a name.');return;}
   const data={name,wire_gauge:document.getElementById('bf-wire').value||null,breaker_size:document.getElementById('bf-breaker').value||null,max_devices:parseInt(document.getElementById('bf-max').value)||null,dedicated:document.getElementById('bf-dedicated').value==='true'};
-  try{
-    const rows=await db('branches',{method:'POST',body:JSON.stringify(data)});
-    if(rows&&rows[0])branches.push(rows[0]);
-    updateCounts();renderBranches();closeBranchModal();toast('Branch added ✓');
-    populateBranchSelects();
-  }catch(e){toast('Save failed: '+e.message);}
+  try{const rows=await db('branches',{method:'POST',body:JSON.stringify(data)});if(rows&&rows[0])branches.push(rows[0]);updateCounts();renderBranches();closeBranchModal();toast('Branch added ✓');populateBranchSelects();}
+  catch(e){toast('Save failed: '+e.message);}
 }
 
 // ── PROTOASSEMBLIES ───────────────────────────────────────────
@@ -599,67 +552,69 @@ function populateBranchSelects(){
 function renderProtos(){
   const q=(document.getElementById('proto-search').value||'').toLowerCase();
   const filtered=protoassemblies.filter(p=>!q||p.name.toLowerCase().includes(q));
-  const grid=document.getElementById('proto-grid');
+  const list=document.getElementById('proto-list');
   if(!filtered.length){
-    grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><i class="ti ti-atom"></i><strong>No protoassemblies yet</strong>Create components first, then build protoassemblies from them.</div>`;
+    list.innerHTML=`<div class="empty-state"><i class="ti ti-atom"></i><strong>No protoassemblies yet</strong>Build components first, then create protoassemblies from them.</div>`;
     return;
   }
-  grid.innerHTML='';
-  filtered.forEach(p=>{
-    const isOpen=expandedProtoId===p.id;
-    const comps=p.components||[];
-    const total=comps.reduce((s,c)=>{const comp=components.find(x=>x.id===c.comp_id);return s+(comp?(parseFloat(comp.unit_price)||0)*(parseFloat(c.qty)||1):0);},0);
-    const branch=branches.find(x=>x.id===p.branch_id);
-    const compOpts=components.map(c=>`<option value="${c.id}">${c.name} (${c.unit})</option>`).join('');
-    const branchOpts='<option value="">None</option>'+branches.map(b=>`<option value="${b.id}" ${p.branch_id===b.id?'selected':''}>${b.name}</option>`).join('');
+  list.innerHTML='';
+  filtered.forEach(p=>list.appendChild(buildProtoCard(p)));
+}
 
-    const compRows=comps.map(c=>{
-      const comp=components.find(x=>x.id===c.comp_id);
-      if(!comp)return'';
-      const lineTotal=(parseFloat(comp.unit_price)||0)*(parseFloat(c.qty)||1);
-      return`<div class="comp-row">
-        <div class="comp-name">${comp.name}</div>
-        <input class="comp-qty-input" type="number" min="0" step="0.5" value="${c.qty}" onchange="updateProtoCompQty(${p.id},${c.comp_id},this.value)"/>
-        <div class="comp-cost">$${lineTotal.toFixed(2)}</div>
-        <button class="comp-del" onclick="removeProtoComp(${p.id},${c.comp_id})"><i class="ti ti-x"></i></button>
-      </div>`;
-    }).join('');
+function buildProtoCard(p){
+  const isOpen=expandedProtoId===p.id;
+  const comps=p.components||[];
+  const total=comps.reduce((s,c)=>{const comp=components.find(x=>x.id===c.comp_id);return s+(comp?(parseFloat(comp.unit_price)||0)*(parseFloat(c.qty)||1):0);},0);
+  const branch=branches.find(x=>x.id===p.branch_id);
+  const compOpts=components.map(c=>`<option value="${c.id}">${c.description||c.technical_name||'Unnamed'} (${c.unit})</option>`).join('');
+  const branchOpts='<option value="">None</option>'+branches.map(b=>`<option value="${b.id}" ${p.branch_id===b.id?'selected':''}>${b.name}</option>`).join('');
 
-    const card=document.createElement('div');
-    card.className='proto-card';
-    card.innerHTML=`
-      <div class="proto-card-header" onclick="toggleProto(${p.id})">
-        <div>
-          <div class="proto-card-title">${p.name}</div>
-          <div class="proto-card-sub">${branch?branch.name:'No branch'} · ${comps.length} component${comps.length!==1?'s':''}</div>
-        </div>
-        <div class="proto-card-right">
-          <div class="proto-total">$${total.toFixed(2)}</div>
-          <i class="ti ti-chevron-down proto-chevron ${isOpen?'open':''}"></i>
-        </div>
+  const compRows=comps.map(c=>{
+    const comp=components.find(x=>x.id===c.comp_id);if(!comp)return'';
+    const lineTotal=(parseFloat(comp.unit_price)||0)*(parseFloat(c.qty)||1);
+    return`<div class="sub-row" style="grid-template-columns:2fr 70px 80px 28px">
+      <div class="sub-name">${comp.description||comp.technical_name||'—'}</div>
+      <input class="sub-qty" type="number" min="0" step="0.5" value="${c.qty}" onchange="updateProtoCompQty(${p.id},${c.comp_id},this.value)"/>
+      <div class="sub-cost" style="text-align:right">$${lineTotal.toFixed(2)}</div>
+      <button class="sub-del" onclick="removeProtoComp(${p.id},${c.comp_id})"><i class="ti ti-x"></i></button>
+    </div>`;
+  }).join('');
+
+  const card=document.createElement('div');
+  card.className='exp-card'+(isOpen?' open':'');
+  card.innerHTML=`
+    <div class="exp-header" onclick="toggleProto(${p.id})">
+      <div>
+        <div class="exp-title">${p.name}</div>
+        <div class="exp-sub">${branch?branch.name:'No branch assigned'} · ${comps.length} component${comps.length!==1?'s':''}</div>
       </div>
-      <div class="proto-body ${isOpen?'open':''}">
-        <div class="proto-name-row">
-          <input class="proto-name-input" value="${(p.name||'').replace(/"/g,'&quot;')}" placeholder="Name" onchange="updateProtoField(${p.id},'name',this.value)"/>
-          <select class="proto-branch-select" onchange="updateProtoField(${p.id},'branch_id',parseInt(this.value)||null)">${branchOpts}</select>
-        </div>
-        <div class="comp-table-wrap">
-          ${comps.length?`<div class="comp-head"><span>Component</span><span>Qty</span><span>Cost</span><span></span></div>${compRows}`:'<div style="padding:8px 0;font-size:13px;color:var(--muted)">No components yet.</div>'}
-        </div>
-        <div class="proto-add-comp">
-          <select class="comp-select" id="csel-${p.id}"><option value="">Add component…</option>${compOpts}</select>
+      <div class="exp-right">
+        <div class="exp-total">$${total.toFixed(2)}</div>
+        <i class="ti ti-chevron-down exp-chevron ${isOpen?'open':''}"></i>
+      </div>
+    </div>
+    <div class="exp-body ${isOpen?'open':''}">
+      <div class="inner-row">
+        <div class="inner-field"><div class="inner-label">Name</div><input class="inner-input" value="${esc(p.name)}" onchange="updateProtoField(${p.id},'name',this.value)"/></div>
+        <div class="inner-field" style="max-width:200px"><div class="inner-label">Branch</div><select class="inner-select" onchange="updateProtoField(${p.id},'branch_id',parseInt(this.value)||null)">${branchOpts}</select></div>
+      </div>
+      <div class="sub-section">
+        <div class="sub-section-label">Components</div>
+        ${comps.length?`<div class="sub-head" style="grid-template-columns:2fr 70px 80px 28px"><span>Component</span><span style="text-align:right">Qty</span><span style="text-align:right">Cost</span><span></span></div>${compRows}`:'<div style="font-size:13px;color:var(--muted);padding:4px 0 8px">No components yet — add from your components list below.</div>'}
+        <div class="sub-add-row">
+          <select class="sub-select" id="csel-${p.id}"><option value="">Add component…</option>${compOpts}</select>
           <button class="nbtn" onclick="addProtoComp(${p.id})"><i class="ti ti-plus"></i> Add</button>
         </div>
-        <div class="proto-footer">
-          <div class="proto-footer-total">Total: <strong>$${total.toFixed(2)}</strong></div>
-          <div class="proto-foot-btns">
-            <button class="nbtn" onclick="saveProto(${p.id})"><i class="ti ti-device-floppy"></i> Save</button>
-            <button class="nbtn danger" onclick="deleteProto(${p.id})"><i class="ti ti-trash"></i></button>
-          </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-footer-total">Material total: <strong>$${total.toFixed(2)}</strong></div>
+        <div class="card-footer-btns">
+          <button class="nbtn primary" onclick="saveProto(${p.id})"><i class="ti ti-device-floppy"></i> Save</button>
+          <button class="nbtn danger" onclick="deleteProto(${p.id})"><i class="ti ti-trash"></i></button>
         </div>
-      </div>`;
-    grid.appendChild(card);
-  });
+      </div>
+    </div>`;
+  return card;
 }
 
 function toggleProto(id){expandedProtoId=expandedProtoId===id?null:id;renderProtos();}
@@ -667,45 +622,33 @@ function updateProtoField(id,field,value){const p=protoassemblies.find(x=>x.id==
 function updateProtoCompQty(pid,cid,value){const p=protoassemblies.find(x=>x.id===pid);if(!p)return;const c=p.components.find(x=>x.comp_id===cid);if(c)c.qty=parseFloat(value)||1;renderProtos();}
 function removeProtoComp(pid,cid){const p=protoassemblies.find(x=>x.id===pid);if(!p)return;p.components=p.components.filter(x=>x.comp_id!==cid);renderProtos();}
 function addProtoComp(pid){
-  const sel=document.getElementById(`csel-${pid}`);
-  const cid=parseInt(sel.value);if(!cid)return;
+  const sel=document.getElementById(`csel-${pid}`);const cid=parseInt(sel.value);if(!cid)return;
   const p=protoassemblies.find(x=>x.id===pid);if(!p)return;
   if(p.components.find(x=>x.comp_id===cid)){toast('Already in this protoassembly.');return;}
   p.components.push({comp_id:cid,qty:1});renderProtos();
 }
-
 async function saveProto(id){
   const p=protoassemblies.find(x=>x.id===id);if(!p)return;
-  try{
-    await db(`protoassemblies?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({name:p.name,branch_id:p.branch_id||null,components:JSON.stringify(p.components)})});
-    toast('Protoassembly saved ✓');renderProtos();
-  }catch(e){toast('Save failed: '+e.message);}
+  try{await db(`protoassemblies?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({name:p.name,branch_id:p.branch_id||null,components:JSON.stringify(p.components)})});toast('Protoassembly saved ✓');renderProtos();}
+  catch(e){toast('Save failed: '+e.message);}
 }
-
 async function deleteProto(id){
   if(!confirm('Delete this protoassembly?'))return;
   try{await db(`protoassemblies?id=eq.${id}`,{method:'DELETE'});}catch(e){toast('Delete failed: '+e.message);return;}
-  protoassemblies=protoassemblies.filter(x=>x.id!==id);
-  expandedProtoId=null;updateCounts();renderProtos();toast('Protoassembly deleted');
+  protoassemblies=protoassemblies.filter(x=>x.id!==id);expandedProtoId=null;updateCounts();renderProtos();toast('Deleted');
 }
-
-function openProtoModal(){
-  document.getElementById('pf-name').value='';
-  populateBranchSelects();
-  document.getElementById('proto-overlay').classList.add('open');
-  setTimeout(()=>document.getElementById('pf-name').focus(),100);
-}
+function openProtoModal(){populateBranchSelects();document.getElementById('pf-name').value='';document.getElementById('proto-overlay').classList.add('open');setTimeout(()=>document.getElementById('pf-name').focus(),80);}
 function closeProtoModal(){document.getElementById('proto-overlay').classList.remove('open');}
-
 async function saveNewProto(){
-  const name=document.getElementById('pf-name').value.trim();
-  if(!name){toast('Please enter a name.');return;}
+  const name=document.getElementById('pf-name').value.trim();if(!name){toast('Enter a name.');return;}
   const bid=parseInt(document.getElementById('pf-branch').value)||null;
   try{
     const rows=await db('protoassemblies',{method:'POST',body:JSON.stringify({name,branch_id:bid,components:JSON.stringify([])})});
     if(rows&&rows[0])protoassemblies.push({...rows[0],components:[]});
     expandedProtoId=rows[0]?.id||null;
     updateCounts();renderProtos();closeProtoModal();toast('Protoassembly created ✓');
+    // switch to protoassemblies view and scroll to new card
+    setTimeout(()=>{const el=document.querySelector('.exp-card.open');if(el)el.scrollIntoView({behavior:'smooth',block:'center'});},100);
   }catch(e){toast('Save failed: '+e.message);}
 }
 
@@ -730,72 +673,75 @@ function buildAsmCard(a){
   const protoOpts=protoassemblies.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
 
   const fixedRows=fixed.map(f=>{
-    const p=protoassemblies.find(x=>x.id===f.proto_id);
-    if(!p)return'';
-    return`<div class="fixed-row">
-      <div class="fixed-name">${p.name}</div>
-      <input class="fixed-qty" type="number" min="0" step="1" value="${f.qty}" onchange="updateFixedQty(${a.id},${f.proto_id},this.value)"/>
-      <button class="comp-del" onclick="removeFixed(${a.id},${f.proto_id})"><i class="ti ti-x"></i></button>
+    const p=protoassemblies.find(x=>x.id===f.proto_id);if(!p)return'';
+    return`<div class="sub-row" style="grid-template-columns:2fr 70px 28px">
+      <div class="sub-name">${p.name}</div>
+      <input class="sub-qty" type="number" min="0" step="1" value="${f.qty}" onchange="updateFixedQty(${a.id},${f.proto_id},this.value)"/>
+      <button class="sub-del" onclick="removeFixed(${a.id},${f.proto_id})"><i class="ti ti-x"></i></button>
     </div>`;
   }).join('');
 
-  const ruleRows=rules.map((r,i)=>{
-    const p=protoassemblies.find(x=>x.id===r.proto_id);
-    return`<div class="rule-row">
+  const ruleRows=rules.map((r,i)=>`
+    <div class="rule-row">
       <select class="rule-select" onchange="updateRule(${a.id},${i},'proto_id',parseInt(this.value))">
         ${protoassemblies.map(p=>`<option value="${p.id}" ${r.proto_id===p.id?'selected':''}>${p.name}</option>`).join('')}
       </select>
       <select class="rule-select" onchange="updateRule(${a.id},${i},'basis',this.value)">
-        <option value="perimeter" ${r.basis==='perimeter'?'selected':''}>Perimeter</option>
-        <option value="area" ${r.basis==='area'?'selected':''}>Area</option>
-        <option value="width" ${r.basis==='width'?'selected':''}>Width</option>
-        <option value="length" ${r.basis==='length'?'selected':''}>Length</option>
+        <option value="perimeter" ${r.basis==='perimeter'?'selected':''}>Perimeter (ft)</option>
+        <option value="area" ${r.basis==='area'?'selected':''}>Area (sq ft)</option>
+        <option value="width" ${r.basis==='width'?'selected':''}>Width (ft)</option>
+        <option value="length" ${r.basis==='length'?'selected':''}>Length (ft)</option>
       </select>
-      <input class="rule-formula" value="${r.formula||''}" placeholder="e.g. ceil(x/12)+1" onchange="updateRule(${a.id},${i},'formula',this.value)"/>
-      <button class="comp-del" onclick="removeRule(${a.id},${i})"><i class="ti ti-x"></i></button>
-    </div>`;
-  }).join('');
+      <input class="rule-formula" value="${esc(r.formula||'')}" placeholder="e.g. ceil(x/12)+1" onchange="updateRule(${a.id},${i},'formula',this.value)"/>
+      <button class="sub-del" onclick="removeRule(${a.id},${i})"><i class="ti ti-x"></i></button>
+    </div>`).join('');
 
   const card=document.createElement('div');
-  card.className='asm-card';
+  card.className='exp-card'+(isOpen?' open':'');
   card.innerHTML=`
-    <div class="asm-header" onclick="toggleAsm(${a.id})">
+    <div class="exp-header" onclick="toggleAsm(${a.id})">
       <div>
-        <div class="asm-title">${a.name}</div>
-        <div class="asm-sub">${ROOM_TYPES[a.room_type||'']||'General'} · ${fixed.length} fixed, ${rules.length} rule${rules.length!==1?'s':''}</div>
+        <div class="exp-title">${a.name}</div>
+        <div class="exp-sub">${ROOM_TYPES[a.room_type||'']||'General'} · ${fixed.length} fixed, ${rules.length} rule${rules.length!==1?'s':''}</div>
       </div>
-      <div class="asm-right">
-        <i class="ti ti-chevron-down asm-chevron ${isOpen?'open':''}"></i>
+      <div class="exp-right">
+        <i class="ti ti-chevron-down exp-chevron ${isOpen?'open':''}"></i>
       </div>
     </div>
-    <div class="asm-body ${isOpen?'open':''}">
-      <div class="asm-name-row">
-        <input class="asm-name-input" value="${(a.name||'').replace(/"/g,'&quot;')}" onchange="updateAsmField(${a.id},'name',this.value)"/>
-        <select class="asm-type-select" onchange="updateAsmField(${a.id},'room_type',this.value)">
-          ${Object.entries(ROOM_TYPES).map(([v,l])=>`<option value="${v}" ${(a.room_type||'')=== v?'selected':''}>${l}</option>`).join('')}
-        </select>
+    <div class="exp-body ${isOpen?'open':''}">
+      <div class="inner-row">
+        <div class="inner-field"><div class="inner-label">Name</div><input class="inner-input" value="${esc(a.name)}" onchange="updateAsmField(${a.id},'name',this.value)"/></div>
+        <div class="inner-field" style="max-width:200px"><div class="inner-label">Room type</div>
+          <select class="inner-select" onchange="updateAsmField(${a.id},'room_type',this.value)">
+            ${Object.entries(ROOM_TYPES).map(([v,l])=>`<option value="${v}" ${(a.room_type||'')=== v?'selected':''}>${l}</option>`).join('')}
+          </select>
+        </div>
       </div>
 
-      <div class="fixed-section">
-        <div class="fixed-label">
-          <span>Fixed components <span style="font-weight:400;color:var(--muted)">(always added regardless of dimensions)</span></span>
+      <div class="sub-section">
+        <div class="sub-section-label">
+          <span>Fixed protoassemblies <span style="font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0">(always included regardless of dimensions)</span></span>
         </div>
-        ${fixed.length?`<div style="margin-bottom:6px">${fixedRows}</div>`:'<div style="font-size:13px;color:var(--muted);margin-bottom:8px">None yet.</div>'}
-        <div style="display:flex;gap:8px;align-items:center">
-          <select class="comp-select" id="fsel-${a.id}"><option value="">Add protoassembly…</option>${protoOpts}</select>
+        ${fixed.length?`<div class="sub-head" style="grid-template-columns:2fr 70px 28px"><span>Protoassembly</span><span style="text-align:right">Qty</span><span></span></div>${fixedRows}`:'<div style="font-size:13px;color:var(--muted);padding:4px 0 8px">None yet.</div>'}
+        <div class="sub-add-row">
+          <select class="sub-select" id="fsel-${a.id}"><option value="">Add protoassembly…</option>${protoOpts}</select>
           <button class="nbtn" onclick="addFixed(${a.id})"><i class="ti ti-plus"></i> Add</button>
         </div>
       </div>
 
-      <div class="rules-section">
-        <div class="rules-label">
-          <span>Rules <span style="font-weight:400;color:var(--muted)">(quantity calculated from room dimensions)</span></span>
+      <div class="sub-section">
+        <div class="sub-section-label">
+          <span>Rules <span style="font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0">(quantity calculated from room dimensions you enter in the assessment)</span></span>
           <button class="nbtn" style="padding:3px 10px;font-size:11px" onclick="addRule(${a.id})"><i class="ti ti-plus"></i> Add rule</button>
         </div>
-        ${rules.length?`<div class="comp-head" style="grid-template-columns:2fr 120px 1fr 28px"><span>Protoassembly</span><span>Based on</span><span>Formula (x = dimension in ft)</span><span></span></div>${ruleRows}<div class="rule-hint">Formulas use x as the dimension value. Examples: <code>ceil(x/12)+1</code> for receptacles per perimeter, <code>round(x*1.2)</code> for wire with buffer.</div>`:'<div style="font-size:13px;color:var(--muted)">No rules yet. Rules calculate quantities automatically from room dimensions.</div>'}
+        ${rules.length
+          ?`<div class="rule-head"><span>Protoassembly</span><span>Based on</span><span>Formula — x = dimension value</span><span></span></div>${ruleRows}
+            <div class="rule-hint">Formula examples: <code>ceil(x/12)</code> receptacles from perimeter · <code>round(x*1.2)</code> wire with 20% buffer · <code>floor(x/100)+1</code> pot lights from area</div>`
+          :'<div style="font-size:13px;color:var(--muted);padding:4px 0">No rules yet. Rules auto-calculate quantities when you enter room dimensions in the assessment.</div>'
+        }
       </div>
 
-      <div class="asm-footer">
+      <div class="card-footer">
         <button class="nbtn danger" onclick="deleteAsm(${a.id})"><i class="ti ti-trash"></i> Delete</button>
         <button class="nbtn primary" onclick="saveAsm(${a.id})"><i class="ti ti-device-floppy"></i> Save assembly</button>
       </div>
@@ -808,8 +754,7 @@ function updateAsmField(id,field,value){const a=assemblies.find(x=>x.id===id);if
 function updateFixedQty(aid,pid,value){const a=assemblies.find(x=>x.id===aid);if(!a)return;const f=a.fixed_components.find(x=>x.proto_id===pid);if(f)f.qty=parseFloat(value)||1;renderAssemblies();}
 function removeFixed(aid,pid){const a=assemblies.find(x=>x.id===aid);if(!a)return;a.fixed_components=a.fixed_components.filter(x=>x.proto_id!==pid);renderAssemblies();}
 function addFixed(aid){
-  const sel=document.getElementById(`fsel-${aid}`);
-  const pid=parseInt(sel.value);if(!pid)return;
+  const sel=document.getElementById(`fsel-${aid}`);const pid=parseInt(sel.value);if(!pid)return;
   const a=assemblies.find(x=>x.id===aid);if(!a)return;
   if(a.fixed_components.find(x=>x.proto_id===pid)){toast('Already added.');return;}
   a.fixed_components.push({proto_id:pid,qty:1});renderAssemblies();
@@ -818,42 +763,30 @@ function updateRule(aid,idx,field,value){const a=assemblies.find(x=>x.id===aid);
 function removeRule(aid,idx){const a=assemblies.find(x=>x.id===aid);if(!a)return;a.rules.splice(idx,1);renderAssemblies();}
 function addRule(aid){
   const a=assemblies.find(x=>x.id===aid);if(!a)return;
-  const firstProto=protoassemblies[0];
-  a.rules.push({proto_id:firstProto?firstProto.id:null,basis:'perimeter',formula:'ceil(x/12)'});
+  const first=protoassemblies[0];
+  a.rules.push({proto_id:first?first.id:null,basis:'perimeter',formula:'ceil(x/12)'});
   renderAssemblies();
 }
-
 async function saveAsm(id){
   const a=assemblies.find(x=>x.id===id);if(!a)return;
-  try{
-    await db(`assemblies?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({name:a.name,room_type:a.room_type||null,fixed_components:JSON.stringify(a.fixed_components),rules:JSON.stringify(a.rules)})});
-    toast('Assembly saved ✓');renderAssemblies();
-  }catch(e){toast('Save failed: '+e.message);}
+  try{await db(`assemblies?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({name:a.name,room_type:a.room_type||null,fixed_components:JSON.stringify(a.fixed_components),rules:JSON.stringify(a.rules)})});toast('Assembly saved ✓');renderAssemblies();}
+  catch(e){toast('Save failed: '+e.message);}
 }
-
 async function deleteAsm(id){
   if(!confirm('Delete this assembly?'))return;
   try{await db(`assemblies?id=eq.${id}`,{method:'DELETE'});}catch(e){toast('Delete failed: '+e.message);return;}
-  assemblies=assemblies.filter(x=>x.id!==id);
-  expandedAsmId=null;updateCounts();renderAssemblies();toast('Assembly deleted');
+  assemblies=assemblies.filter(x=>x.id!==id);expandedAsmId=null;updateCounts();renderAssemblies();toast('Deleted');
 }
-
-function openAsmModal(){
-  document.getElementById('af-name').value='';
-  document.getElementById('af-type').value='';
-  document.getElementById('asm-overlay').classList.add('open');
-  setTimeout(()=>document.getElementById('af-name').focus(),100);
-}
+function openAsmModal(){document.getElementById('af-name').value='';document.getElementById('af-type').value='';document.getElementById('asm-overlay').classList.add('open');setTimeout(()=>document.getElementById('af-name').focus(),80);}
 function closeAsmModal(){document.getElementById('asm-overlay').classList.remove('open');}
-
 async function saveNewAsm(){
-  const name=document.getElementById('af-name').value.trim();
-  if(!name){toast('Please enter a name.');return;}
+  const name=document.getElementById('af-name').value.trim();if(!name){toast('Enter a name.');return;}
   try{
     const rows=await db('assemblies',{method:'POST',body:JSON.stringify({name,room_type:document.getElementById('af-type').value||null,fixed_components:JSON.stringify([]),rules:JSON.stringify([])})});
     if(rows&&rows[0])assemblies.push({...rows[0],fixed_components:[],rules:[]});
     expandedAsmId=rows[0]?.id||null;
     updateCounts();renderAssemblies();closeAsmModal();toast('Assembly created ✓');
+    setTimeout(()=>{const el=document.querySelector('#asm-list .exp-card.open');if(el)el.scrollIntoView({behavior:'smooth',block:'center'});},100);
   }catch(e){toast('Save failed: '+e.message);}
 }
 
