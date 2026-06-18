@@ -23,8 +23,6 @@
       color: var(--black);
       min-height: 100vh;
     }
-
-    /* NAV */
     nav {
       background: var(--white);
       border-bottom: 0.5px solid var(--border);
@@ -37,273 +35,53 @@
       top: 0;
       z-index: 100;
     }
-    .nav-logo {
-      font-size: 18px;
-      font-weight: 600;
-      letter-spacing: -0.03em;
-      color: var(--black);
-      text-decoration: none;
-    }
+    .nav-logo { font-size: 18px; font-weight: 600; letter-spacing: -0.03em; color: var(--black); text-decoration: none; }
     .nav-logo span { color: var(--blue); }
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .nav-badge {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--muted);
-      padding: 3px 10px;
-      border: 0.5px solid var(--border);
-      border-radius: 99px;
-    }
-    .nav-company {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--black);
-    }
-
-    /* HERO */
-    .hero {
-      background: var(--white);
-      border-bottom: 0.5px solid var(--border);
-      padding: 3rem 2rem 2.5rem;
-    }
-    .hero-inner {
-      max-width: 960px;
-      margin: 0 auto;
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 2rem;
-      flex-wrap: wrap;
-    }
-    .hero-left {}
-    .hero-eyebrow {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--blue);
-      margin-bottom: 10px;
-    }
-    .hero-title {
-      font-size: 36px;
-      font-weight: 600;
-      letter-spacing: -0.03em;
-      line-height: 1.1;
-      color: var(--black);
-      margin-bottom: 10px;
-    }
+    .nav-right { display: flex; align-items: center; gap: 8px; }
+    .nav-badge { font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding: 3px 10px; border: 0.5px solid var(--border); border-radius: 99px; }
+    .nav-company { font-size: 13px; font-weight: 500; color: var(--black); }
+    .hero { background: var(--white); border-bottom: 0.5px solid var(--border); padding: 3rem 2rem 2.5rem; }
+    .hero-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; flex-wrap: wrap; }
+    .hero-eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); margin-bottom: 10px; }
+    .hero-title { font-size: 36px; font-weight: 600; letter-spacing: -0.03em; line-height: 1.1; color: var(--black); margin-bottom: 10px; }
     .hero-title span { color: var(--blue); }
-    .hero-sub {
-      font-size: 15px;
-      color: var(--muted);
-      line-height: 1.5;
-      max-width: 440px;
-    }
-    .hero-stats {
-      display: flex;
-      gap: 2rem;
-      flex-shrink: 0;
-    }
-    .stat {
-      text-align: right;
-    }
-    .stat-num {
-      font-size: 28px;
-      font-weight: 600;
-      letter-spacing: -0.03em;
-      color: var(--black);
-      line-height: 1;
-    }
+    .hero-sub { font-size: 15px; color: var(--muted); line-height: 1.5; max-width: 440px; }
+    .hero-stats { display: flex; gap: 2rem; flex-shrink: 0; }
+    .stat { text-align: right; }
+    .stat-num { font-size: 28px; font-weight: 600; letter-spacing: -0.03em; color: var(--black); line-height: 1; }
     .stat-num span { color: var(--blue); }
-    .stat-label {
-      font-size: 11px;
-      color: var(--muted);
-      font-weight: 500;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      margin-top: 4px;
-    }
-
-    /* MAIN */
-    .main {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
-
-    /* SECTION HEADER */
-    .section-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1rem;
-    }
-    .section-title {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    /* TOOL GRID */
-    .tool-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1rem;
-      margin-bottom: 2.5rem;
-    }
-
-    /* TOOL CARD */
-    .tool-card {
-      background: var(--white);
-      border: 0.5px solid var(--border);
-      border-radius: 8px;
-      padding: 1.5rem;
-      text-decoration: none;
-      color: inherit;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      transition: border-color 0.15s, box-shadow 0.15s;
-      position: relative;
-      overflow: hidden;
-    }
-    .tool-card.active {
-      cursor: pointer;
-    }
-    .tool-card.active:hover {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(26,110,255,0.08);
-    }
-    .tool-card.soon {
-      opacity: 0.6;
-      cursor: default;
-    }
-    .tool-card-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-    }
-    .tool-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      flex-shrink: 0;
-    }
+    .stat-label { font-size: 11px; color: var(--muted); font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 4px; }
+    .main { max-width: 960px; margin: 0 auto; padding: 2rem; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+    .section-title { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+    .tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; }
+    .tool-card { background: var(--white); border: 0.5px solid var(--border); border-radius: 8px; padding: 1.5rem; text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 1rem; transition: border-color 0.15s, box-shadow 0.15s; position: relative; overflow: hidden; }
+    .tool-card.active { cursor: pointer; }
+    .tool-card.active:hover { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,110,255,0.08); }
+    .tool-card.soon { opacity: 0.6; cursor: default; }
+    .tool-card-top { display: flex; align-items: flex-start; justify-content: space-between; }
+    .tool-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
     .tool-icon.blue { background: var(--blue-light); color: var(--blue); }
     .tool-icon.slate { background: #f0f0ee; color: #555; }
-    .tool-status {
-      font-size: 10px;
-      font-weight: 500;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      padding: 3px 8px;
-      border-radius: 99px;
-    }
+    .tool-status { font-size: 10px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 8px; border-radius: 99px; }
     .tool-status.live { background: #e6f4ea; color: #1e7e34; }
     .tool-status.soon { background: #f0f0ee; color: #888; }
-    .tool-card-body {}
-    .tool-name {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--black);
-      margin-bottom: 5px;
-      letter-spacing: -0.01em;
-    }
-    .tool-desc {
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-    .tool-card-footer {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--blue);
-      margin-top: auto;
-    }
-    .tool-card.soon .tool-card-footer {
-      color: var(--muted);
-    }
-    .tool-arrow {
-      font-size: 14px;
-      transition: transform 0.15s;
-    }
-    .tool-card.active:hover .tool-arrow {
-      transform: translateX(3px);
-    }
-
-    /* ACTIVITY STRIP */
-    .activity-strip {
-      background: var(--white);
-      border: 0.5px solid var(--border);
-      border-radius: 8px;
-      padding: 1.25rem 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-    .activity-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .activity-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #1e7e34;
-      flex-shrink: 0;
-      box-shadow: 0 0 0 3px #e6f4ea;
-    }
-    .activity-text {
-      font-size: 13px;
-      color: var(--black);
-    }
+    .tool-name { font-size: 16px; font-weight: 600; color: var(--black); margin-bottom: 5px; letter-spacing: -0.01em; }
+    .tool-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+    .tool-card-footer { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--blue); margin-top: auto; }
+    .tool-card.soon .tool-card-footer { color: var(--muted); }
+    .tool-arrow { font-size: 14px; transition: transform 0.15s; }
+    .tool-card.active:hover .tool-arrow { transform: translateX(3px); }
+    .activity-strip { background: var(--white); border: 0.5px solid var(--border); border-radius: 8px; padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .activity-left { display: flex; align-items: center; gap: 10px; }
+    .activity-dot { width: 8px; height: 8px; border-radius: 50%; background: #1e7e34; flex-shrink: 0; box-shadow: 0 0 0 3px #e6f4ea; }
+    .activity-text { font-size: 13px; color: var(--black); }
     .activity-text span { color: var(--muted); }
-    .activity-right {
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    /* FOOTER */
-    footer {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 0 2rem 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-    .footer-logo {
-      font-size: 14px;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      color: var(--black);
-    }
+    .activity-right { font-size: 12px; color: var(--muted); }
+    footer { max-width: 960px; margin: 0 auto; padding: 0 2rem 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .footer-logo { font-size: 14px; font-weight: 600; letter-spacing: -0.02em; color: var(--black); }
     .footer-logo span { color: var(--blue); }
-    .footer-copy {
-      font-size: 12px;
-      color: var(--muted);
-    }
-
+    .footer-copy { font-size: 12px; color: var(--muted); }
     @media (max-width: 600px) {
       .hero-title { font-size: 26px; }
       .hero-stats { display: none; }
@@ -331,38 +109,23 @@
       </div>
       <div class="hero-stats">
         <div class="stat">
-          <div class="stat-num">2<span>/5</span></div>
+          <div class="stat-num">4<span>/6</span></div>
           <div class="stat-label">Tools live</div>
         </div>
         <div class="stat">
-          <div class="stat-num" id="est-count">0</div>
-          <div class="stat-label">Estimates built</div>
+          <div class="stat-num" id="proj-count">—</div>
+          <div class="stat-label">Active projects</div>
         </div>
       </div>
     </div>
   </div>
 
   <div class="main">
-
     <div class="section-header">
       <span class="section-title">Tools</span>
     </div>
 
     <div class="tool-grid">
-
-      <a href="/estimator.html" class="tool-card active">
-        <div class="tool-card-top">
-          <div class="tool-icon blue"><i class="ti ti-file-dollar" aria-hidden="true"></i></div>
-          <span class="tool-status live">Live</span>
-        </div>
-        <div class="tool-card-body">
-          <div class="tool-name">Smart Estimator</div>
-          <div class="tool-desc">AI-powered quoting with Ontario Electrical Code awareness. Describe the job, get a fully itemized estimate.</div>
-        </div>
-        <div class="tool-card-footer">
-          Open estimator <i class="ti ti-arrow-right tool-arrow" aria-hidden="true"></i>
-        </div>
-      </a>
 
       <a href="/tracker.html" class="tool-card active">
         <div class="tool-card-top">
@@ -373,9 +136,43 @@
           <div class="tool-name">Project Tracker</div>
           <div class="tool-desc">Visualize active jobs on a regional map. Grid-based status view with drill-down to property level.</div>
         </div>
-        <div class="tool-card-footer">
-          Open tracker <i class="ti ti-arrow-right tool-arrow" aria-hidden="true"></i>
+        <div class="tool-card-footer">Open tracker <i class="ti ti-arrow-right tool-arrow"></i></div>
+      </a>
+
+      <a href="/projects.html" class="tool-card active">
+        <div class="tool-card-top">
+          <div class="tool-icon blue"><i class="ti ti-list" aria-hidden="true"></i></div>
+          <span class="tool-status live">Live</span>
         </div>
+        <div class="tool-card-body">
+          <div class="tool-name">Projects</div>
+          <div class="tool-desc">Full project list with status, progress stages, custom fields, and inline editing. Synced with the map.</div>
+        </div>
+        <div class="tool-card-footer">Open projects <i class="ti ti-arrow-right tool-arrow"></i></div>
+      </a>
+
+      <a href="/estimator.html" class="tool-card active">
+        <div class="tool-card-top">
+          <div class="tool-icon blue"><i class="ti ti-file-dollar" aria-hidden="true"></i></div>
+          <span class="tool-status live">Live</span>
+        </div>
+        <div class="tool-card-body">
+          <div class="tool-name">Assessment</div>
+          <div class="tool-desc">AI-powered job assessments with Ontario Electrical Code awareness. Room-by-room scope and pricing.</div>
+        </div>
+        <div class="tool-card-footer">Open assessment <i class="ti ti-arrow-right tool-arrow"></i></div>
+      </a>
+
+      <a href="/catalogue.html" class="tool-card active">
+        <div class="tool-card-top">
+          <div class="tool-icon blue"><i class="ti ti-books" aria-hidden="true"></i></div>
+          <span class="tool-status live">Live</span>
+        </div>
+        <div class="tool-card-body">
+          <div class="tool-name">Catalogue</div>
+          <div class="tool-desc">Build your components, branches, protoassemblies, and room assemblies. Powers the assessment tool.</div>
+        </div>
+        <div class="tool-card-footer">Open catalogue <i class="ti ti-arrow-right tool-arrow"></i></div>
       </a>
 
       <div class="tool-card soon">
@@ -385,11 +182,9 @@
         </div>
         <div class="tool-card-body">
           <div class="tool-name">Customer Database</div>
-          <div class="tool-desc">Every customer, job history, and contact in one searchable place. Auto-fills into estimates.</div>
+          <div class="tool-desc">Every customer, job history, and contact in one searchable place. Auto-fills into assessments.</div>
         </div>
-        <div class="tool-card-footer">
-          In development <i class="ti ti-clock tool-arrow" aria-hidden="true"></i>
-        </div>
+        <div class="tool-card-footer">In development <i class="ti ti-clock tool-arrow"></i></div>
       </div>
 
       <div class="tool-card soon">
@@ -399,25 +194,9 @@
         </div>
         <div class="tool-card-body">
           <div class="tool-name">Schedule</div>
-          <div class="tool-desc">Book jobs, manage crew availability, and keep every project on time — synced with your project tracker.</div>
+          <div class="tool-desc">Book jobs, manage crew availability, and keep every project on time — synced with the tracker.</div>
         </div>
-        <div class="tool-card-footer">
-          In development <i class="ti ti-clock tool-arrow" aria-hidden="true"></i>
-        </div>
-      </div>
-
-      <div class="tool-card soon">
-        <div class="tool-card-top">
-          <div class="tool-icon slate"><i class="ti ti-box" aria-hidden="true"></i></div>
-          <span class="tool-status soon">Coming soon</span>
-        </div>
-        <div class="tool-card-body">
-          <div class="tool-name">Parts Catalogue</div>
-          <div class="tool-desc">Your full materials library with live pricing. Powers the estimator's assembly bundles automatically.</div>
-        </div>
-        <div class="tool-card-footer">
-          In development <i class="ti ti-clock tool-arrow" aria-hidden="true"></i>
-        </div>
+        <div class="tool-card-footer">In development <i class="ti ti-clock tool-arrow"></i></div>
       </div>
 
     </div>
@@ -429,13 +208,22 @@
       </div>
       <div class="activity-right">DW Electric · Ontario, CA</div>
     </div>
-
   </div>
 
   <footer>
     <div class="footer-logo">Ampers<span>&</span>nd</div>
     <div class="footer-copy">Built for DW Electric · ampersend.ca</div>
   </footer>
+
+  <script>
+    // Pull active project count from Supabase
+    const SB_URL='https://vojgddmlwakvhmbkzfld.supabase.co';
+    const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvamdkZG1sd2FrdmhtYmt6ZmxkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NDQ1MzAsImV4cCI6MjA5NzIyMDUzMH0.PGu1HeCZ3SsMgRyLC_s4xP8m3Qt73NlRyvzA-hFroEk';
+    fetch(`${SB_URL}/rest/v1/projects?select=id&status=eq.active`,{headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`}})
+      .then(r=>r.json())
+      .then(d=>{document.getElementById('proj-count').textContent=Array.isArray(d)?d.length:'—';})
+      .catch(()=>{});
+  </script>
 
 </body>
 </html>
