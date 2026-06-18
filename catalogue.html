@@ -801,42 +801,10 @@ async function saveNewAsm(){
 }
 
 // ── INLINE DELETE CONFIRM ─────────────────────────────────────
-let _delPending=null;
 function confirmDel(type,id){
-  const btnId=type==='comp'?`del-btn-${id}`:`del-btn-${type}-${id}`;
-  const btn=document.getElementById(btnId);
-  if(!btn)return;
-  // If already in confirm state for this button, execute delete
-  if(_delPending&&_delPending.type===type&&_delPending.id===id){
-    clearTimeout(_delPending.timer);_delPending=null;
-    if(type==='comp')deleteComp(id);
-    else if(type==='branch')deleteBranch(id);
-    else if(type==='proto')deleteProto(id);
-    else if(type==='asm')deleteAsm(id);
-    return;
-  }
-  // Cancel any previous pending confirm
-  if(_delPending)_cancelDel();
-  // Enter confirm state
-  btn.dataset._origHtml=btn.innerHTML;
-  btn.dataset._origStyle=btn.getAttribute('style')||'';
-  btn.innerHTML='<i class="ti ti-trash"></i> Sure?';
-  btn.style.background='var(--red)';btn.style.color='#fff';btn.style.borderColor='var(--red)';
-  _delPending={type,id,btn,timer:setTimeout(_cancelDel,3000)};
+  const fns={comp:deleteComp,branch:deleteBranch,proto:deleteProto,asm:deleteAsm};
+  if(confirm('Delete this item?'))fns[type](id);
 }
-function _cancelDel(){
-  if(!_delPending)return;
-  const{btn}=_delPending;
-  if(btn){btn.innerHTML=btn.dataset._origHtml||btn.innerHTML;btn.setAttribute('style',btn.dataset._origStyle||'');}
-  clearTimeout(_delPending.timer);_delPending=null;
-}
-document.addEventListener('click',e=>{
-  if(_delPending){
-    const btnId=_delPending.type==='comp'?`del-btn-${_delPending.id}`:`del-btn-${_delPending.type}-${_delPending.id}`;
-    const btn=document.getElementById(btnId);
-    if(btn&&!btn.contains(e.target))_cancelDel();
-  }
-});
 
 loadAll();
 </script>
