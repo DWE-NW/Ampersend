@@ -557,7 +557,7 @@ function setupCanvas(){
 
 function snapPt(x,y,shift,forceSnap){
   // Streets: never snap to grid (free placement), only shift-45
-  // Lots/shapes: snap to grid
+  // Lots/shapes: snap to grid, then try edge snap to nearby shapes
   const isStreet=activeTool==='street';
   if(shift&&drawPoints.length){
     const[lx,ly]=drawPoints[drawPoints.length-1];
@@ -566,7 +566,15 @@ function snapPt(x,y,shift,forceSnap){
     const dist=Math.sqrt(dx*dx+dy*dy);
     x=lx+Math.cos(snap45)*dist;y=ly+Math.sin(snap45)*dist;
   }
-  if(isStreet&&!forceSnap)return[x,y]; // streets: free placement
+  if(isStreet&&!forceSnap)return[x,y];
+  // Edge snap: check corners of all other shapes first
+  const EDGE_THRESH=16;
+  for(const s of shapes){
+    if(!s.points)continue;
+    for(const[px,py] of s.points){
+      if(Math.hypot(x-px,y-py)<EDGE_THRESH)return[px,py];
+    }
+  }
   if(!SNAP)return[x,y];
   return[Math.round(x/SNAP)*SNAP,Math.round(y/SNAP)*SNAP];
 }
@@ -649,6 +657,14 @@ function onDown(e){
       selShapeId=hit.id;
       const hh=hitHandle(hit,cx,cy);
       isDragging=true;dragStartX=cx;dragStartY=cy;
+      // Capture backup immediately at mousedown — prevents jump on first move
+      if(hit.type==='circle'){
+        dragShapeBackup={cx:hit.cx,cy:hit.cy,r:hit.r};
+      } else if(hit.type==='street'){
+        dragShapeBackup=JSON.parse(JSON.stringify(hit.centreLine));
+      } else {
+        dragShapeBackup=JSON.parse(JSON.stringify(hit.points));
+      }
       if(hh!==null){isDragging='handle';dragHandle=hh;}
       else isDragging='move';
       if(hit.type==='lot'){showLotDetail(hit.id);}
@@ -664,18 +680,21 @@ function onDown(e){
     drawPoints.push([sx,sy]);redraw();return;
   }
 
-  // CIRCLE — first click = centre, second click = radius point
+  // CIRCLE — first click = centre, second click = radius (single clicks only)
   if(activeTool==='circle'){
-    drawPoints.push([cx,cy]); // circles don't snap
-    if(drawPoints.length===2){
-      const[cx2,cy2]=drawPoints[0],[rx,ry]=drawPoints[1];
-      const r=Math.hypot(rx-cx2,ry-cy2);
-      pushHistory();
-      const shape={id:uid(),type:'circle',cx:cx2,cy:cy2,r:Math.max(10,r),label:''};
-      shapes.push(shape);selShapeId=shape.id;drawPoints=[];
-      showShapePropsAt(shape,e.clientX,e.clientY);
-      redraw();
-    }else redraw();
+    if(drawPoints.length===0){
+      drawPoints.push([cx,cy]);redraw();
+    } else {
+      const[ocx,ocy]=drawPoints[0];
+      const r=Math.hypot(cx-ocx,cy-ocy);
+      if(r>5){
+        pushHistory();
+        const shape={id:uid(),type:'circle',cx:ocx,cy:ocy,r:Math.max(10,r),label:''};
+        shapes.push(shape);selShapeId=shape.id;drawPoints=[];
+        showShapePropsAt(shape,e.clientX,e.clientY);
+        redraw();
+      }
+    }
     return;
   }
   // LOT / GREENSPACE / WATER — click corners, dbl-click to close
@@ -691,27 +710,23 @@ function onMove(e){
     const dx=cx-dragStartX,dy=cy-dragStartY;
     if(isDragging==='move'){
       if(shape.type==='circle'){
-        if(!dragShapeBackup)dragShapeBackup={cx:shape.cx,cy:shape.cy};
         shape.cx=dragShapeBackup.cx+dx;shape.cy=dragShapeBackup.cy+dy;
       } else if(shape.type==='street'){
-        if(!dragShapeBackup)dragShapeBackup=JSON.parse(JSON.stringify(shape.centreLine));
-        shape.centreLine=dragShapeBackup.map(([px,py])=>[px+dx,py+dy]); // streets: free move
+        shape.centreLine=dragShapeBackup.map(([px,py])=>[px+dx,py+dy]);
       } else {
-        if(!dragShapeBackup)dragShapeBackup=JSON.parse(JSON.stringify(shape.points));
         shape.points=dragShapeBackup.map(([px,py])=>snapPt(px+dx,py+dy));
       }
     } else if(isDragging==='handle'){
       if(shape.type==='circle'){
-        if(!dragShapeBackup)dragShapeBackup={cx:shape.cx,cy:shape.cy,r:shape.r};
         if(dragHandle==='radius')shape.r=Math.max(10,Math.hypot(cx-shape.cx,cy-shape.cy));
-        else{shape.cx=cx;shape.cy=cy;}
+        else{shape.cx=dragShapeBackup.cx+dx;shape.cy=dragShapeBackup.cy+dy;}
       } else if(shape.type==='street'){
-        if(!dragShapeBackup)dragShapeBackup=JSON.parse(JSON.stringify(shape.centreLine));
-        const newPts=[...dragShapeBackup];newPts[dragHandle]=[dragShapeBackup[dragHandle][0]+dx,dragShapeBackup[dragHandle][1]+dy];
-        shape.centreLine=newPts; // streets: free drag
+        const newPts=dragShapeBackup.map(p=>[...p]);
+        newPts[dragHandle]=[dragShapeBackup[dragHandle][0]+dx,dragShapeBackup[dragHandle][1]+dy];
+        shape.centreLine=newPts;
       } else {
-        if(!dragShapeBackup)dragShapeBackup=JSON.parse(JSON.stringify(shape.points));
-        const newPts=[...dragShapeBackup];newPts[dragHandle]=snapPt(dragShapeBackup[dragHandle][0]+dx,dragShapeBackup[dragHandle][1]+dy);
+        const newPts=dragShapeBackup.map(p=>[...p]);
+        newPts[dragHandle]=snapPt(dragShapeBackup[dragHandle][0]+dx,dragShapeBackup[dragHandle][1]+dy);
         shape.points=newPts;
       }
     }
@@ -722,21 +737,28 @@ function onMove(e){
 }
 
 function onDbl(e){
-  const[cx,cy]=canvasXY(e);
-  // Remove the last point that was added by the mousedown on the dblclick
-  if(drawPoints.length>1)drawPoints.pop();
+  // A dblclick fires: mousedown, mouseup, mousedown, mouseup, dblclick
+  // So drawPoints has 2 extra points from those two mousedowns — remove both
+  if(activeTool==='street'){
+    // Remove the last 2 points added by the dblclick mousedowns, keep intentional clicks
+    if(drawPoints.length>2)drawPoints.splice(-2,2);
+    else if(drawPoints.length>0)drawPoints.pop();
+  } else {
+    if(drawPoints.length>1)drawPoints.pop();
+  }
 
   if(activeTool==='street'&&drawPoints.length>=2){
     pushHistory();
-    const shape={id:uid(),type:'street',centreLine:[...drawPoints],width:40,label:''};
-    shapes.push(shape);selShapeId=shape.id;drawPoints=[];
+    const shape={id:uid(),type:'street',centreLine:[...drawPoints],width:parseInt(document.getElementById('street-width').value)||40,label:''};
+    shapes.push(shape);selShapeId=shape.id;
     showShapePropsAt(shape,e.clientX,e.clientY);
-  } else if(activeTool!=='select'&&activeTool!=='street'&&drawPoints.length>=3){
+  } else if(activeTool!=='select'&&activeTool!=='street'&&activeTool!=='circle'&&drawPoints.length>=3){
     pushHistory();
     const shape={id:uid(),type:activeTool,points:[...drawPoints],label:''};
-    shapes.push(shape);selShapeId=shape.id;drawPoints=[];
+    shapes.push(shape);selShapeId=shape.id;
     showShapePropsAt(shape,e.clientX,e.clientY);
   }
+  drawPoints=[]; // always clear — no dangling preview lines
   redraw();
 }
 
@@ -854,12 +876,21 @@ function drawShape(s){
     ctx.strokeStyle='rgba(255,255,255,0.12)';ctx.lineWidth=1;
     ctx.beginPath();pts.forEach(([x,y],i)=>i===0?ctx.moveTo(x,y):ctx.lineTo(x,y));ctx.stroke();
     ctx.lineCap='butt';ctx.lineJoin='miter';
-    // Label at true path midpoint (by total length)
+    // Label at true path midpoint, rotated along road direction
     if(s.label){
       const[lx,ly]=pathMidpoint(pts);
-      ctx.fillStyle='rgba(255,255,255,0.8)';
-      ctx.font=`500 ${Math.max(9,Math.min(13,w*0.3))}px -apple-system,sans-serif`;
-      ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(s.label,lx,ly);
+      const angle=pathAngleAtMidpoint(pts);
+      const fs=Math.max(9,Math.min(13,w*0.3));
+      ctx.save();
+      ctx.translate(lx,ly);
+      // Keep text readable — flip if angle would make it upside down
+      const a=angle>Math.PI/2||(angle<-Math.PI/2)?angle+Math.PI:angle;
+      ctx.rotate(a);
+      ctx.fillStyle='rgba(255,255,255,0.85)';
+      ctx.font=`500 ${fs}px -apple-system,sans-serif`;
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(s.label,0,0);
+      ctx.restore();
     }
     // Handles — only when selected, small clean white dots
     if(isSel){
@@ -927,6 +958,22 @@ function drawShape(s){
   }
 }
 
+function pathAngleAtMidpoint(pts){
+  // Find the segment containing the midpoint and return its angle
+  let total=0;
+  for(let i=0;i<pts.length-1;i++)total+=Math.hypot(pts[i+1][0]-pts[i][0],pts[i+1][1]-pts[i][1]);
+  let target=total/2,walked=0;
+  for(let i=0;i<pts.length-1;i++){
+    const seg=Math.hypot(pts[i+1][0]-pts[i][0],pts[i+1][1]-pts[i][1]);
+    if(walked+seg>=target){
+      return Math.atan2(pts[i+1][1]-pts[i][1],pts[i+1][0]-pts[i][0]);
+    }
+    walked+=seg;
+  }
+  // fallback: last segment angle
+  const last=pts.length-1;
+  return Math.atan2(pts[last][1]-pts[last-1][1],pts[last][0]-pts[last-1][0]);
+}
 function pathMidpoint(pts){
   // Walk total length, find point at 50%
   let total=0;
