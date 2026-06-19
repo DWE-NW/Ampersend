@@ -181,7 +181,7 @@
     <button class="tool-btn street" id="tool-street" onclick="setTool('street')" title="Draw street (S)"><i class="ti ti-road"></i> Street</button>
     <button class="tool-btn green" id="tool-green" onclick="setTool('greenspace')" title="Draw green space (G)"><i class="ti ti-trees"></i> Green</button>
     <button class="tool-btn water" id="tool-water" onclick="setTool('water')" title="Draw water (W)"><i class="ti ti-droplet"></i> Water</button>
-    <button class="tool-btn" id="tool-poly" onclick="setTool('poly')" title="Polygon (P)"><i class="ti ti-pentagon"></i> Polygon</button>
+    
     <div class="tb-sep"></div>
     <span class="tb-label">Snap</span>
     <select id="snap-size" onchange="SNAP=parseInt(this.value)" style="font-size:11px;padding:3px 6px;border:0.5px solid var(--border);border-radius:4px;font-family:inherit;color:var(--black);">
@@ -190,6 +190,9 @@
       <option value="40">40px</option>
       <option value="0">Off</option>
     </select>
+    <div class="tb-sep"></div>
+    <span class="tb-label" id="sw-label" style="display:none">Width</span>
+    <input type="number" id="street-width" min="10" max="200" value="40" style="width:54px;font-size:11px;padding:3px 6px;border:0.5px solid var(--border);border-radius:4px;font-family:inherit;display:none" onchange="updateStreetWidth(this.value)" title="Street width (px)"/>
     <div class="tb-sep"></div>
     <span class="tb-label">Zoom</span>
     <button class="tool-btn" onclick="setZoom(zoom-0.1)"><i class="ti ti-minus"></i></button>
@@ -200,6 +203,8 @@
     <div class="tb-sep"></div>
     <button class="tool-btn" onclick="undo()" title="Undo (Ctrl+Z)"><i class="ti ti-arrow-back-up"></i></button>
     <button class="tool-btn" onclick="saveShapes(true)" title="Save plan"><i class="ti ti-device-floppy"></i> Save</button>
+    <div class="tb-sep"></div>
+    <button class="tool-btn" id="help-btn" onclick="toggleHelp()" title="Keyboard shortcuts"><i class="ti ti-keyboard"></i></button>
   </div>
 
   <div class="site-body">
@@ -305,6 +310,7 @@
       </div>
     </div>
     <div class="mf">
+      <button class="mbtn" style="color:var(--red);border-color:var(--red);margin-right:auto" onclick="deleteDevelopment()"><i class="ti ti-trash"></i> Delete development</button>
       <button class="mbtn" onclick="closeSettings()">Cancel</button>
       <button class="mbtn primary" onclick="saveSettings()"><i class="ti ti-check"></i> Save</button>
     </div>
@@ -331,7 +337,62 @@
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<!-- HELP POPUP -->
+<div id="help-popup" style="display:none;position:fixed;top:60px;right:16px;background:var(--white);border:0.5px solid var(--border);border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,0.14);padding:18px 20px;z-index:500;width:260px;">
+  <div style="font-size:13px;font-weight:600;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">
+    Shortcuts <button onclick="toggleHelp()" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;line-height:1">×</button>
+  </div>
+  <div style="font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Tools</div>
+  <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:14px;">
+    <tr><td style="padding:3px 0;color:var(--muted)"><kbd class="hk">V</kbd></td><td style="padding:3px 0">Select &amp; move</td></tr>
+    <tr><td style="padding:3px 0;color:var(--muted)"><kbd class="hk">L</kbd></td><td style="padding:3px 0">Draw lot</td></tr>
+    <tr><td style="padding:3px 0;color:var(--muted)"><kbd class="hk">S</kbd></td><td style="padding:3px 0">Draw street</td></tr>
+    <tr><td style="padding:3px 0;color:var(--muted)"><kbd class="hk">G</kbd></td><td style="padding:3px 0">Draw green space</td></tr>
+    <tr><td style="padding:3px 0;color:var(--muted)"><kbd class="hk">W</kbd></td><td style="padding:3px 0">Draw water</td></tr>
+  </table>
+  <div style="font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Drawing</div>
+  <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:14px;">
+    <tr><td style="padding:3px 0"><kbd class="hk">Click</kbd></td><td style="padding:3px 0">Place point / corner</td></tr>
+    <tr><td style="padding:3px 0"><kbd class="hk">Dbl click</kbd></td><td style="padding:3px 0">Finish shape</td></tr>
+    <tr><td style="padding:3px 0"><kbd class="hk">Shift</kbd></td><td style="padding:3px 0">Snap to 45°</td></tr>
+    <tr><td style="padding:3px 0"><kbd class="hk">Esc</kbd></td><td style="padding:3px 0">Cancel drawing</td></tr>
+    <tr><td style="padding:3px 0"><kbd class="hk">Del</kbd></td><td style="padding:3px 0">Delete selected</td></tr>
+  </table>
+  <div style="font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Navigation</div>
+  <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:14px;">
+    <tr><td style="padding:3px 0"><kbd class="hk">Scroll</kbd></td><td style="padding:3px 0">Zoom in / out</td></tr>
+    <tr><td style="padding:3px 0"><kbd class="hk">Space</kbd> + drag</td><td style="padding:3px 0">Pan canvas</td></tr>
+    <tr><td style="padding:3px 0"><kbd class="hk">Middle</kbd> drag</td><td style="padding:3px 0">Pan canvas</td></tr>
+  </table>
+  <div style="font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Edit</div>
+  <table style="width:100%;border-collapse:collapse;font-size:12px;">
+    <tr><td style="padding:3px 0"><kbd class="hk">Ctrl Z</kbd></td><td style="padding:3px 0">Undo</td></tr>
+    <tr><td style="padding:3px 0">Drag handle</td><td style="padding:3px 0">Reshape / move point</td></tr>
+    <tr><td style="padding:3px 0">Drag shape</td><td style="padding:3px 0">Move shape</td></tr>
+  </table>
+</div>
+
+<style>
+.hk{background:var(--surface);border:0.5px solid var(--border);border-radius:3px;padding:1px 5px;font-size:10px;font-family:monospace;color:var(--black);white-space:nowrap;}
+</style>
+
+<script>
+function toggleHelp(){
+  const p=document.getElementById('help-popup');
+  const btn=document.getElementById('help-btn');
+  const open=p.style.display==='none';
+  p.style.display=open?'block':'none';
+  btn.classList.toggle('active',open);
+}
+// Close on outside click
+document.addEventListener('click',e=>{
+  const p=document.getElementById('help-popup');
+  if(p.style.display==='block'&&!p.contains(e.target)&&!document.getElementById('help-btn').contains(e.target)){
+    p.style.display='none';document.getElementById('help-btn').classList.remove('active');
+  }
+});
+</script>
+
 
 <script>
 // ── SUPABASE ──────────────────────────────────────────────────
@@ -440,9 +501,7 @@ let zoom=1,panX=0,panY=0;
 let refImage=null,showRef=true;
 let pendingUploadFile=null;
 let history=[]; // for undo
-let isDragging=false,dragStartX=0,dragStartY=0;
-let drawState=null; // for rect/poly drawing
-let polyPoints=[];
+
 let CANVAS_W=1600,CANVAS_H=1200;
 
 // canvas
@@ -489,8 +548,19 @@ function setupCanvas(){
   redraw();
 }
 
-// ── DRAWING ───────────────────────────────────────────────────
-function snapPt(x,y){
+// ── DRAWING ENGINE ────────────────────────────────────────────
+// Street shapes store: {id, type:'street', centreLine:[[x,y],...], width:40, label:''}
+// All other shapes store: {id, type, points:[[x,y],...], label:''}
+
+function snapPt(x,y,shift){
+  // Shift = snap to 45° from last point (used during polygon drawing)
+  if(shift&&drawPoints.length){
+    const[lx,ly]=drawPoints[drawPoints.length-1];
+    const dx=x-lx,dy=y-ly,angle=Math.atan2(dy,dx);
+    const snap45=Math.round(angle/(Math.PI/4))*(Math.PI/4);
+    const dist=Math.sqrt(dx*dx+dy*dy);
+    x=lx+Math.cos(snap45)*dist;y=ly+Math.sin(snap45)*dist;
+  }
   if(!SNAP)return[x,y];
   return[Math.round(x/SNAP)*SNAP,Math.round(y/SNAP)*SNAP];
 }
@@ -501,31 +571,39 @@ function canvasXY(e){
 }
 
 function setTool(t){
-  activeTool=t;polyPoints=[];drawState=null;
+  activeTool=t;drawPoints=[];
   document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));
   const el=document.getElementById('tool-'+t);
   if(el)el.classList.add('active');
   canvas.className=t==='select'?'sel-mode':'';
-  hideShapeProps();
-  redraw();
+  // Show street width control only when street tool is active
+  const sw=document.getElementById('street-width'),swl=document.getElementById('sw-label');
+  sw.style.display=t==='street'?'block':'none';swl.style.display=t==='street'?'block':'none';
+  hideShapeProps();redraw();
 }
+function updateStreetWidth(v){
+  // If a street is selected, update its width live
+  if(selShapeId){const s=shapes.find(x=>x.id===selShapeId);if(s&&s.type==='street'){s.width=parseInt(v)||40;redraw();}}
+}
+
+let drawPoints=[]; // points being placed for current shape (polygon or street centreline)
+let mousePos=[0,0]; // live cursor position for preview
 
 function setupEvents(){
   canvas.addEventListener('mousedown',onDown);
   canvas.addEventListener('mousemove',onMove);
-  canvas.addEventListener('mouseup',onUp);
   canvas.addEventListener('dblclick',onDbl);
   canvas.addEventListener('contextmenu',e=>{e.preventDefault();cancelDraw();});
 
-  // pan with middle mouse or space+drag
-  let spaceDown=false;
-  window.addEventListener('keydown',e=>{if(e.code==='Space'&&!e.target.closest('input,textarea,select')){spaceDown=true;canvas.style.cursor='grab';}});
-  window.addEventListener('keyup',e=>{if(e.code==='Space'){spaceDown=false;canvas.style.cursor='';}});
-
-  let panStart=null;
+  let spaceDown=false,panStart=null;
+  window.addEventListener('keydown',e=>{if(e.code==='Space'&&!e.target.closest('input,textarea,select')){spaceDown=true;}});
+  window.addEventListener('keyup',e=>{if(e.code==='Space')spaceDown=false;});
   canvas.addEventListener('mousedown',e=>{if(e.button===1||spaceDown){panStart={x:e.clientX-panX,y:e.clientY-panY};e.preventDefault();}});
   window.addEventListener('mousemove',e=>{if(panStart){panX=e.clientX-panStart.x;panY=e.clientY-panStart.y;applyTransform();}});
-  window.addEventListener('mouseup',()=>panStart=null);
+  window.addEventListener('mouseup',e=>{
+    panStart=null;
+    if(isDragging){dragShapeBackup=null;isDragging=false;dragHandle=null;}
+  });
 
   wrap.addEventListener('wheel',e=>{
     e.preventDefault();
@@ -544,30 +622,29 @@ function setupKeys(){
     if(e.key==='s'||e.key==='S')setTool('street');
     if(e.key==='g'||e.key==='G')setTool('greenspace');
     if(e.key==='w'||e.key==='W')setTool('water');
-    if(e.key==='p'||e.key==='P')setTool('poly');
     if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();undo();}
     if(e.key==='Escape'){cancelDraw();selShapeId=null;hideShapeProps();redraw();}
     if(e.key==='Delete'||e.key==='Backspace'){if(selShapeId&&!e.target.closest('input,textarea'))deleteSelected();}
   });
 }
 
-let mouseDownPt=null;
+let isDragging=false,dragStartX=0,dragStartY=0,dragHandle=null,dragShapeBackup=null;
+
 function onDown(e){
   if(e.button!==0)return;
   const[cx,cy]=canvasXY(e);
-  const[sx,sy]=snapPt(cx,cy);
+  const[sx,sy]=snapPt(cx,cy,e.shiftKey);
 
+  // SELECT tool
   if(activeTool==='select'){
     const hit=hitTest(cx,cy);
     if(hit){
       selShapeId=hit.id;
-      isDragging=true;dragStartX=cx;dragStartY=cy;
-      // check handle hit
       const hh=hitHandle(hit,cx,cy);
+      isDragging=true;dragStartX=cx;dragStartY=cy;
       if(hh!==null){isDragging='handle';dragHandle=hh;}
-      else{isDragging='move';}
-      // show lot detail if lot shape
-      if(hit.type==='lot'){const ld=lots.find(l=>l.shapeId===hit.id);if(ld)showLotDetail(hit.id);}
+      else isDragging='move';
+      if(hit.type==='lot'){showLotDetail(hit.id);}
       showShapeProps(hit,e);
     } else {
       selShapeId=null;hideShapeProps();closeDetail();
@@ -575,88 +652,99 @@ function onDown(e){
     redraw();return;
   }
 
-  if(activeTool==='poly'){
-    polyPoints.push([sx,sy]);redraw();return;
+  // STREET — click to add centreline points, dbl-click finishes
+  if(activeTool==='street'){
+    drawPoints.push([sx,sy]);redraw();return;
   }
 
-  // rect tools
-  mouseDownPt=[sx,sy];
-  drawState={x0:sx,y0:sy,x1:sx,y1:sy,type:activeTool};
+  // LOT / GREENSPACE / WATER — click corners, dbl-click to close
+  drawPoints.push([sx,sy]);redraw();
 }
 
-let dragHandle=null,dragShapeBackup=null;
 function onMove(e){
   const[cx,cy]=canvasXY(e);
-  const[sx,sy]=snapPt(cx,cy);
-
-  if(activeTool==='poly'){redraw();drawPolyPreview(cx,cy);return;}
-
-  if(mouseDownPt&&drawState){
-    drawState.x1=sx;drawState.y1=sy;redraw();drawRectPreview();return;
-  }
+  mousePos=[cx,cy];
 
   if(isDragging&&selShapeId){
     const shape=shapes.find(s=>s.id===selShapeId);if(!shape)return;
     const dx=cx-dragStartX,dy=cy-dragStartY;
     if(isDragging==='move'){
-      if(!dragShapeBackup)dragShapeBackup=JSON.parse(JSON.stringify(shape.points));
-      shape.points=dragShapeBackup.map(([px,py])=>snapPt(px+dx,py+dy));
+      if(!dragShapeBackup)dragShapeBackup=JSON.parse(JSON.stringify(shape.type==='street'?shape.centreLine:shape.points));
+      if(shape.type==='street'){
+        shape.centreLine=dragShapeBackup.map(([px,py])=>snapPt(px+dx,py+dy));
+      } else {
+        shape.points=dragShapeBackup.map(([px,py])=>snapPt(px+dx,py+dy));
+      }
     } else if(isDragging==='handle'){
-      if(!dragShapeBackup)dragShapeBackup=JSON.parse(JSON.stringify(shape.points));
-      const newPts=[...dragShapeBackup];
-      newPts[dragHandle]=snapPt(dragShapeBackup[dragHandle][0]+dx,dragShapeBackup[dragHandle][1]+dy);
-      shape.points=newPts;
+      if(!dragShapeBackup)dragShapeBackup=JSON.parse(JSON.stringify(shape.type==='street'?shape.centreLine:shape.points));
+      if(shape.type==='street'){
+        const newPts=[...dragShapeBackup];newPts[dragHandle]=snapPt(dragShapeBackup[dragHandle][0]+dx,dragShapeBackup[dragHandle][1]+dy);
+        shape.centreLine=newPts;
+      } else {
+        const newPts=[...dragShapeBackup];newPts[dragHandle]=snapPt(dragShapeBackup[dragHandle][0]+dx,dragShapeBackup[dragHandle][1]+dy);
+        shape.points=newPts;
+      }
     }
-    redraw();
+    redraw();return;
   }
-}
 
-function onUp(e){
-  if(mouseDownPt&&drawState&&activeTool!=='select'&&activeTool!=='poly'){
-    const[sx,sy]=snapPt(...canvasXY(e));
-    const x0=Math.min(drawState.x0,sx),y0=Math.min(drawState.y0,sy);
-    const x1=Math.max(drawState.x0,sx),y1=Math.max(drawState.y0,sy);
-    if(Math.abs(x1-x0)>5&&Math.abs(y1-y0)>5){
-      pushHistory();
-      const shape={id:uid(),type:activeTool,points:[[x0,y0],[x1,y0],[x1,y1],[x0,y1]],label:''};
-      shapes.push(shape);selShapeId=shape.id;
-      showShapePropsAt(shape,e.clientX,e.clientY);
-    }
-    mouseDownPt=null;drawState=null;redraw();
-  }
-  if(isDragging){dragShapeBackup=null;isDragging=false;dragHandle=null;}
-  mouseDownPt=null;
+  if(drawPoints.length)redraw();
 }
 
 function onDbl(e){
-  if(activeTool==='poly'&&polyPoints.length>=3){
+  const[cx,cy]=canvasXY(e);
+  // Remove the last point that was added by the mousedown on the dblclick
+  if(drawPoints.length>1)drawPoints.pop();
+
+  if(activeTool==='street'&&drawPoints.length>=2){
     pushHistory();
-    const shape={id:uid(),type:'lot',points:[...polyPoints],label:''};
-    shapes.push(shape);selShapeId=shape.id;polyPoints=[];
+    const shape={id:uid(),type:'street',centreLine:[...drawPoints],width:40,label:''};
+    shapes.push(shape);selShapeId=shape.id;drawPoints=[];
     showShapePropsAt(shape,e.clientX,e.clientY);
-    redraw();
+  } else if(activeTool!=='select'&&activeTool!=='street'&&drawPoints.length>=3){
+    pushHistory();
+    const shape={id:uid(),type:activeTool,points:[...drawPoints],label:''};
+    shapes.push(shape);selShapeId=shape.id;drawPoints=[];
+    showShapePropsAt(shape,e.clientX,e.clientY);
   }
+  redraw();
 }
 
-function cancelDraw(){polyPoints=[];mouseDownPt=null;drawState=null;redraw();}
+function cancelDraw(){drawPoints=[];redraw();}
 
 // ── HIT TESTING ───────────────────────────────────────────────
 function hitTest(cx,cy){
   for(let i=shapes.length-1;i>=0;i--){
-    if(pointInPoly(cx,cy,shapes[i].points))return shapes[i];
+    const s=shapes[i];
+    if(s.type==='street'){if(pointNearPath(cx,cy,s.centreLine,s.width/2+4))return s;}
+    else if(pointInPoly(cx,cy,s.points))return s;
   }return null;
 }
 function pointInPoly(x,y,pts){
+  if(!pts||pts.length<3)return false;
   let inside=false;
   for(let i=0,j=pts.length-1;i<pts.length;j=i++){
     const[xi,yi]=pts[i],[xj,yj]=pts[j];
     if(((yi>y)!==(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi))inside=!inside;
   }return inside;
 }
+function pointNearPath(x,y,pts,thresh){
+  for(let i=0;i<pts.length-1;i++){
+    if(distToSegment(x,y,pts[i],pts[i+1])<thresh)return true;
+  }return false;
+}
+function distToSegment(px,py,[ax,ay],[bx,by]){
+  const dx=bx-ax,dy=by-ay,len2=dx*dx+dy*dy;
+  if(len2===0)return Math.hypot(px-ax,py-ay);
+  let t=((px-ax)*dx+(py-ay)*dy)/len2;t=Math.max(0,Math.min(1,t));
+  return Math.hypot(px-(ax+t*dx),py-(ay+t*dy));
+}
 function hitHandle(shape,cx,cy){
-  const r=8/zoom;
-  for(let i=0;i<shape.points.length;i++){
-    const[px,py]=shape.points[i];
+  const r=10/zoom;
+  const pts=shape.type==='street'?shape.centreLine:shape.points;
+  if(!pts)return null;
+  for(let i=0;i<pts.length;i++){
+    const[px,py]=pts[i];
     if(Math.abs(cx-px)<r&&Math.abs(cy-py)<r)return i;
   }return null;
 }
@@ -664,97 +752,119 @@ function hitHandle(shape,cx,cy){
 // ── REDRAW ────────────────────────────────────────────────────
 function redraw(){
   ctx.clearRect(0,0,CANVAS_W,CANVAS_H);
-  // Background
   ctx.fillStyle='#f8f8f8';ctx.fillRect(0,0,CANVAS_W,CANVAS_H);
 
-  // Snap grid (dots)
+  // Snap grid dots
   if(SNAP>0){
-    ctx.fillStyle='rgba(0,0,0,0.12)';
+    ctx.fillStyle='rgba(0,0,0,0.1)';
     for(let x=0;x<=CANVAS_W;x+=SNAP)for(let y=0;y<=CANVAS_H;y+=SNAP){ctx.beginPath();ctx.arc(x,y,1,0,Math.PI*2);ctx.fill();}
   }
 
   // Reference image
   if(refImage&&document.getElementById('ref-toggle').checked){
-    ctx.globalAlpha=0.3;ctx.drawImage(refImage,0,0,CANVAS_W,CANVAS_H);ctx.globalAlpha=1;
+    ctx.globalAlpha=0.28;ctx.drawImage(refImage,0,0,CANVAS_W,CANVAS_H);ctx.globalAlpha=1;
   }
 
-  // Draw shapes (non-lots first, then lots on top)
-  const nonLots=shapes.filter(s=>s.type!=='lot');
-  const lotShapes=shapes.filter(s=>s.type==='lot');
-  [...nonLots,...lotShapes].forEach(s=>drawShape(s));
+  // Streets first (bottom layer), then greenspace/water, then lots (top)
+  const order=['street','greenspace','water','lot'];
+  [...order.flatMap(t=>shapes.filter(s=>s.type===t)),...shapes.filter(s=>!order.includes(s.type))].forEach(s=>drawShape(s));
 
-  // Poly preview
-  if(activeTool==='poly'&&polyPoints.length){
-    ctx.strokeStyle=getStyle('lot').stroke;ctx.lineWidth=1.5;ctx.setLineDash([4,4]);
-    ctx.beginPath();polyPoints.forEach(([x,y],i)=>i===0?ctx.moveTo(x,y):ctx.lineTo(x,y));ctx.stroke();
-    ctx.setLineDash([]);
-    polyPoints.forEach(([x,y])=>{ctx.fillStyle='#1a6eff';ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();});
+  // Draw-in-progress preview
+  if(drawPoints.length&&activeTool!=='select'){
+    const[mx,my]=mousePos;
+    if(activeTool==='street'){
+      // Show centreline + width preview
+      const previewPts=[...drawPoints,[mx,my]];
+      ctx.strokeStyle='rgba(60,60,60,0.5)';ctx.lineWidth=40;ctx.lineCap='round';ctx.lineJoin='round';
+      ctx.beginPath();previewPts.forEach(([x,y],i)=>i===0?ctx.moveTo(x,y):ctx.lineTo(x,y));ctx.stroke();
+      ctx.strokeStyle='rgba(255,255,255,0.8)';ctx.lineWidth=1.5;ctx.setLineDash([5,5]);
+      ctx.beginPath();previewPts.forEach(([x,y],i)=>i===0?ctx.moveTo(x,y):ctx.lineTo(x,y));ctx.stroke();
+      ctx.setLineDash([]);ctx.lineCap='butt';ctx.lineJoin='miter';
+    } else {
+      // Polygon preview
+      const st=getStyle(activeTool);
+      ctx.fillStyle=st.fill;ctx.strokeStyle='#1a6eff';ctx.lineWidth=1.5;ctx.setLineDash([4,4]);
+      ctx.beginPath();drawPoints.forEach(([x,y],i)=>i===0?ctx.moveTo(x,y):ctx.lineTo(x,y));ctx.lineTo(mx,my);
+      ctx.closePath();ctx.fill();ctx.stroke();ctx.setLineDash([]);
+    }
+    // Draw placed points
+    drawPoints.forEach(([x,y],i)=>{
+      ctx.fillStyle=i===0?'#1e7e34':'#1a6eff';
+      ctx.strokeStyle='#fff';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fill();ctx.stroke();
+    });
   }
 }
 
 function getStyle(type){return SHAPE_STYLES[type]||SHAPE_STYLES.lot;}
 
 function drawShape(s){
-  const st=getStyle(s.type);
-  const pts=s.points;if(!pts||pts.length<2)return;
   const isSel=s.id===selShapeId;
 
-  // Fill
+  if(s.type==='street'){
+    // Draw as stroked centre line with width
+    const pts=s.centreLine;if(!pts||pts.length<2)return;
+    const w=s.width||40;
+    ctx.lineCap='round';ctx.lineJoin='round';
+    ctx.strokeStyle='rgba(45,45,45,0.9)';ctx.lineWidth=w;
+    ctx.beginPath();pts.forEach(([x,y],i)=>i===0?ctx.moveTo(x,y):ctx.lineTo(x,y));ctx.stroke();
+    // Selection highlight
+    if(isSel){
+      ctx.strokeStyle='rgba(26,110,255,0.5)';ctx.lineWidth=w+4;
+      ctx.beginPath();pts.forEach(([x,y],i)=>i===0?ctx.moveTo(x,y):ctx.lineTo(x,y));ctx.stroke();
+    }
+    // Centre line (subtle)
+    ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.lineWidth=1;
+    ctx.beginPath();pts.forEach(([x,y],i)=>i===0?ctx.moveTo(x,y):ctx.lineTo(x,y));ctx.stroke();
+    ctx.lineCap='butt';ctx.lineJoin='miter';
+    // Label along midpoint
+    if(s.label&&pts.length>=2){
+      const mid=Math.floor(pts.length/2);
+      const[mx,my]=pts[mid];
+      ctx.fillStyle='rgba(255,255,255,0.75)';
+      ctx.font=`500 ${Math.max(9,Math.min(13,w*0.3))}px -apple-system,sans-serif`;
+      ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(s.label,mx,my);
+    }
+    // Handles on centreline points
+    if(isSel){
+      pts.forEach(([x,y])=>{
+        ctx.fillStyle='#fff';ctx.strokeStyle='#1a6eff';ctx.lineWidth=1.5;
+        ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fill();ctx.stroke();
+      });
+    }
+    return;
+  }
+
+  // Polygon shapes
+  const st=getStyle(s.type);
+  const pts=s.points;if(!pts||pts.length<2)return;
   ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);
   for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);
   ctx.closePath();
 
-  // If lot — check if has project data and colour by stage
   if(s.type==='lot'){
     const ld=lots.find(l=>l.shapeId===s.id);
     if(ld&&(ld.stage||0)>0){
-      const stages=dev?.stages||DEFAULT_STAGES;
-      const done=ld.stage||0;
-      const col=done>=stages.length?'rgba(30,126,52,0.5)':hexAlpha(LOT_COLOURS[(done-1)%LOT_COLOURS.length],0.4);
-      ctx.fillStyle=col;
-    } else {ctx.fillStyle=st.fill;}
-  } else {ctx.fillStyle=st.fill;}
+      const stages=dev?.stages||DEFAULT_STAGES;const done=ld.stage||0;
+      ctx.fillStyle=done>=stages.length?'rgba(30,126,52,0.55)':hexAlpha(LOT_COLOURS[(done-1)%LOT_COLOURS.length],0.45);
+    } else ctx.fillStyle=st.fill;
+  } else ctx.fillStyle=st.fill;
   ctx.fill();
 
-  // Stroke
-  ctx.strokeStyle=isSel?'#1a6eff':st.stroke;
-  ctx.lineWidth=isSel?2.5:st.strokeW;
-  ctx.stroke();
+  ctx.strokeStyle=isSel?'#1a6eff':st.stroke;ctx.lineWidth=isSel?2.5:st.strokeW;ctx.stroke();
 
-  // Label
   if(s.label){
-    const bounds=polyBounds(pts);
-    const cx=bounds.cx,cy=bounds.cy;
-    const fs=Math.max(9,Math.min(14,bounds.w*0.18,bounds.h*0.3));
-    ctx.fillStyle=s.type==='street'?'rgba(255,255,255,0.7)':'#1a1a1a';
-    ctx.font=`500 ${fs}px -apple-system,sans-serif`;
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(s.label,cx,cy);
+    const b=polyBounds(pts);
+    const fs=Math.max(9,Math.min(14,b.w*0.18,b.h*0.3));
+    ctx.fillStyle='#1a1a1a';ctx.font=`500 ${fs}px -apple-system,sans-serif`;
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(s.label,b.cx,b.cy);
   }
-
-  // Handles if selected
   if(isSel){
     pts.forEach(([x,y])=>{
       ctx.fillStyle='#fff';ctx.strokeStyle='#1a6eff';ctx.lineWidth=1.5;
       ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fill();ctx.stroke();
     });
   }
-}
-
-function drawRectPreview(){
-  if(!drawState)return;
-  const{x0,y0,x1,y1,type}=drawState;
-  const st=getStyle(type);
-  ctx.fillStyle=st.fill;ctx.strokeStyle='#1a6eff';ctx.lineWidth=1.5;ctx.setLineDash([4,4]);
-  ctx.beginPath();ctx.rect(Math.min(x0,x1),Math.min(y0,y1),Math.abs(x1-x0),Math.abs(y1-y0));
-  ctx.fill();ctx.stroke();ctx.setLineDash([]);
-}
-
-function drawPolyPreview(mx,my){
-  if(!polyPoints.length)return;
-  ctx.strokeStyle='#1a6eff';ctx.lineWidth=1;ctx.setLineDash([3,3]);
-  ctx.beginPath();ctx.moveTo(polyPoints[polyPoints.length-1][0],polyPoints[polyPoints.length-1][1]);
-  ctx.lineTo(mx,my);ctx.stroke();ctx.setLineDash([]);
 }
 
 function polyBounds(pts){
@@ -772,6 +882,8 @@ function showShapePropsAt(shape,clientX,clientY){
   const pp=document.getElementById('shape-props');
   document.getElementById('sp-label').value=shape.label||'';
   document.getElementById('sp-type').value=shape.type||'lot';
+  // If street selected, update width input
+  if(shape.type==='street'){const sw=document.getElementById('street-width');sw.value=shape.width||40;}
   pp.classList.add('show');
   if(clientX!=null){
     const wrapR=wrap.getBoundingClientRect();
@@ -786,8 +898,24 @@ function applyShapeProps(){
   const shape=shapes.find(s=>s.id===selShapeId);if(!shape)return;
   pushHistory();
   shape.label=document.getElementById('sp-label').value.trim();
-  shape.type=document.getElementById('sp-type').value;
+  const newType=document.getElementById('sp-type').value;
+  if(newType==='street'&&shape.type!=='street'){
+    // Convert polygon to street
+    const b=polyBounds(shape.points||[[0,0],[100,0]]);
+    shape.centreLine=shape.points||[[b.cx-50,b.cy],[b.cx+50,b.cy]];
+    shape.width=40;delete shape.points;
+  } else if(newType!=='street'&&shape.type==='street'){
+    // Convert street to polygon (use bounding box)
+    shape.points=streetToPolygon(shape);
+    delete shape.centreLine;delete shape.width;
+  }
+  shape.type=newType;
   hideShapeProps();redraw();renderStats();renderLotList();
+}
+function streetToPolygon(s){
+  const pts=s.centreLine||[];if(!pts.length)return[[0,0],[100,0],[100,50],[0,50]];
+  const b=polyBounds(pts);const w=s.width||40;
+  return[[b.cx-50,b.cy-w/2],[b.cx+50,b.cy-w/2],[b.cx+50,b.cy+w/2],[b.cx-50,b.cy+w/2]];
 }
 function deleteSelected(){
   if(!selShapeId)return;pushHistory();
@@ -941,6 +1069,14 @@ function openSettings(){
   document.getElementById('settings-overlay').classList.add('open');
 }
 function closeSettings(){document.getElementById('settings-overlay').classList.remove('open');pendingUploadFile=null;}
+async function deleteDevelopment(){
+  const title=dev.title||'this development';
+  if(!confirm(`Delete "${title}"? This will permanently remove the development, all its shapes, and all lot data. This cannot be undone.`))return;
+  try{
+    await db(`developments?id=eq.${DEV_ID}`,{method:'DELETE'});
+    window.location.href='/development.html';
+  }catch(e){toast('Delete failed: '+e.message);}
+}
 function renderStageInputs(){
   document.getElementById('stage-list').innerHTML=(dev.stages||DEFAULT_STAGES).map((s,i)=>`
     <div class="stage-input-row">
