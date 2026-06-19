@@ -152,6 +152,7 @@
   </div>
   <div class="nr">
     <a href="/projects.html" class="nbtn"><i class="ti ti-list"></i> Project list</a>
+    <button class="nbtn" onclick="window.location.href='/development.html'" style="color:var(--black)"><i class="ti ti-building-community"></i> Developments</button>
     <button class="nbtn primary" onclick="startAddJob()"><i class="ti ti-plus"></i> Add job</button>
   </div>
 </nav>
@@ -204,13 +205,15 @@
       <div class="li"><div class="ld" style="background:#1e7e34"></div>Scheduled</div>
       <div class="li"><div class="ld" style="background:#888"></div>Complete</div>
       <div class="li"><div class="ld" style="background:#dc3545"></div>Urgent</div>
+      <div class="li"><div class="ld" style="background:#1a1a1a"></div>Development</div>
     </div>
 
     <div class="draw-bar" id="draw-bar">
       <i class="ti ti-map-pin" style="color:var(--blue);font-size:14px"></i>
-      <span class="draw-msg">Click cells to outline the job area</span>
+      <span class="draw-msg">Click cells to outline the area</span>
       <span class="draw-cnt" id="draw-cnt">0 selected</span>
-      <button class="nbtn primary" style="padding:5px 12px;font-size:11px" onclick="confirmDraw()">Next — job details</button>
+      <button class="nbtn primary" style="padding:5px 12px;font-size:11px" onclick="confirmDraw()">Job</button>
+      <button class="nbtn" style="padding:5px 12px;font-size:11px;background:#1a1a1a;color:#fff;border-color:#1a1a1a" onclick="openDevModal()">Development</button>
       <button class="nbtn" style="padding:5px 10px;font-size:11px" onclick="cancelDraw()">Cancel</button>
     </div>
 
@@ -275,9 +278,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
 <script>
-const SC={active:'#1a6eff',quoted:'#BA7517',scheduled:'#1e7e34',complete:'#888',urgent:'#dc3545'};
-const SB={active:'rgba(26,110,255,0.15)',quoted:'rgba(186,117,23,0.15)',scheduled:'rgba(30,126,52,0.12)',complete:'rgba(136,136,136,0.1)',urgent:'rgba(220,53,69,0.15)'};
-const SF={active:'rgba(26,110,255,0.5)',quoted:'rgba(186,117,23,0.5)',scheduled:'rgba(30,126,52,0.45)',complete:'rgba(136,136,136,0.4)',urgent:'rgba(220,53,69,0.5)'};
+const SC={active:'#1a6eff',quoted:'#BA7517',scheduled:'#1e7e34',complete:'#888',urgent:'#dc3545',development:'#1a1a1a'};
+const SB={active:'rgba(26,110,255,0.15)',quoted:'rgba(186,117,23,0.15)',scheduled:'rgba(30,126,52,0.12)',complete:'rgba(136,136,136,0.1)',urgent:'rgba(220,53,69,0.15)',development:'rgba(26,26,26,0.85)'};
+const SF={active:'rgba(26,110,255,0.5)',quoted:'rgba(186,117,23,0.5)',scheduled:'rgba(30,126,52,0.45)',complete:'rgba(136,136,136,0.4)',urgent:'rgba(220,53,69,0.5)',development:'rgba(26,26,26,0.85)'};
 const DEFAULT_STAGES={residential:['Site visit','Rough-in','Inspection','Final'],commercial:['Design','Permit','Rough-in','Inspection','Final'],panel:['Permit','Rough-in','Inspection','Final'],lighting:['Design','Supply','Install','Commission'],service:['Permit','Disconnect','Install','Inspection']};
 const VIEWS=[{zoom:9,center:[44.3,-77.4]},{zoom:13,center:[44.18,-77.38]},{zoom:16,center:[44.18,-77.38]},{zoom:19,center:[44.18,-77.38]}];
 
@@ -317,8 +320,29 @@ let drawMode=false,selCells=new Set(),pendingCells=null;
 let geocodedLL=null; // stores lat/lng from address geocode in modal
 
 async function loadJobs(){
-  try{const rows=await dbFetch(`${TABLE}?select=*&order=created_at.desc`);jobs=rows.map(dbToJob);}
-  catch(e){console.error('Failed to load projects:',e);jobs=[];}
+  try{
+    const [rows, devRows]=await Promise.all([
+      dbFetch(`${TABLE}?select=*&order=created_at.desc`),
+      dbFetch(`developments?select=id,title,developer_id,developers(name),lat,lng,cells&order=created_at.desc`)
+    ]);
+    jobs=rows.map(dbToJob);
+    // Merge developments as special job-like entries
+    devRows.forEach(d=>{
+      if(d.lat===null&&d.lng===null&&!d.cells)return;
+      const devName=d.developers?.name||'';
+      jobs.push({
+        id:`dev-${d.id}`,development_id:d.id,
+        customer:d.title||'Unnamed Development',
+        address:devName,
+        phone:'',email:'',notes:'',
+        type:'development',status:'development',
+        stage:0,lat:d.lat||null,lng:d.lng||null,
+        cells:d.cells?JSON.parse(d.cells):null,
+        customStages:null,customFields:{}
+      });
+    });
+  }
+  catch(e){console.error('Failed to load:',e);jobs=[];}
   drawGrid();
 }
 
@@ -361,7 +385,7 @@ function drawGrid(){
       const cj=cellMap[k]||[];
       const hasJ=cj.length>0;
       const isSel=drawMode&&selCells.has(k);
-      const priority=['urgent','active','quoted','scheduled','complete'];
+      const priority=['development','urgent','active','quoted','scheduled','complete'];
       let dom=null;for(const st of priority)if(cj.some(j=>j.status===st)){dom=st;break;}
       const uCnt=cj.filter(j=>j.status==='urgent').length;
       let fc='transparent',c='rgba(26,110,255,0.15)',wt=0.5;
@@ -371,7 +395,7 @@ function drawGrid(){
       if(drawMode){
         rect.on('click',ev=>{L.DomEvent.stopPropagation(ev);if(selCells.has(k))selCells.delete(k);else selCells.add(k);const cnt=selCells.size;document.getElementById('draw-cnt').textContent=`${cnt} cell${cnt!==1?'s':''} selected`;drawGrid();});
       } else {
-        rect.on('click',ev=>{L.DomEvent.stopPropagation(ev);const level=currentLevel();if(level<3){drillInto([s+la/2,w+lo/2]);}else{if(cj.length>0){if(cj.length===1)showDetail(cj[0].id);else renderSb(cj);}}});
+        rect.on('click',ev=>{L.DomEvent.stopPropagation(ev);const level=currentLevel();if(level<3){drillInto([s+la/2,w+lo/2]);}else{if(cj.length>0){const devJob=cj.find(j=>j.type==='development');if(devJob){window.location.href=`/development.html?id=${devJob.development_id}`;return;}if(cj.length===1)showDetail(cj[0].id);else renderSb(cj);}}});
         if(hasJ){rect.on('mouseover',()=>rect.setStyle({weight:2.5}));rect.on('mouseout',()=>rect.setStyle({weight:1.5}));}
       }
       gridLayer.addLayer(rect);
@@ -550,13 +574,60 @@ async function setStage(id,s){
   showDetail(id);drawGrid();
 }
 
+
+// ── DEVELOPMENT ───────────────────────────────────────────────
+let _developers=[];
+async function openDevModal(){
+  document.getElementById('d-title').value='';
+  const cnt=selCells.size;
+  document.getElementById('d-pin-text').textContent=cnt>0?`${cnt} cell${cnt!==1?'s':''} selected as development footprint`:'Draw cells on the map first to place this development';
+  // Load developers
+  try{
+    _developers=await dbFetch('developers?select=*&order=name');
+    const sel=document.getElementById('d-developer-id');
+    sel.innerHTML=`<option value="">— Select developer —</option>`
+      +_developers.map(d=>`<option value="${d.id}">${d.name}</option>`).join('')
+      +`<option value="__new__">+ New developer…</option>`;
+  }catch(e){console.error(e);}
+  document.getElementById('dev-overlay').classList.add('open');
+}
+function closeDevModal(){document.getElementById('dev-overlay').classList.remove('open');}
+async function saveDev(){
+  const title=document.getElementById('d-title').value.trim();
+  if(!title){alert('Please enter a development title.');return;}
+  let devId=document.getElementById('d-developer-id').value;
+  if(devId==='__new__'){
+    const name=prompt('New developer name:');
+    if(!name)return;
+    try{
+      const rows=await dbFetch('developers',{method:'POST',body:JSON.stringify({name})});
+      if(rows&&rows[0])devId=rows[0].id;
+    }catch(e){alert('Error creating developer: '+e.message);return;}
+  }
+  const{la,lo}=getCellDims();
+  let lat=null,lng=null,cells=null;
+  if(selCells.size>0){
+    cells=Array.from(selCells);
+    const[row,col]=cells[0].split('_').map(Number);
+    lat=row*la+la/2;lng=col*lo+lo/2;
+  }
+  try{
+    const rows=await dbFetch(`developments`,{method:'POST',body:JSON.stringify({
+      title,developer_id:devId||null,
+      lat,lng,cells:cells?JSON.stringify(cells):null
+    })});
+    if(rows&&rows[0])window.location.href=`/development.html?id=${rows[0].id}`;
+  }catch(e){alert('Error: '+e.message);}
+  closeDevModal();
+}
+
 map.on('click',()=>{closeDetail();sr.classList.remove('show');});
 loadJobs();
 
 function toggleF(btn){const s=btn.dataset.s;if(filters.has(s)){filters.delete(s);btn.classList.remove('on');}else{filters.add(s);btn.classList.add('on');}drawGrid();}
 
-const GROUP_ORDER=['urgent','active','quoted','scheduled','complete'];
-const GROUP_LABELS={urgent:'Urgent',active:'Active',quoted:'Quoted',scheduled:'Scheduled',complete:'Complete'};
+const GROUP_ORDER=['development','urgent','active','quoted','scheduled','complete'];
+const GROUP_LABELS={development:'Development',urgent:'Urgent',active:'Active',quoted:'Quoted',scheduled:'Scheduled',complete:'Complete'};
 const collapsedGroups=new Set(['complete']);
 
 function toggleGroup(status){if(collapsedGroups.has(status))collapsedGroups.delete(status);else collapsedGroups.add(status);renderSb();}
@@ -580,10 +651,12 @@ function renderSb(highlight){
       const pct=Math.round(done/stages.length*100);
       const noLocation=j.lat===null||j.lng===null;
       const progBar=j.status==='active'?`<div style="margin-top:5px;display:flex;align-items:center;gap:6px;"><div style="flex:1;height:3px;background:rgba(26,110,255,0.15);border-radius:2px;overflow:hidden;"><div style="width:${pct}%;height:3px;background:#1a6eff;border-radius:2px;"></div></div><span style="font-size:10px;color:var(--muted);flex-shrink:0">${pct}%</span></div>`:'';
-      return`<div class="ji ${selId===j.id?'sel':''}" onclick="showDetail(${j.id})">
+      const isDev=j.type==='development';
+      const clickHandler=isDev?`window.location.href='/development.html?id=${j.development_id}'`:`showDetail(${j.id})`;
+      return`<div class="ji ${selId===j.id?'sel':''}" onclick="${clickHandler}">
         <div class="jd" style="background:${SC[j.status]}"></div>
         <div class="jinfo">
-          <div class="jn">${j.customer}</div>
+          <div class="jn">${j.customer}${isDev?'<span style="font-size:9px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:#fff;background:#1a1a1a;padding:1px 5px;border-radius:3px;margin-left:5px">DEV</span>':''}</div>
           <div class="jm">${noLocation?'<span style="color:#f0a500">⚠ No map location</span>':j.address||'No address'}</div>
           ${progBar}
         </div>
@@ -609,5 +682,26 @@ async function doSearch(q){
 function flyTo(lat,lng,label){sinput.value=label;sr.classList.remove('show');sclr.style.display='block';if(searchPin)map.removeLayer(searchPin);map.flyTo([lat,lng],19,{duration:1.2});const icon=L.divIcon({className:'',html:`<div style="width:12px;height:12px;border-radius:50%;background:#1a6eff;border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3)"></div>`,iconSize:[12,12],iconAnchor:[6,6]});searchPin=L.marker([lat,lng],{icon}).addTo(map);}
 function clearSearch(){sinput.value='';sclr.style.display='none';sr.classList.remove('show');if(searchPin){map.removeLayer(searchPin);searchPin=null;}}
 </script>
+
+<!-- ADD DEVELOPMENT MODAL -->
+<div class="overlay" id="dev-overlay">
+  <div class="modal">
+    <div class="mh"><span class="mh-t">New development</span><button class="mh-x" onclick="closeDevModal()">×</button></div>
+    <div class="mb">
+      <div class="fg"><label>Title</label><input id="d-title" placeholder="Riverbend Phase 1"/></div>
+      <div class="fg"><label>Developer</label>
+        <select id="d-developer-id">
+          <option value="">Loading developers…</option>
+        </select>
+      </div>
+      <div class="pin-note" style="display:flex;margin-top:4px"><i class="ti ti-map-pin" style="font-size:13px"></i><span id="d-pin-text">Draw cells on the map first to place this development</span></div>
+    </div>
+    <div class="mf">
+      <button class="mbtn" onclick="closeDevModal()">Cancel</button>
+      <button class="mbtn primary" onclick="saveDev()"><i class="ti ti-check"></i> Create development</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
