@@ -221,6 +221,13 @@
         <div class="fg"><label>Title</label><input id="s-title"/></div>
         <div class="fg"><label>Developer</label><select id="s-developer-id"></select></div>
       </div>
+      <div class="fg"><label>Site plan SVG</label>
+        <div id="s-upload-area" onclick="document.getElementById('s-svg-file').click()" style="border:1.5px dashed var(--border);border-radius:6px;padding:16px;text-align:center;cursor:pointer;color:var(--muted);font-size:12px;line-height:1.6;transition:border-color 0.15s;">
+          <i class="ti ti-file-vector" style="font-size:20px;display:block;margin-bottom:4px;opacity:0.4"></i>
+          <span id="s-upload-label">Click to upload SVG site plan</span>
+        </div>
+        <input type="file" id="s-svg-file" accept=".svg,image/svg+xml" style="display:none" onchange="handleSettingsSvg(this)"/>
+      </div>
       <div class="fg">
         <label>Project stages</label>
         <div class="stage-list" id="stage-list"></div>
@@ -229,6 +236,7 @@
     </div>
     <div class="mf">
       <button class="mbtn" style="color:var(--red);border-color:var(--red);margin-right:auto" onclick="deleteDevelopment()"><i class="ti ti-trash"></i> Delete</button>
+      <button class="mbtn" onclick="placeOnTracker()" style="color:var(--black)"><i class="ti ti-map-pin"></i> Place on map</button>
       <button class="mbtn" onclick="closeSettings()">Cancel</button>
       <button class="mbtn primary" onclick="saveSettings()"><i class="ti ti-check"></i> Save</button>
     </div>
@@ -244,7 +252,10 @@
         <div class="fg"><label>Customer</label><input id="l-customer"/></div>
         <div class="fg"><label>Phone</label><input id="l-phone"/></div>
       </div>
-      <div class="fg"><label>Email</label><input id="l-email" type="email"/></div>
+      <div class="g2">
+        <div class="fg"><label>Email</label><input id="l-email" type="email"/></div>
+        <div class="fg"><label>Permit #</label><input id="l-permit" placeholder="e.g. B-2024-1234"/></div>
+      </div>
       <div class="fg"><label>Notes</label><textarea id="l-notes"></textarea></div>
       <div class="fg"><label>Stage</label><select id="l-stage"></select></div>
     </div>
@@ -460,33 +471,66 @@ function addLotNumbers(planSvg){
   const numLayer=document.createElementNS(ns,'g');
   numLayer.id='lot-numbers';
   numLayer.style.pointerEvents='none';
+  numLayer.style.opacity='0'; // hidden by default, shown on hover
 
   lotsGroup.querySelectorAll('[id^="Lot-"]').forEach(g=>{
     const num=g.id.split('-')[1];
-    // Get bounding box of the fill shape (first child)
     const fillEl=g.querySelector('path,rect,polygon');
     if(!fillEl)return;
     try{
       const bb=fillEl.getBBox();
       if(bb.width<8||bb.height<8)return;
-      const cx=bb.x+bb.width/2;
-      const cy=bb.y+bb.height/2;
-      const fs=Math.max(7,Math.min(11,Math.min(bb.width,bb.height)*0.28));
+      // Use polygon centroid for irregular shapes
+      let cx,cy;
+      try{
+        const pts=getPolygonPoints(fillEl);
+        if(pts&&pts.length>=3){[cx,cy]=polygonCentroid(pts);}
+        else{cx=bb.x+bb.width/2;cy=bb.y+bb.height/2;}
+      }catch{cx=bb.x+bb.width/2;cy=bb.y+bb.height/2;}
+      const fs=Math.max(7,Math.min(12,Math.min(bb.width,bb.height)*0.3));
       const t=document.createElementNS(ns,'text');
-      t.setAttribute('x',cx);
-      t.setAttribute('y',cy);
-      t.setAttribute('text-anchor','middle');
-      t.setAttribute('dominant-baseline','middle');
+      t.setAttribute('x',cx);t.setAttribute('y',cy);
+      t.setAttribute('text-anchor','middle');t.setAttribute('dominant-baseline','middle');
       t.setAttribute('font-size',fs);
       t.setAttribute('font-family','-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif');
-      t.setAttribute('font-weight','500');
-      t.setAttribute('fill','#9090a0');
+      t.setAttribute('font-weight','600');t.setAttribute('fill','#1a1a1a');
       t.setAttribute('data-lot-id',g.id);
       t.textContent=num;
       numLayer.appendChild(t);
     }catch(e){}
   });
   planSvg.appendChild(numLayer);
+}
+
+function getPolygonPoints(el){
+  // Extract point array from path or rect
+  const tag=el.tagName.toLowerCase();
+  if(tag==='rect'){
+    const x=parseFloat(el.getAttribute('x')||0),y=parseFloat(el.getAttribute('y')||0);
+    const w=parseFloat(el.getAttribute('width')),h=parseFloat(el.getAttribute('height'));
+    return[[x,y],[x+w,y],[x+w,y+h],[x,y+h]];
+  }
+  if(tag==='path'){
+    // Sample points from path using getTotalLength/getPointAtLength
+    const len=el.getTotalLength();
+    const pts=[];const steps=Math.min(32,Math.max(8,Math.floor(len/10)));
+    for(let i=0;i<steps;i++){const p=el.getPointAtLength(i/steps*len);pts.push([p.x,p.y]);}
+    return pts;
+  }
+  return null;
+}
+
+function polygonCentroid(pts){
+  // Proper polygon centroid formula
+  let area=0,cx=0,cy=0;
+  const n=pts.length;
+  for(let i=0;i<n;i++){
+    const[x0,y0]=pts[i],[x1,y1]=pts[(i+1)%n];
+    const a=x0*y1-x1*y0;
+    area+=a;cx+=(x0+x1)*a;cy+=(y0+y1)*a;
+  }
+  area/=2;if(Math.abs(area)<0.001)return[pts[0][0],pts[0][1]];
+  return[cx/(6*area),cy/(6*area)];
 }
 
 function wireLotClicks(){
@@ -500,12 +544,17 @@ function wireLotClicks(){
       if(g.id===selLotId)return;
       const fillEl=g.querySelector('path,rect,polygon');
       if(fillEl)fillEl.style.opacity='0.75';
-      // Show tooltip
-      showLotTooltip(g.id,g);
+      // Show lot number
+      const numEl=document.querySelector(`#lot-numbers [data-lot-id="${g.id}"]`);
+      if(numEl)numEl.style.opacity='1';
+      showLotTooltip(g.id);
     });
     g.addEventListener('mouseleave',()=>{
       const fillEl=g.querySelector('path,rect,polygon');
       if(fillEl)fillEl.style.opacity='';
+      // Hide lot number
+      const numEl=document.querySelector(`#lot-numbers [data-lot-id="${g.id}"]`);
+      if(numEl)numEl.style.opacity='';
       hideLotTooltip();
     });
     g.addEventListener('click',e=>{
@@ -548,6 +597,9 @@ function selectLot(id){
       const prevFill=prev.querySelector('path,rect,polygon');
       if(prevFill){prevFill.style.filter='';prevFill.style.strokeWidth='';}
     }
+    // Hide previous number
+    const prevNum=document.querySelector(`#lot-numbers [data-lot-id="${selLotId}"]`);
+    if(prevNum)prevNum.style.opacity='';
   }
   selLotId=id;
   const g=document.getElementById(id);
@@ -555,6 +607,9 @@ function selectLot(id){
     const fillEl=g.querySelector('path,rect,polygon');
     if(fillEl){fillEl.style.filter='drop-shadow(0 0 3px rgba(26,110,255,0.8))';fillEl.style.strokeWidth='2';}
   }
+  // Show number for selected lot
+  const numEl=document.querySelector(`#lot-numbers [data-lot-id="${id}"]`);
+  if(numEl)numEl.style.opacity='1';
   renderLotList();
   showDetail(id);
 }
@@ -566,9 +621,11 @@ function deselectLot(){
       const fillEl=g.querySelector('path,rect,polygon');
       if(fillEl){fillEl.style.filter='';fillEl.style.strokeWidth='';}
     }
+    const numEl=document.querySelector(`#lot-numbers [data-lot-id="${selLotId}"]`);
+    if(numEl)numEl.style.opacity='';
   }
   selLotId=null;
-  document.getElementById('rpanel').classList.remove('open');
+  hideLotCard();
   renderLotList();
 }
 
@@ -593,28 +650,57 @@ function applyLotColour(id){
   if(txt)txt.setAttribute('fill',(!ld||(ld.stage||0)===0)?'#9090a0':'rgba(255,255,255,0.8)');
 }
 
-// ── DETAIL PANEL ──────────────────────────────────────────────
+// ── FLOATING LOT CARD ────────────────────────────────────────
 function showDetail(id){
+  hideLotCard();
   const ld=lots.find(l=>l.shapeId===id);
   const stages=dev?.stages||DEFAULT_STAGES;
   const done=ld?.stage||0;
-  document.getElementById('rp-title').textContent=id.replace('-',' ');
+  const num=id.replace('Lot-','Lot ');
+
   const stageRows=stages.map((s,i)=>`
-    <button class="stage-btn ${i<done?'done-s':''} ${i===done?'active-s':''}" onclick="setLotStage('${id}',${i+1})">
-      <i class="ti ti-${i<done?'check':'circle'}"></i>${esc(s)}
+    <button onclick="setLotStage('${id}',${i+1})" style="display:flex;align-items:center;gap:6px;padding:5px 9px;border-radius:4px;font-size:11px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:${i===done?'var(--blue)':i<done?'var(--surface)':'var(--white)'};color:${i===done?'#fff':i<done?'var(--black)':'var(--muted)'};font-family:inherit;text-align:left;width:100%">
+      <i class="ti ti-${i<done?'check':'circle'}" style="font-size:11px"></i>${esc(s)}
     </button>`).join('');
-  document.getElementById('rp-body').innerHTML=`
-    ${ld?.customer?`<div class="rpf"><div class="rpl">Customer</div><div class="rpv">${esc(ld.customer)}</div></div>`:''}
-    ${ld?.phone?`<div class="rpf"><div class="rpl">Phone</div><div class="rpv">${esc(ld.phone)}</div></div>`:''}
-    ${ld?.email?`<div class="rpf"><div class="rpl">Email</div><div class="rpv">${esc(ld.email)}</div></div>`:''}
-    ${ld?.notes?`<div class="rpf"><div class="rpl">Notes</div><div class="rpv">${esc(ld.notes)}</div></div>`:''}
-    <div class="rpf"><div class="rpl">Stage</div><div class="stage-row">${stageRows}</div></div>`;
-  document.getElementById('rpanel').classList.add('open');
+
+  const projectBtn=ld?.project_id
+    ?`<a href="/projects.html?id=${ld.project_id}" style="display:flex;align-items:center;justify-content:center;gap:5px;padding:7px;border-radius:4px;font-size:12px;font-weight:500;background:var(--blue);color:#fff;text-decoration:none;border:none;cursor:pointer"><i class="ti ti-external-link"></i> Open project</a>`
+    :`<button onclick="createProjectForLot('${id}')" style="display:flex;align-items:center;justify-content:center;gap:5px;padding:7px;border-radius:4px;font-size:12px;font-weight:500;background:var(--black);color:#fff;border:none;cursor:pointer;width:100%;font-family:inherit"><i class="ti ti-plus"></i> Create project</button>`;
+
+  const card=document.createElement('div');
+  card.id='lot-card';
+  card.style.cssText='position:absolute;top:16px;right:16px;width:230px;background:var(--white);border:0.5px solid var(--border);border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,0.12);z-index:60;overflow:hidden;';
+  card.innerHTML=`
+    <div style="padding:12px 14px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-size:13px;font-weight:700">${num}</div>
+        ${ld?.customer?`<div style="font-size:11px;color:var(--muted);margin-top:1px">${esc(ld.customer)}</div>`:''}
+      </div>
+      <button onclick="closeDetail()" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;line-height:1">×</button>
+    </div>
+    <div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px;">
+      ${ld?.permit?`<div><div style="font-size:10px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:3px">Permit</div><div style="font-size:12px">${esc(ld.permit)}</div></div>`:''}
+      ${ld?.phone?`<div><div style="font-size:10px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:3px">Phone</div><div style="font-size:12px">${esc(ld.phone)}</div></div>`:''}
+      <div>
+        <div style="font-size:10px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Stage</div>
+        <div style="display:flex;flex-direction:column;gap:3px">${stageRows}</div>
+      </div>
+      ${ld?.notes?`<div><div style="font-size:10px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:3px">Notes</div><div style="font-size:12px;color:var(--muted)">${esc(ld.notes)}</div></div>`:''}
+    </div>
+    <div style="padding:10px 14px;border-top:0.5px solid var(--border);display:flex;flex-direction:column;gap:6px;">
+      ${projectBtn}
+      <button onclick="editLotOpen()" style="display:flex;align-items:center;justify-content:center;gap:5px;padding:7px;border-radius:4px;font-size:12px;font-weight:500;background:var(--white);color:var(--black);border:0.5px solid var(--border);cursor:pointer;font-family:inherit"><i class="ti ti-edit"></i> Edit lot details</button>
+    </div>`;
+  document.getElementById('main-wrap').appendChild(card);
+}
+
+function hideLotCard(){
+  const c=document.getElementById('lot-card');if(c)c.remove();
 }
 
 function closeDetail(){
   deselectLot();
-  document.getElementById('rpanel').classList.remove('open');
+  hideLotCard();
 }
 
 async function setLotStage(id,stage){
@@ -633,10 +719,11 @@ function editLotOpen(){
   if(!selLotId)return;
   editingLotId=selLotId;
   const ld=lots.find(l=>l.shapeId===selLotId)||{};
-  document.getElementById('lot-modal-title').textContent=selLotId.replace('-',' ');
+  document.getElementById('lot-modal-title').textContent=selLotId.replace('Lot-','Lot ');
   document.getElementById('l-customer').value=ld.customer||'';
   document.getElementById('l-phone').value=ld.phone||'';
   document.getElementById('l-email').value=ld.email||'';
+  document.getElementById('l-permit').value=ld.permit||'';
   document.getElementById('l-notes').value=ld.notes||'';
   const stages=dev?.stages||DEFAULT_STAGES;
   document.getElementById('l-stage').innerHTML=stages.map((s,i)=>`<option value="${i}" ${(ld.stage||0)===i?'selected':''} >${s}</option>`).join('');
@@ -649,6 +736,7 @@ async function saveLotData(){
   ld.customer=document.getElementById('l-customer').value.trim();
   ld.phone=document.getElementById('l-phone').value.trim();
   ld.email=document.getElementById('l-email').value.trim();
+  ld.permit=document.getElementById('l-permit').value.trim();
   ld.notes=document.getElementById('l-notes').value.trim();
   ld.stage=parseInt(document.getElementById('l-stage').value)||0;
   await saveLots();
@@ -668,6 +756,47 @@ async function clearLotData(){
   toast('Cleared');
 }
 
+const DEV_STAGES=['Service','Client Walkthrough','Rough-in','First Inspection','Finish','Final Walkthrough','Final Inspection','Post-build'];
+
+async function createProjectForLot(shapeId){
+  const ld=lots.find(l=>l.shapeId===shapeId)||{};
+  const num=shapeId.replace('Lot-','Lot ');
+  const projectData={
+    customer:ld.customer||num,
+    address:dev.title||'',
+    phone:ld.phone||'',
+    email:ld.email||'',
+    type:'residential',
+    status:'active',
+    stage:0,
+    notes:`Development: ${dev.title||''} · ${num}`,
+    custom_stages:JSON.stringify(DEV_STAGES),
+    custom_fields:JSON.stringify({lot:num,permit:ld.permit||''})
+  };
+  try{
+    const SB_URL2='https://vojgddmlwakvhmbkzfld.supabase.co';
+    const SB_KEY2='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvamdkZG1sd2FrdmhtYmt6ZmxkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NDQ1MzAsImV4cCI6MjA5NzIyMDUzMH0.PGu1HeCZ3SsMgRyLC_s4xP8m3Qt73NlRyvzA-hFroEk';
+    const r=await fetch(`${SB_URL2}/rest/v1/projects`,{
+      method:'POST',
+      headers:{'apikey':SB_KEY2,'Authorization':`Bearer ${SB_KEY2}`,'Content-Type':'application/json','Prefer':'return=representation'},
+      body:JSON.stringify(projectData)
+    });
+    if(!r.ok)throw new Error(await r.text());
+    const rows=await r.json();
+    if(rows&&rows[0]){
+      // Link project to lot
+      let lot=lots.find(l=>l.shapeId===shapeId);
+      if(!lot){lot={shapeId};lots.push(lot);}
+      lot.project_id=rows[0].id;
+      await saveLots();
+      toast('Project created ✓');
+      showDetail(shapeId); // refresh card
+      // Open project in new tab
+      window.open(`/projects.html?highlight=${rows[0].id}`,'_blank');
+    }
+  }catch(e){toast('Failed: '+e.message);}
+}
+
 // ── SIDEBAR ───────────────────────────────────────────────────
 function renderStats(){
   const stages=dev?.stages||DEFAULT_STAGES;
@@ -682,30 +811,62 @@ function renderStats(){
   document.getElementById('st-done').textContent=done;
 }
 
+const collapsedStageGroups=new Set();
+
 function renderLotList(){
   const list=document.getElementById('lot-list');
   const planSvg=document.getElementById('plan-svg');
   const lotsGroup=planSvg?.querySelector('#Lots');
   if(!lotsGroup){list.innerHTML='';return;}
-  const lotEls=[...lotsGroup.querySelectorAll('[id^="Lot-"]')].sort((a,b)=>{
-    return parseInt(a.id.split('-')[1])-parseInt(b.id.split('-')[1]);
-  });
+  const lotEls=[...lotsGroup.querySelectorAll('[id^="Lot-"]')].sort((a,b)=>parseInt(a.id.split('-')[1])-parseInt(b.id.split('-')[1]));
   const stages=dev?.stages||DEFAULT_STAGES;
-  list.innerHTML=lotEls.map(el=>{
-    const id=el.id;
-    const ld=lots.find(l=>l.shapeId===id);
-    const done=ld?.stage||0,total=stages.length,pct=Math.round(done/total*100);
-    const stageName=done>=total?'Complete':(ld&&done>0?stages[done-1]:'Unassigned');
-    const col=lotColour(ld);
-    return`<div class="lot-item ${selLotId===id?'sel':''}" onclick="selectLot('${id}');showDetail('${id}')">
-      <div class="lot-dot" style="background:${col}"></div>
-      <div class="lot-info">
-        <div class="lot-name">${id.replace('-',' ')}</div>
-        <div class="lot-stage">${esc(stageName)}</div>
-        <div class="lot-prog"><div class="lot-prog-fill" style="width:${pct}%"></div></div>
+
+  // Group lots by stage name
+  const groups={};
+  lotEls.forEach(el=>{
+    const ld=lots.find(l=>l.shapeId===el.id);
+    const done=ld?.stage||0;
+    const groupName=done>=stages.length?'Complete':done===0?'Unassigned':stages[done-1];
+    if(!groups[groupName])groups[groupName]={lots:[],stageIdx:done};
+    groups[groupName].lots.push(el);
+  });
+
+  // Order: Unassigned first, then by stage order, Complete last
+  const stageOrder=['Unassigned',...stages,'Complete'];
+  const html=stageOrder.filter(g=>groups[g]).map(groupName=>{
+    const grp=groups[groupName];
+    const count=grp.lots.length;
+    const collapsed=collapsedStageGroups.has(groupName);
+    const items=collapsed?'':grp.lots.map(el=>{
+      const id=el.id;
+      const ld=lots.find(l=>l.shapeId===id);
+      const done=ld?.stage||0,total=stages.length,pct=Math.round(done/total*100);
+      const col=lotColour(ld);
+      return`<div class="lot-item ${selLotId===id?'sel':''}" onclick="selectLot('${id}');showDetail('${id}')">
+        <div class="lot-dot" style="background:${col}"></div>
+        <div class="lot-info">
+          <div class="lot-name">${id.replace('Lot-','Lot ')}</div>
+          ${ld?.customer?`<div class="lot-stage">${esc(ld.customer)}</div>`:''}
+          <div class="lot-prog"><div class="lot-prog-fill" style="width:${pct}%"></div></div>
+        </div>
+      </div>`;
+    }).join('');
+    return`<div>
+      <div onclick="toggleStageGroup('${groupName}')" style="display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:var(--surface);border-bottom:0.5px solid var(--border);cursor:pointer;user-select:none;">
+        <span style="font-size:10px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted)">${esc(groupName)}</span>
+        <span style="font-size:10px;color:var(--muted)">${count} <i class="ti ti-chevron-${collapsed?'down':'up'}" style="font-size:10px"></i></span>
       </div>
+      ${items}
     </div>`;
   }).join('');
+
+  list.innerHTML=html||'<div style="padding:20px 14px;text-align:center;color:var(--muted);font-size:12px">No lots found</div>';
+}
+
+function toggleStageGroup(name){
+  if(collapsedStageGroups.has(name))collapsedStageGroups.delete(name);
+  else collapsedStageGroups.add(name);
+  renderLotList();
 }
 
 // ── SAVE ──────────────────────────────────────────────────────
@@ -728,7 +889,7 @@ function fitView(){
 }
 
 function setupPanZoom(){
-  // Pan with drag
+  // Pan with drag only — no scroll zoom
   mainWrap.addEventListener('mousedown',e=>{
     if(e.button===0&&!e.target.closest('[id^="Lot-"]')){
       isPanning=true;panStart={x:e.clientX-panX,y:e.clientY-panY};
@@ -739,14 +900,8 @@ function setupPanZoom(){
     if(isPanning){panX=e.clientX-panStart.x;panY=e.clientY-panStart.y;applyTransform();}
   });
   window.addEventListener('mouseup',()=>{isPanning=false;mainWrap.style.cursor='';});
-  // Pinch/scroll zoom
-  mainWrap.addEventListener('wheel',e=>{
-    e.preventDefault();
-    const prev=zoom;zoom=Math.max(0.3,Math.min(5,zoom+(e.deltaY<0?0.08:-0.08)));
-    const r=mainWrap.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
-    panX=mx-(mx-panX)*(zoom/prev);panY=my-(my-panY)*(zoom/prev);
-    applyTransform();
-  },{passive:false});
+  // Block scroll from zooming — let it scroll the page normally
+  mainWrap.addEventListener('wheel',e=>{e.stopPropagation();},{passive:true});
 }
 
 // ── SETTINGS ──────────────────────────────────────────────────
@@ -754,10 +909,25 @@ function openSettings(){
   document.getElementById('s-title').value=dev.title||'';
   document.getElementById('s-developer-id').innerHTML=
     `<option value="">— None —</option>`+allDevs.map(d=>`<option value="${d.id}" ${dev.developer_id===d.id?'selected':''} >${esc(d.name)}</option>`).join('');
+  // Show SVG status
+  const lbl=document.getElementById('s-upload-label');
+  if(dev.svg_url){lbl.textContent='SVG uploaded — click to replace';}
+  else{lbl.textContent='Click to upload SVG site plan';}
+  document.getElementById('s-upload-area').style.borderColor='';
+  document.getElementById('s-upload-area').style.color='';
   renderStageInputs();
   document.getElementById('settings-overlay').classList.add('open');
 }
-function closeSettings(){document.getElementById('settings-overlay').classList.remove('open');}
+function closeSettings(){document.getElementById('settings-overlay').classList.remove('open');_settingsSvgFile=null;}
+
+let _settingsSvgFile=null;
+function handleSettingsSvg(input){
+  const file=input.files[0];if(!file)return;
+  _settingsSvgFile=file;
+  document.getElementById('s-upload-label').textContent=file.name+' — ready to save';
+  document.getElementById('s-upload-area').style.borderColor='var(--blue)';
+  document.getElementById('s-upload-area').style.color='var(--blue)';
+}
 function renderStageInputs(){
   document.getElementById('stage-list').innerHTML=(dev.stages||DEFAULT_STAGES).map((s,i)=>`
     <div class="stage-input-row">
@@ -772,18 +942,39 @@ async function saveSettings(){
     developer_id:document.getElementById('s-developer-id').value||null,
     stages:JSON.stringify(dev.stages||DEFAULT_STAGES)
   };
+  // Upload new SVG if provided
+  if(_settingsSvgFile){
+    try{
+      const fname=`dev-${DEV_ID}-${Date.now()}.svg`;
+      const r=await fetch(`${SB_URL}/storage/v1/object/site-plans/${fname}`,{
+        method:'POST',
+        headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Content-Type':'image/svg+xml'},
+        body:_settingsSvgFile
+      });
+      if(r.ok){data.svg_url=`${SB_URL}/storage/v1/object/public/site-plans/${fname}`;}
+      else{toast('SVG upload failed');return;}
+    }catch(e){toast('SVG upload failed: '+e.message);return;}
+  }
   try{
     await db(`developments?id=eq.${DEV_ID}`,{method:'PATCH',body:JSON.stringify(data)});
     Object.assign(dev,data);dev.stages=safeJson(dev.stages,DEFAULT_STAGES);
     document.getElementById('nav-label').textContent=dev.title||'Development';
     closeSettings();toast('Saved');
-    applyAllLotColours();
+    // Reload SVG if changed
+    if(data.svg_url){dev.svg_url=data.svg_url;await loadSVG();}
+    else applyAllLotColours();
   }catch(e){toast('Save failed: '+e.message);}
 }
 async function deleteDevelopment(){
   if(!confirm(`Delete "${dev.title||'this development'}"? This cannot be undone.`))return;
   try{await db(`developments?id=eq.${DEV_ID}`,{method:'DELETE'});window.location.href='/development.html';}
   catch(e){toast('Delete failed: '+e.message);}
+}
+
+function placeOnTracker(){
+  closeSettings();
+  // Go to tracker with a flag to place this development
+  window.location.href=`/tracker.html?place_dev=${DEV_ID}`;
 }
 
 // ── DEFAULT SVG (Norwood Park Estates Phase 3) ────────────────

@@ -577,6 +577,7 @@ async function setStage(id,s){
 
 // ── DEVELOPMENT ───────────────────────────────────────────────
 let _developers=[];
+function closeDevModal(){document.getElementById('dev-overlay').classList.remove('open');}
 async function openDevModal(){
   document.getElementById('d-title').value='';
   const cnt=selCells.size;
@@ -589,9 +590,50 @@ async function openDevModal(){
       +_developers.map(d=>`<option value="${d.id}">${d.name}</option>`).join('')
       +`<option value="__new__">+ New developer…</option>`;
   }catch(e){console.error(e);}
+  // If placing an existing development, load its data
+  if(window._placeDevId){
+    try{
+      const rows=await dbFetch(`developments?id=eq.${window._placeDevId}&select=*`);
+      if(rows&&rows[0]){
+        const d=rows[0];
+        document.getElementById('d-title').value=d.title||'';
+        document.getElementById('d-developer-id').value=d.developer_id||'';
+        // Change button to update mode
+        document.querySelector('#dev-overlay .mbtn.primary').textContent='Update placement';
+        document.querySelector('#dev-overlay .mbtn.primary').onclick=()=>updateDevPlacement(window._placeDevId);
+      }
+    }catch(e){console.error(e);}
+  } else {
+    document.querySelector('#dev-overlay .mbtn.primary').innerHTML='<i class="ti ti-check"></i> Create development';
+    document.querySelector('#dev-overlay .mbtn.primary').onclick=saveDev;
+  }
   document.getElementById('dev-overlay').classList.add('open');
 }
-function closeDevModal(){document.getElementById('dev-overlay').classList.remove('open');}
+async function updateDevPlacement(devId){
+  const{la,lo}=getCellDims();
+  let lat=null,lng=null,cells=null;
+  if(selCells.size>0){
+    cells=Array.from(selCells);
+    const[row,col]=cells[0].split('_').map(Number);
+    lat=row*la+la/2;lng=col*lo+lo/2;
+  }
+  try{
+    await dbFetch(`developments?id=eq.${devId}`,{method:'PATCH',body:JSON.stringify({lat,lng,cells:cells?JSON.stringify(cells):null})});
+    window._placeDevId=null;
+    closeDevModal();cancelDraw();
+    await loadJobs();
+    toast('Development placed on map ✓');
+    window.location.href=`/development.html?id=${devId}`;
+  }catch(e){alert('Error: '+e.message);}
+}
+let _devSvgFile=null;
+function handleDevSvg(input){
+  const file=input.files[0];if(!file)return;
+  _devSvgFile=file;
+  document.getElementById('d-upload-area').innerHTML=`<i class="ti ti-file-check" style="font-size:22px;display:block;margin-bottom:6px;color:var(--blue)"></i>${file.name}`;
+  document.getElementById('d-upload-area').style.borderColor='var(--blue)';
+}
+
 async function saveDev(){
   const title=document.getElementById('d-title').value.trim();
   if(!title){alert('Please enter a development title.');return;}
@@ -611,18 +653,47 @@ async function saveDev(){
     const[row,col]=cells[0].split('_').map(Number);
     lat=row*la+la/2;lng=col*lo+lo/2;
   }
+  // Upload SVG if provided
+  let svg_url=null;
+  if(_devSvgFile){
+    try{
+      const fname=`dev-${Date.now()}.svg`;
+      const r=await fetch(`https://vojgddmlwakvhmbkzfld.supabase.co/storage/v1/object/site-plans/${fname}`,{
+        method:'POST',
+        headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvamdkZG1sd2FrdmhtYmt6ZmxkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NDQ1MzAsImV4cCI6MjA5NzIyMDUzMH0.PGu1HeCZ3SsMgRyLC_s4xP8m3Qt73NlRyvzA-hFroEk','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvamdkZG1sd2FrdmhtYmt6ZmxkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NDQ1MzAsImV4cCI6MjA5NzIyMDUzMH0.PGu1HeCZ3SsMgRyLC_s4xP8m3Qt73NlRyvzA-hFroEk','Content-Type':'image/svg+xml'},
+        body:_devSvgFile
+      });
+      if(r.ok)svg_url=`https://vojgddmlwakvhmbkzfld.supabase.co/storage/v1/object/public/site-plans/${fname}`;
+    }catch(e){console.error('SVG upload failed:',e);}
+  }
   try{
     const rows=await dbFetch(`developments`,{method:'POST',body:JSON.stringify({
       title,developer_id:devId||null,
-      lat,lng,cells:cells?JSON.stringify(cells):null
+      lat,lng,cells:cells?JSON.stringify(cells):null,
+      svg_url
     })});
     if(rows&&rows[0])window.location.href=`/development.html?id=${rows[0].id}`;
   }catch(e){alert('Error: '+e.message);}
   closeDevModal();
+  _devSvgFile=null;
 }
 
 map.on('click',()=>{closeDetail();sr.classList.remove('show');});
 loadJobs();
+
+// Handle place_dev param — if coming from development settings "Place on map"
+const _placeDevId=new URLSearchParams(location.search).get('place_dev');
+if(_placeDevId){
+  setTimeout(()=>{
+    startAddJob();
+    document.getElementById('draw-bar').innerHTML=document.getElementById('draw-bar').innerHTML.replace(
+      'Click cells to outline the area',
+      'Select cells to place development on map, then click Development'
+    );
+    // Pre-select development in modal when user clicks Development
+    window._placeDevId=parseInt(_placeDevId);
+  },800);
+}
 
 function toggleF(btn){const s=btn.dataset.s;if(filters.has(s)){filters.delete(s);btn.classList.remove('on');}else{filters.add(s);btn.classList.add('on');}drawGrid();}
 
@@ -694,7 +765,14 @@ function clearSearch(){sinput.value='';sclr.style.display='none';sr.classList.re
           <option value="">Loading developers…</option>
         </select>
       </div>
-      <div class="pin-note" style="display:flex;margin-top:4px"><i class="ti ti-map-pin" style="font-size:13px"></i><span id="d-pin-text">Draw cells on the map first to place this development</span></div>
+      <div class="fg"><label>Site plan SVG</label>
+        <div id="d-upload-area" onclick="document.getElementById('d-svg-file').click()" style="border:1.5px dashed var(--border);border-radius:6px;padding:20px;text-align:center;cursor:pointer;color:var(--muted);font-size:12px;line-height:1.6;transition:border-color 0.15s;">
+          <i class="ti ti-file-vector" style="font-size:22px;display:block;margin-bottom:6px;opacity:0.4"></i>
+          Click to upload SVG site plan
+        </div>
+        <input type="file" id="d-svg-file" accept=".svg,image/svg+xml" style="display:none" onchange="handleDevSvg(this)"/>
+      </div>
+      <div class="pin-note" style="display:flex;gap:6px;margin-top:4px;font-size:12px;color:var(--muted)"><i class="ti ti-map-pin" style="font-size:13px"></i><span id="d-pin-text">Draw cells on the map first to place this development</span></div>
     </div>
     <div class="mf">
       <button class="mbtn" onclick="closeDevModal()">Cancel</button>
