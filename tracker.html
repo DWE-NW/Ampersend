@@ -622,7 +622,6 @@ async function updateDevPlacement(devId){
     window._placeDevId=null;
     closeDevModal();cancelDraw();
     await loadJobs();
-    toast('Development placed on map ✓');
     window.location.href=`/development.html?id=${devId}`;
   }catch(e){alert('Error: '+e.message);}
 }
