@@ -678,18 +678,19 @@ function setJobType(type,btn){
 // Evaluates assembly rules given dimensions, returns line items with real costs
 function evalFormula(formula,x){
   try{
-    // Replace math function names FIRST, then strip any remaining unsafe characters
+    // Replace math function names first
     let safe=formula
-      .replace(/ceil/g,'Math.ceil')
-      .replace(/floor/g,'Math.floor')
-      .replace(/round/g,'Math.round')
-      .replace(/min/g,'Math.min')
-      .replace(/max/g,'Math.max');
-    // Now strip anything that isn't a valid JS math expression character
-    safe=safe.replace(/[^0-9x+\-*/().,Math]/g,'');
+      .replace(/\bceil\b/g,'Math.ceil')
+      .replace(/\bfloor\b/g,'Math.floor')
+      .replace(/\bround\b/g,'Math.round')
+      .replace(/\bmin\b/g,'Math.min')
+      .replace(/\bmax\b/g,'Math.max');
+    // Only allow chars that appear in valid math expressions + Math. calls
+    // Allow: digits, x, operators, parens, dot, whitespace, and letters (for Math.ceil etc)
+    safe=safe.replace(/[^0-9x+\-*/().\s]/g,c=>/[a-zA-Z.]/.test(c)?c:'');
     // eslint-disable-next-line no-new-func
     const result=Number(new Function('x','return '+safe)(x));
-    return Math.max(0,result);
+    return isNaN(result)?0:Math.max(0,result);
   }catch{return 0;}
 }
 
