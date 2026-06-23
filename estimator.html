@@ -218,6 +218,33 @@
     .empty-hint{text-align:center;padding:2rem;color:var(--muted);font-size:13px;}
     .empty-hint i{font-size:28px;display:block;margin-bottom:8px;opacity:0.3;}
 
+    /* LIGHTING GRID */
+    .lighting-grid-wrap{background:var(--surface);border:0.5px solid var(--border);border-radius:0 0 6px 6px;border-top:none;padding:12px 14px;}
+    .lighting-grid-header{font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+    .lighting-grid-header i{font-size:12px;}
+    .lighting-colour-rows{display:flex;flex-direction:column;gap:6px;margin-bottom:12px;}
+    .lighting-colour-row{display:flex;align-items:center;gap:8px;}
+    .lighting-colour-swatch{width:22px;height:22px;border-radius:50%;border:2px solid transparent;cursor:pointer;flex-shrink:0;transition:transform 0.1s;}
+    .lighting-colour-swatch:hover{transform:scale(1.15);}
+    .lighting-colour-swatch.active{border-color:var(--black);transform:scale(1.15);}
+    .lighting-colour-swatch.c1{background:#3b82f6;}
+    .lighting-colour-swatch.c2{background:#ef4444;}
+    .lighting-colour-swatch.c3{background:#22c55e;}
+    .lighting-colour-swatch.c4{background:#eab308;}
+    .lighting-colour-label{font-size:11px;font-weight:500;color:var(--muted);width:42px;flex-shrink:0;}
+    .lighting-colour-count{font-size:11px;color:var(--muted);width:52px;flex-shrink:0;}
+    .lighting-fixture-sel{flex:1;font-size:12px;padding:4px 8px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;opacity:0.4;pointer-events:none;}
+    .lighting-fixture-sel.active{opacity:1;pointer-events:auto;}
+    .lighting-fixture-sel:focus{outline:none;border-color:var(--blue);}
+    .lighting-dot-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;max-width:200px;}
+    .lighting-dot{width:100%;aspect-ratio:1;border-radius:50%;background:var(--border);border:1.5px solid transparent;cursor:pointer;transition:all 0.1s;display:flex;align-items:center;justify-content:center;}
+    .lighting-dot:hover{background:#ccc;}
+    .lighting-dot.placed-1{background:#3b82f6;border-color:#2563eb;}
+    .lighting-dot.placed-2{background:#ef4444;border-color:#dc2626;}
+    .lighting-dot.placed-3{background:#22c55e;border-color:#16a34a;}
+    .lighting-dot.placed-4{background:#eab308;border-color:#ca8a04;}
+    .lighting-dot.placed-1:hover,.lighting-dot.placed-2:hover,.lighting-dot.placed-3:hover,.lighting-dot.placed-4:hover{opacity:0.7;}
+
     @media(max-width:600px){
       .job-type-grid{grid-template-columns:1fr 1fr;}
       .g4,.g3{grid-template-columns:1fr 1fr;}
@@ -808,25 +835,155 @@ function addRoom(){
 
 function removeRoom(id){rooms=rooms.filter(r=>r.id!==id);renderRooms();}
 
+// ── LIGHTING GRID ─────────────────────────────────────────────
+// Tracks which colour group is active per room (UI only, not persisted)
+const roomActiveGroup={};
+
+function setRoomActiveGroup(roomId,group){
+  roomActiveGroup[roomId]=group;
+  renderRooms();
+}
+
+function toggleLightingNode(roomId,index){
+  const r=rooms.find(x=>x.id===roomId);
+  if(!r)return;
+  if(!r.lightingGrid)r.lightingGrid={nodes:[],fixtureByGroup:{}};
+  const existing=r.lightingGrid.nodes.find(n=>n.index===index);
+  if(existing){
+    // Remove node
+    r.lightingGrid.nodes=r.lightingGrid.nodes.filter(n=>n.index!==index);
+  } else {
+    // Place node in active group
+    const group=roomActiveGroup[roomId]||1;
+    r.lightingGrid.nodes.push({index,group});
+  }
+  renderRooms();
+  updateTotals();
+}
+
+function setRoomFixture(roomId,group,protoId){
+  const r=rooms.find(x=>x.id===roomId);
+  if(!r)return;
+  if(!r.lightingGrid)r.lightingGrid={nodes:[],fixtureByGroup:{}};
+  if(!r.lightingGrid.fixtureByGroup)r.lightingGrid.fixtureByGroup={};
+  if(protoId){
+    r.lightingGrid.fixtureByGroup[group]=parseInt(protoId);
+  } else {
+    delete r.lightingGrid.fixtureByGroup[group];
+  }
+  updateTotals();
+}
+
+// Returns line items from lighting grid for a room
+function getLightingLineItems(room){
+  const grid=room.lightingGrid;
+  if(!grid||!grid.nodes||!grid.nodes.length)return[];
+
+  // Find switch protoassembly — match "15A Single-pole" or first with "single-pole"/"single pole" in name
+  const switchProto=catalogue.protoassemblies.find(p=>
+    p.name.toLowerCase().includes('15a single-pole')||
+    p.name.toLowerCase().includes('single-pole switch')||
+    p.name.toLowerCase().includes('single pole switch')
+  );
+
+  const items=[];
+  const groupsUsed=[...new Set(grid.nodes.map(n=>n.group))];
+
+  groupsUsed.forEach(g=>{
+    const nodeCount=grid.nodes.filter(n=>n.group===g).length;
+
+    // 1 switch per colour group
+    if(switchProto){
+      items.push({
+        id:Date.now()+Math.random(),
+        desc:`${switchProto.name} (lighting circuit ${g})`,
+        cat:'material',qty:1,
+        price:calcProtoTotal(switchProto),
+        source:'lighting',codeNote:''
+      });
+    }
+
+    // N fixtures per colour group
+    const fixtureId=grid.fixtureByGroup?.[g];
+    if(fixtureId){
+      const fixtureProto=catalogue.protoassemblies.find(p=>p.id===fixtureId);
+      if(fixtureProto){
+        items.push({
+          id:Date.now()+Math.random(),
+          desc:`${fixtureProto.name} (circuit ${g})`,
+          cat:'material',qty:nodeCount,
+          price:calcProtoTotal(fixtureProto),
+          source:'lighting',codeNote:''
+        });
+      }
+    }
+  });
+
+  return items;
+}
+
 function renderRooms(){
   const el=document.getElementById('room-list');
   if(!rooms.length){el.innerHTML='<div class="empty-hint"><i class="ti ti-layout-grid"></i>No rooms added yet — select an assembly and enter dimensions.</div>';return;}
   el.innerHTML=rooms.map(r=>{
     const name=r.label?`${r.asmName} — ${r.label}`:r.asmName;
     const tags=r.lineItems.map(i=>`<span class="room-tag ${i.desc.toLowerCase().includes('wire')||i.desc.toLowerCase().includes('cable')?'wire':''}">${i.qty>1?(Number.isInteger(i.qty)?i.qty:i.qty.toFixed(1))+'× ':''}${i.desc}</span>`).join('');
-    const total=r.lineItems.reduce((s,i)=>s+i.qty*i.price,0);
-    return`<div class="room-item">
-      <div class="room-item-left">
-        <div class="room-item-name">${name}</div>
-        <div class="room-item-dims">${r.w} × ${r.l} ft · perimeter ${2*(r.w+r.l)} ft · area ${r.w*r.l} sq ft</div>
-        <div class="room-item-tags">${tags}</div>
+    const lightItems=getLightingLineItems(r);
+    const total=r.lineItems.reduce((s,i)=>s+i.qty*i.price,0)+lightItems.reduce((s,i)=>s+i.qty*i.price,0);
+    const grid=r.lightingGrid||{nodes:[],fixtureByGroup:{}};
+    const activeGroup=roomActiveGroup[r.id]||1;
+
+    // Colour rows — show fixture selector for each colour
+    const colours=[{g:1,label:'Blue',cls:'c1'},{g:2,label:'Red',cls:'c2'},{g:3,label:'Green',cls:'c3'},{g:4,label:'Yellow',cls:'c4'}];
+    const lightingProtos=catalogue.protoassemblies.filter(p=>(p.category||'').toLowerCase()==='lighting');
+
+    const colourRows=colours.map(c=>{
+      const count=grid.nodes.filter(n=>n.group===c.g).length;
+      const selVal=grid.fixtureByGroup?.[c.g]||'';
+      const isActive=count>0;
+      const fixtureOpts=lightingProtos.map(p=>`<option value="${p.id}"${selVal===p.id?' selected':''}>${p.name}</option>`).join('');
+      return`<div class="lighting-colour-row">
+        <div class="lighting-colour-swatch ${c.cls}${activeGroup===c.g?' active':''}" onclick="setRoomActiveGroup(${r.id},${c.g})" title="${c.label}"></div>
+        <span class="lighting-colour-label">${c.label}</span>
+        <span class="lighting-colour-count">${count>0?count+' light'+(count>1?'s':''):''}</span>
+        <select class="lighting-fixture-sel${isActive?' active':''}" onchange="setRoomFixture(${r.id},${c.g},this.value)">
+          <option value="">— Fixture type —</option>
+          ${fixtureOpts}
+        </select>
+      </div>`;
+    }).join('');
+
+    // Dot grid
+    const dots=Array.from({length:16},(_,i)=>{
+      const placed=grid.nodes.find(n=>n.index===i);
+      const cls=placed?`placed-${placed.group}`:'';
+      return`<div class="lighting-dot ${cls}" onclick="toggleLightingNode(${r.id},${i})"></div>`;
+    }).join('');
+
+    return`<div style="margin-bottom:8px;">
+      <div class="room-item" style="border-radius:6px 6px 0 0;margin-bottom:0;border-bottom:none;">
+        <div class="room-item-left">
+          <div class="room-item-name">${name}</div>
+          <div class="room-item-dims">${r.w} × ${r.l} ft · perimeter ${2*(r.w+r.l)} ft · area ${r.w*r.l} sq ft</div>
+          <div class="room-item-tags">${tags}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;">
+          <span style="font-size:13px;font-weight:600;color:var(--blue)">$${total.toFixed(2)}</span>
+          <button class="room-item-del" onclick="removeRoom(${r.id})"><i class="ti ti-x"></i></button>
+        </div>
       </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;">
-        <span style="font-size:13px;font-weight:600;color:var(--blue)">$${total.toFixed(2)}</span>
-        <button class="room-item-del" onclick="removeRoom(${r.id})"><i class="ti ti-x"></i></button>
+      <div class="lighting-grid-wrap">
+        <div class="lighting-grid-header"><i class="ti ti-bulb"></i> Lighting layout</div>
+        <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;">
+          <div class="lighting-dot-grid">${dots}</div>
+          <div style="flex:1;min-width:220px;">
+            <div class="lighting-colour-rows">${colourRows}</div>
+          </div>
+        </div>
       </div>
     </div>`;
   }).join('');
+
 }
 
 // ── ADD-ONS ───────────────────────────────────────────────────
@@ -1026,6 +1183,10 @@ function renderAllLineItems(){
     r.lineItems.forEach(item=>{
       html+=renderLIRow(item,'room',r.id);
     });
+    const lightItems=getLightingLineItems(r);
+    if(lightItems.length){
+      lightItems.forEach(item=>{html+=renderLIRow(item,'room',r.id);});
+    }
     html+=`</div>`;
   });
 
@@ -1102,7 +1263,10 @@ function addManualItem(){
 // ── TOTALS ────────────────────────────────────────────────────
 function updateTotals(){
   let materials=0;
-  rooms.forEach(r=>{r.lineItems.forEach(i=>{materials+=i.qty*i.price;});});
+  rooms.forEach(r=>{
+    r.lineItems.forEach(i=>{materials+=i.qty*i.price;});
+    getLightingLineItems(r).forEach(i=>{materials+=i.qty*i.price;});
+  });
   addons.forEach(a=>{a.lineItems.forEach(i=>{materials+=i.qty*i.price;});});
   aiItems.forEach(i=>{materials+=i.qty*i.price;});
   manualItems.forEach(i=>{materials+=i.qty*i.price;});
@@ -1283,7 +1447,10 @@ function preparePrint(){
 
   // Get totals
   let materials=0;
-  rooms.forEach(r=>{r.lineItems.forEach(i=>{materials+=i.qty*i.price;});});
+  rooms.forEach(r=>{
+    r.lineItems.forEach(i=>{materials+=i.qty*i.price;});
+    getLightingLineItems(r).forEach(i=>{materials+=i.qty*i.price;});
+  });
   addons.forEach(a=>{a.lineItems.forEach(i=>{materials+=i.qty*i.price;});});
   aiItems.forEach(i=>{materials+=i.qty*i.price;});
   manualItems.forEach(i=>{materials+=i.qty*i.price;});
