@@ -283,6 +283,8 @@
         </div>
       </div>
     </div>
+    <div class="card">
+      <div class="card-title">Job type</div>
       <div class="job-type-grid">
         <button class="job-type-btn active" data-type="newbuild" onclick="setJobType('newbuild',this)">
           <i class="ti ti-home-plus"></i>New build / addition
@@ -300,11 +302,15 @@
     </div>
     <div class="card">
       <div class="card-title">Assessment details</div>
-      <div class="g4">
+      <div class="g2">
         <div class="fg"><label>Assessment #</label><input id="est-num" value="EST-001"/></div>
         <div class="fg"><label>Date</label><input type="date" id="est-date"/></div>
-        <div class="fg"><label>Customer name</label><input id="cust-name" placeholder="Jane Smith"/></div>
-        <div class="fg"><label>Job address</label><input id="job-addr" placeholder="123 Main St, Belleville ON"/></div>
+      </div>
+      <div id="customer-fields">
+        <div class="g2">
+          <div class="fg"><label>Customer name</label><input id="cust-name" placeholder="Jane Smith"/></div>
+          <div class="fg"><label>Job address</label><input id="job-addr" placeholder="123 Main St, Belleville ON"/></div>
+        </div>
       </div>
       <div class="fg"><label>Internal notes</label><textarea id="job-notes" placeholder="e.g. New build, 1,800 sq ft bungalow, forced air gas, client supplied fixtures in master…"></textarea></div>
     </div>
@@ -672,7 +678,15 @@ function setJobType(type,btn){
 // Evaluates assembly rules given dimensions, returns line items with real costs
 function evalFormula(formula,x){
   try{
-    const safe=formula.replace(/ceil/g,'Math.ceil').replace(/floor/g,'Math.floor').replace(/round/g,'Math.round').replace(/min/g,'Math.min').replace(/max/g,'Math.max').replace(/[^0-9x+\-*/().,%Math]/g,'');
+    // Replace math function names FIRST, then strip any remaining unsafe characters
+    let safe=formula
+      .replace(/ceil/g,'Math.ceil')
+      .replace(/floor/g,'Math.floor')
+      .replace(/round/g,'Math.round')
+      .replace(/min/g,'Math.min')
+      .replace(/max/g,'Math.max');
+    // Now strip anything that isn't a valid JS math expression character
+    safe=safe.replace(/[^0-9x+\-*/().,Math]/g,'');
     // eslint-disable-next-line no-new-func
     const result=Number(new Function('x','return '+safe)(x));
     return Math.max(0,result);
@@ -1152,13 +1166,15 @@ function linkProject(proj){
   document.getElementById('project-search-wrap').style.display='none';
   document.getElementById('create-project-wrap').style.display='none';
   document.getElementById('project-results').classList.remove('show');
-  // Auto-fill customer/address
+  // Auto-fill and hide customer/address — pulled from project
   if(proj.customer)document.getElementById('cust-name').value=proj.customer;
   if(proj.address)document.getElementById('job-addr').value=proj.address;
+  document.getElementById('customer-fields').style.display='none';
 }
 function clearProjectLink(){
   linkedProjectId=null;linkedAssessmentId=null;
   document.getElementById('project-linked-display').style.display='none';
+  document.getElementById('customer-fields').style.display='block';
 }
 
 // ── MARGIN MODE ───────────────────────────────────────────────

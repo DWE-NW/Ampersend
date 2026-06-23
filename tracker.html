@@ -568,7 +568,6 @@ async function saveJob(){
   if(!ll&&!editId){
     if(!addrVal){showToast('Please enter an address and click Locate to place this job on the map.');return;}
   }
-  }
   const data={
     customer:cust,phone:document.getElementById('f-phone').value,
     address:addrVal,type:document.getElementById('f-type').value,
