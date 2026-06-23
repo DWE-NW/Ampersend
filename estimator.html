@@ -15,6 +15,8 @@
       --red:#dc3545;--red-light:#fff0f0;
     }
     html,body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--black);background:var(--surface);min-height:100vh;}
+
+    /* NAV */
     nav{height:52px;background:var(--white);border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;position:sticky;top:0;z-index:100;}
     .nl{display:flex;align-items:center;gap:12px;}
     .logo{font-size:16px;font-weight:600;letter-spacing:-0.03em;color:var(--black);text-decoration:none;}
@@ -25,42 +27,75 @@
     .nbtn{padding:6px 12px;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:var(--white);color:var(--black);display:flex;align-items:center;gap:5px;font-family:inherit;text-decoration:none;}
     .nbtn:hover{background:var(--surface);}
     .nbtn.primary{background:var(--black);color:#fff;border-color:var(--black);}
-    .nbtn.primary:hover{background:#333;}
+    .nbtn.blue{background:var(--blue);color:#fff;border-color:var(--blue);}
 
-    .main{padding:1.5rem;max-width:900px;margin:0 auto;}
+    /* STEP PROGRESS */
+    .step-bar{background:var(--white);border-bottom:0.5px solid var(--border);padding:0 1.5rem;display:flex;gap:0;overflow-x:auto;}
+    .step-pill{padding:14px 16px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;display:flex;align-items:center;gap:6px;}
+    .step-pill:hover{color:var(--black);}
+    .step-pill.active{color:var(--blue);border-bottom-color:var(--blue);}
+    .step-pill.done{color:var(--black);border-bottom-color:var(--black);}
+    .step-num{width:18px;height:18px;border-radius:50%;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;background:var(--border);color:var(--muted);}
+    .step-pill.active .step-num{background:var(--blue);color:#fff;}
+    .step-pill.done .step-num{background:var(--black);color:#fff;}
 
-    /* API KEY BANNER */
-    .api-banner{background:var(--amber-light);border:0.5px solid var(--amber);border-radius:6px;padding:12px 14px;margin-bottom:1rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-    .api-banner i{color:var(--amber);font-size:16px;flex-shrink:0;}
-    .api-banner-text{font-size:13px;font-weight:500;color:var(--black);}
-    .api-banner input{flex:1;min-width:200px;font-size:13px;padding:7px 10px;border:0.5px solid var(--border);border-radius:4px;font-family:inherit;background:var(--white);}
-    .api-banner input:focus{outline:none;border-color:var(--blue);}
-    .api-saved{background:var(--green-light);border-color:var(--green);color:var(--green);font-size:12px;padding:3px 9px;border-radius:3px;font-weight:500;}
-
-    /* TABS */
-    .tabs{display:flex;border-bottom:0.5px solid var(--border);margin-bottom:1.5rem;background:var(--white);border-radius:8px 8px 0 0;border:0.5px solid var(--border);overflow:hidden;}
-    .tab{padding:12px 20px;font-size:13px;cursor:pointer;border:none;border-bottom:2px solid transparent;color:var(--muted);background:none;font-family:inherit;transition:color 0.15s;display:flex;align-items:center;gap:6px;}
-    .tab.active{color:var(--black);border-bottom-color:var(--blue);font-weight:500;background:var(--white);}
-    .tab:hover:not(.active){color:var(--black);background:var(--surface);}
-    .panel{display:none;} .panel.active{display:block;}
+    /* MAIN LAYOUT */
+    .main{max-width:860px;margin:0 auto;padding:1.5rem;}
+    .step-panel{display:none;}
+    .step-panel.active{display:block;}
 
     /* CARDS */
-    .card{background:var(--white);border:0.5px solid var(--border);border-radius:6px;padding:1.25rem;margin-bottom:1rem;}
+    .card{background:var(--white);border:0.5px solid var(--border);border-radius:8px;padding:1.25rem;margin-bottom:1rem;}
+    .card-title{font-size:14px;font-weight:600;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;}
     .sec-label{font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
-    .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-    .g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;}
-    .fg{display:flex;flex-direction:column;gap:4px;margin-bottom:0;}
-    .fg label{font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0.04em;text-transform:uppercase;}
-    .fg input,.fg select,.fg textarea{font-size:13px;padding:8px 10px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);width:100%;font-family:inherit;}
-    .fg textarea{resize:vertical;min-height:80px;}
-    .fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,110,255,0.08);}
 
-    /* ROOMS */
-    .rooms-list{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;min-height:28px;}
-    .room-tag{display:inline-flex;align-items:center;gap:6px;background:var(--blue-light);color:var(--blue);font-size:12px;padding:4px 10px;border-radius:3px;font-weight:500;}
-    .room-tag button{background:none;border:none;color:var(--blue);cursor:pointer;font-size:16px;padding:0;line-height:1;}
-    .room-row{display:flex;gap:8px;align-items:flex-end;}
-    .room-row .fg{flex:1;}
+    /* FORM FIELDS */
+    .fg{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
+    .fg label{font-size:11px;font-weight:500;letter-spacing:0.05em;text-transform:uppercase;color:var(--muted);}
+    .fg input,.fg select,.fg textarea{font-size:13px;padding:8px 10px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);width:100%;font-family:inherit;}
+    .fg textarea{resize:vertical;min-height:70px;}
+    .fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,110,255,0.08);}
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+    .g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;}
+
+    /* JOB TYPE SELECTOR */
+    .job-type-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:0;}
+    .job-type-btn{padding:12px 8px;border-radius:6px;border:0.5px solid var(--border);background:var(--surface);font-size:12px;font-weight:500;color:var(--muted);text-align:center;cursor:pointer;transition:all 0.15s;font-family:inherit;line-height:1.4;}
+    .job-type-btn i{display:block;font-size:20px;margin-bottom:5px;color:var(--muted);}
+    .job-type-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-light);}
+    .job-type-btn:hover i{color:var(--blue);}
+    .job-type-btn.active{border-color:var(--blue);background:var(--blue-light);color:var(--blue);}
+    .job-type-btn.active i{color:var(--blue);}
+
+    /* ROOM LIST */
+    .room-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+    .room-item{background:var(--surface);border:0.5px solid var(--border);border-radius:6px;padding:10px 12px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+    .room-item-left{flex:1;}
+    .room-item-name{font-size:13px;font-weight:600;margin-bottom:4px;}
+    .room-item-dims{font-size:12px;color:var(--muted);}
+    .room-item-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
+    .room-tag{font-size:11px;padding:2px 7px;border-radius:3px;background:var(--blue-light);color:var(--blue);font-weight:500;}
+    .room-tag.wire{background:var(--surface);color:var(--muted);border:0.5px solid var(--border);}
+    .room-tag.fixed{background:var(--green-light);color:var(--green);}
+    .room-item-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:2px;flex-shrink:0;display:flex;align-items:center;border-radius:3px;}
+    .room-item-del:hover{color:var(--red);}
+
+    /* ADD ROOM PANEL */
+    .add-room-panel{background:var(--surface);border:0.5px dashed var(--border);border-radius:6px;padding:14px;}
+    .add-room-row{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;}
+    .add-room-row .fg{margin-bottom:0;flex:1;min-width:130px;}
+
+    /* PROTO ADD-ONS */
+    .addon-list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+    .addon-item{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:0.5px solid var(--border);border-radius:5px;padding:8px 12px;font-size:13px;}
+    .addon-item-name{font-weight:500;}
+    .addon-item-cost{color:var(--blue);font-weight:600;font-size:12px;}
+    .addon-item-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;display:flex;align-items:center;}
+    .addon-item-del:hover{color:var(--red);}
+    .add-addon-row{display:flex;gap:8px;align-items:center;}
+    .add-addon-row select{flex:1;font-size:13px;padding:7px 10px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;}
+    .add-addon-row select:focus{outline:none;border-color:var(--blue);}
 
     /* BUTTONS */
     .btn{padding:8px 16px;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-family:inherit;border:0.5px solid var(--border);background:var(--white);color:var(--black);}
@@ -69,73 +104,87 @@
     .btn-black{background:var(--black);color:#fff;border-color:var(--black);}
     .btn-black:hover:not(:disabled){background:#333;}
     .btn-blue{background:var(--blue);color:#fff;border-color:var(--blue);}
-    .btn-blue:hover{background:#155ee0;}
+    .btn-blue:hover:not(:disabled){background:#155ee0;}
     .btn-sm{padding:5px 12px;font-size:12px;}
 
-    /* AI AREA */
-    .ai-box{background:var(--surface);border:0.5px solid var(--border);border-radius:6px;padding:1rem;margin-bottom:1rem;}
-    .ai-box.thinking{border-color:var(--blue);background:var(--blue-light);}
-    .ai-box.clarify{border-color:var(--amber);background:var(--amber-light);}
-    .ai-box.success{border-color:var(--green);background:var(--green-light);}
-    .ai-label{font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+    /* STEP NAV */
+    .step-nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;padding-top:1.25rem;border-top:0.5px solid var(--border);}
+
+    /* AI BOX */
+    .ai-box{border-radius:6px;padding:12px 14px;margin-bottom:10px;}
+    .ai-box.thinking{background:var(--blue-light);border:0.5px solid #c0d4ff;}
+    .ai-box.clarify{background:var(--amber-light);border:0.5px solid var(--amber);}
+    .ai-box.success{background:var(--green-light);border:0.5px solid var(--green);}
+    .ai-box.error{background:var(--red-light);border:0.5px solid #ffaaaa;}
+    .ai-label{font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:6px;}
     .ai-label.blue{color:var(--blue);}
     .ai-label.amber{color:var(--amber);}
     .ai-label.green{color:var(--green);}
+    .ai-label.red{color:var(--red);}
     .ai-msg{font-size:13px;line-height:1.6;}
-    .clarify-q{margin-bottom:12px;}
-    .clarify-q p{font-size:13px;margin-bottom:7px;font-weight:500;}
+    .clarify-q{margin-bottom:10px;}
+    .clarify-q p{font-size:13px;margin-bottom:6px;font-weight:500;}
     .clarify-q .options{display:flex;flex-wrap:wrap;gap:6px;}
-    .clarify-q .options button{padding:5px 13px;border-radius:3px;font-size:12px;border:0.5px solid var(--border);background:var(--white);cursor:pointer;font-family:inherit;}
+    .clarify-q .options button{padding:5px 12px;border-radius:3px;font-size:12px;border:0.5px solid var(--border);background:var(--white);cursor:pointer;font-family:inherit;}
     .clarify-q .options button:hover,.clarify-q .options button.picked{background:var(--blue-light);border-color:var(--blue);color:var(--blue);}
 
     /* LINE ITEMS */
-    .items-head{display:grid;grid-template-columns:2.5fr 85px 70px 85px 32px;gap:8px;font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);padding:0 2px 8px;border-bottom:0.5px solid var(--border);}
-    .line-row{display:grid;grid-template-columns:2.5fr 85px 70px 85px 32px;gap:8px;align-items:start;padding:6px 0;border-bottom:0.5px solid var(--surface);}
-    .line-row input,.line-row select{font-size:13px;padding:6px 8px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);width:100%;font-family:inherit;}
-    .line-row input:focus,.line-row select:focus{outline:none;border-color:var(--blue);}
-    .line-desc{display:flex;flex-direction:column;gap:3px;}
-    .code-note{font-size:10px;color:var(--blue);font-style:italic;padding:0 2px;}
-    .del-btn{background:none;border:0.5px solid var(--border);border-radius:4px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:14px;margin-top:1px;}
-    .del-btn:hover{background:var(--red-light);border-color:#ffaaaa;color:var(--red);}
-    .add-btn{background:none;border:0.5px dashed var(--border);border-radius:4px;padding:8px 14px;font-size:12px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit;width:100%;justify-content:center;margin-top:8px;}
-    .add-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-light);}
-    .totals{display:flex;justify-content:flex-end;margin-top:1.25rem;}
-    .totals-inner{min-width:260px;}
-    .t-row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;color:#555;}
-    .t-grand{display:flex;justify-content:space-between;font-size:17px;font-weight:600;border-top:2px solid var(--black);margin-top:6px;padding-top:10px;}
-    .t-grand span:last-child{color:var(--blue);}
-    .action-bar{display:flex;gap:10px;margin-top:1.5rem;padding-top:1.25rem;border-top:0.5px solid var(--border);flex-wrap:wrap;}
+    .li-section{margin-bottom:1rem;}
+    .li-section-title{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);padding:8px 0 6px;border-bottom:0.5px solid var(--border);margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;}
+    .li-row{display:grid;grid-template-columns:2.5fr 90px 80px 90px 32px;gap:8px;align-items:center;padding:5px 0;border-bottom:0.5px solid var(--surface);}
+    .li-row:last-child{border-bottom:none;}
+    .li-row input,.li-row select{font-size:13px;padding:5px 8px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);width:100%;font-family:inherit;}
+    .li-row input:focus,.li-row select:focus{outline:none;border-color:var(--blue);}
+    .li-head{display:grid;grid-template-columns:2.5fr 90px 80px 90px 32px;gap:8px;font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);padding:0 0 6px;border-bottom:0.5px solid var(--border);margin-bottom:4px;}
+    .li-del{background:none;border:0.5px solid var(--border);border-radius:4px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:13px;}
+    .li-del:hover{background:var(--red-light);border-color:#ffaaaa;color:var(--red);}
+    .add-li-btn{display:flex;align-items:center;gap:6px;padding:8px 12px;font-size:12px;color:var(--muted);cursor:pointer;background:none;width:100%;border:0.5px dashed var(--border);border-radius:4px;font-family:inherit;margin-top:8px;justify-content:center;}
+    .add-li-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-light);}
 
-    /* BADGE */
-    .badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:2px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;}
-    .badge-labour{background:var(--amber-light);color:var(--amber);}
-    .badge-material{background:var(--blue-light);color:var(--blue);}
-    .badge-permit{background:var(--green-light);color:var(--green);}
-    .badge-other{background:var(--surface);color:var(--muted);}
+    /* TOTALS */
+    .totals-block{background:var(--surface);border:0.5px solid var(--border);border-radius:6px;padding:14px 16px;margin-top:1rem;}
+    .t-row{display:flex;justify-content:space-between;font-size:13px;padding:3px 0;color:#555;}
+    .t-row.section{color:var(--muted);font-size:12px;padding-top:8px;margin-top:4px;border-top:0.5px solid var(--border);}
+    .t-grand{display:flex;justify-content:space-between;font-size:16px;font-weight:700;border-top:1.5px solid var(--black);margin-top:8px;padding-top:10px;}
+    .t-range{display:flex;justify-content:space-between;font-size:15px;font-weight:600;color:var(--blue);padding:6px 0;}
 
-    /* EMAIL TOAST */
-    .toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9000;background:var(--black);color:#fff;padding:10px 16px;border-radius:6px;font-size:13px;display:none;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,0.2);}
-    .toast.show{display:flex;}
+    /* LABOUR */
+    .labour-row{display:grid;grid-template-columns:1.5fr 1fr 1fr 90px;gap:8px;align-items:center;padding:6px 0;border-bottom:0.5px solid var(--surface);}
+    .labour-row:last-child{border-bottom:none;}
+    .labour-head{display:grid;grid-template-columns:1.5fr 1fr 1fr 90px;gap:8px;font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);padding-bottom:6px;border-bottom:0.5px solid var(--border);margin-bottom:4px;}
+    .labour-row input{font-size:13px;padding:6px 8px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;width:100%;}
+    .labour-row input:focus{outline:none;border-color:var(--blue);}
+    .labour-total{font-size:13px;font-weight:600;color:var(--blue);text-align:right;}
+    .labour-note{font-size:11px;color:var(--muted);margin-top:6px;padding:6px 8px;background:var(--amber-light);border-radius:4px;border:0.5px solid var(--amber);}
 
-    .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--blue-light);border-top-color:var(--blue);border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:-3px;}
+    /* API KEY BANNER */
+    .api-banner{background:var(--amber-light);border:0.5px solid var(--amber);border-radius:6px;padding:12px 14px;margin-bottom:1rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+    .api-banner i{color:var(--amber);font-size:16px;flex-shrink:0;}
+    .api-banner-text{font-size:13px;font-weight:500;color:var(--black);}
+    .api-banner input{flex:1;min-width:180px;font-size:13px;padding:7px 10px;border:0.5px solid var(--border);border-radius:4px;font-family:inherit;background:var(--white);}
+    .api-banner input:focus{outline:none;border-color:var(--blue);}
+
+    .spinner{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:-2px;}
+    .spinner.dark{border-color:rgba(26,110,255,0.2);border-top-color:var(--blue);}
     @keyframes spin{to{transform:rotate(360deg);}}
 
-    @media print{
-      nav{display:none;}
-      .main{padding:0;max-width:100%;}
-      .tabs,.action-bar,.api-banner{display:none!important;}
-      .panel{display:block!important;}
-      #tab-build{display:none!important;}
-      #tab-items{display:block!important;}
-    }
+    .toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9000;background:var(--black);color:#fff;padding:10px 16px;border-radius:6px;font-size:13px;display:none;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,0.2);}
+    .toast.show{display:flex;}
+    .info-note{font-size:12px;color:var(--muted);padding:8px 10px;background:var(--surface);border-radius:4px;border:0.5px solid var(--border);margin-bottom:10px;line-height:1.5;}
+    .empty-hint{text-align:center;padding:2rem;color:var(--muted);font-size:13px;}
+    .empty-hint i{font-size:28px;display:block;margin-bottom:8px;opacity:0.3;}
+
     @media(max-width:600px){
-      .g4{grid-template-columns:1fr 1fr;}
-      .items-head,.line-row{grid-template-columns:1fr 70px 60px 32px;}
-      .items-head span:nth-child(2),.line-row>select{display:none;}
+      .job-type-grid{grid-template-columns:1fr 1fr;}
+      .g4,.g3{grid-template-columns:1fr 1fr;}
+      .li-head,.li-row{grid-template-columns:1fr 70px 60px 32px;}
+      .li-head span:nth-child(2),.li-row>select{display:none;}
+      .labour-head,.labour-row{grid-template-columns:1fr 1fr 80px;}
     }
   </style>
 </head>
 <body>
+
 <nav>
   <div class="nl">
     <a href="/index.html" class="logo">Ampers<span>&</span>nd</a>
@@ -143,200 +192,539 @@
     <span class="ntitle">Assessment</span>
   </div>
   <div class="nr">
+    <a href="/catalogue.html" class="nbtn"><i class="ti ti-books"></i> Catalogue</a>
     <a href="/projects.html" class="nbtn"><i class="ti ti-list"></i> Projects</a>
-    <a href="/tracker.html" class="nbtn"><i class="ti ti-map-pin"></i> Map</a>
+    <button class="nbtn primary" onclick="newAssessment()"><i class="ti ti-plus"></i> New</button>
   </div>
 </nav>
 
+<div class="step-bar">
+  <div class="step-pill active" id="pill-1" onclick="goStep(1)"><span class="step-num">1</span> Job details</div>
+  <div class="step-pill" id="pill-2" onclick="goStep(2)"><span class="step-num">2</span> Rooms &amp; assemblies</div>
+  <div class="step-pill" id="pill-3" onclick="goStep(3)"><span class="step-num">3</span> AI assist</div>
+  <div class="step-pill" id="pill-4" onclick="goStep(4)"><span class="step-num">4</span> Labour &amp; margin</div>
+  <div class="step-pill" id="pill-5" onclick="goStep(5)"><span class="step-num">5</span> Review</div>
+</div>
+
 <div class="main">
 
-  <!-- API KEY BANNER -->
-  <div id="api-banner" class="api-banner">
-    <i class="ti ti-key"></i>
-    <span class="api-banner-text">Enter your Anthropic API key to enable AI assessment</span>
-    <input type="password" id="api-key-input" placeholder="sk-ant-..."/>
-    <button class="btn btn-sm btn-black" onclick="saveKey()">Save key</button>
-    <span style="font-size:11px;color:var(--muted)">Stored locally in your browser only</span>
-  </div>
-
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab('build',this)"><i class="ti ti-sparkles"></i> Build assessment</button>
-    <button class="tab" onclick="switchTab('items',this)"><i class="ti ti-list"></i> Line items</button>
-  </div>
-
-  <!-- BUILD TAB -->
-  <div id="tab-build" class="panel active">
+  <!-- STEP 1: JOB DETAILS -->
+  <div class="step-panel active" id="step-1">
     <div class="card">
-      <div class="sec-label">Assessment details</div>
-      <div class="g4" style="gap:10px">
-        <div class="fg"><label>Assessment #</label><input type="text" id="est-num" value="EST-001"/></div>
-        <div class="fg"><label>Date issued</label><input type="date" id="est-date"/></div>
-        <div class="fg"><label>Customer name</label><input type="text" id="cust-name" placeholder="Jane Smith"/></div>
-        <div class="fg"><label>Job address</label><input type="text" id="job-addr" placeholder="123 Main St, Belleville ON"/></div>
+      <div class="card-title">Job type</div>
+      <div class="job-type-grid">
+        <button class="job-type-btn active" data-type="newbuild" onclick="setJobType('newbuild',this)">
+          <i class="ti ti-home-plus"></i>New build / addition
+        </button>
+        <button class="job-type-btn" data-type="reno" onclick="setJobType('reno',this)">
+          <i class="ti ti-refresh"></i>Renovation
+        </button>
+        <button class="job-type-btn" data-type="service" onclick="setJobType('service',this)">
+          <i class="ti ti-bolt"></i>Service / panel
+        </button>
+        <button class="job-type-btn" data-type="custom" onclick="setJobType('custom',this)">
+          <i class="ti ti-pencil"></i>Custom / other
+        </button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Assessment details</div>
+      <div class="g4">
+        <div class="fg"><label>Assessment #</label><input id="est-num" value="EST-001"/></div>
+        <div class="fg"><label>Date</label><input type="date" id="est-date"/></div>
+        <div class="fg"><label>Customer name</label><input id="cust-name" placeholder="Jane Smith"/></div>
+        <div class="fg"><label>Job address</label><input id="job-addr" placeholder="123 Main St, Belleville ON"/></div>
+      </div>
+      <div class="fg"><label>Internal notes</label><textarea id="job-notes" placeholder="e.g. New build, 1,800 sq ft bungalow, forced air gas, client supplied fixtures in master…"></textarea></div>
+    </div>
+    <div class="step-nav">
+      <div></div>
+      <button class="btn btn-black" onclick="goStep(2)">Rooms &amp; assemblies <i class="ti ti-arrow-right"></i></button>
+    </div>
+  </div>
+
+  <!-- STEP 2: ROOMS & ASSEMBLIES -->
+  <div class="step-panel" id="step-2">
+    <div class="card" id="spatial-card">
+      <div class="card-title">
+        Rooms <span style="font-size:12px;font-weight:400;color:var(--muted)">— spatial assemblies with dimension rules</span>
+      </div>
+      <div id="room-list" class="room-list"></div>
+      <div class="add-room-panel">
+        <div class="sec-label">Add room</div>
+        <div class="add-room-row">
+          <div class="fg"><label>Assembly</label>
+            <select id="room-asm-sel">
+              <option value="">— Select assembly —</option>
+            </select>
+          </div>
+          <div class="fg" style="max-width:90px"><label>Width (ft)</label><input type="number" id="room-w" min="1" placeholder="12"/></div>
+          <div class="fg" style="max-width:90px"><label>Length (ft)</label><input type="number" id="room-l" min="1" placeholder="14"/></div>
+          <div class="fg" style="max-width:120px"><label>Label (optional)</label><input id="room-label" placeholder="e.g. Master bed"/></div>
+          <button class="btn btn-black btn-sm" onclick="addRoom()" style="margin-bottom:1px"><i class="ti ti-plus"></i> Add</button>
+        </div>
+        <div id="room-preview" style="margin-top:10px;"></div>
       </div>
     </div>
 
     <div class="card">
-      <div class="sec-label">Rooms & areas</div>
-      <div class="rooms-list" id="rooms-list"><span style="font-size:12px;color:var(--muted)">No rooms added yet</span></div>
-      <div class="room-row">
-        <div class="fg">
-          <label>Room type</label>
-          <select id="room-type">
-            <option value="">Select room...</option>
-            <option>Kitchen</option><option>Bathroom</option><option>Living room</option>
-            <option>Bedroom</option><option>Garage</option><option>Workshop</option>
-            <option>Basement</option><option>Outdoor / exterior</option><option>Panel / utility room</option>
-          </select>
-        </div>
-        <div class="fg" style="max-width:110px">
-          <label>Sq ft</label>
-          <input type="number" id="room-sqft" placeholder="e.g. 180" min="0"/>
-        </div>
-        <button class="btn btn-sm" onclick="addRoom()" style="margin-bottom:1px"><i class="ti ti-plus"></i> Add</button>
+      <div class="card-title">
+        Add-ons <span style="font-size:12px;font-weight:400;color:var(--muted)">— fixed protoassemblies (panel, service, dedicated circuits, etc.)</span>
+      </div>
+      <div id="addon-list" class="addon-list"></div>
+      <div class="add-addon-row">
+        <select id="addon-proto-sel"><option value="">— Add protoassembly —</option></select>
+        <button class="btn btn-sm" onclick="addAddon()"><i class="ti ti-plus"></i> Add</button>
       </div>
     </div>
 
+    <div class="step-nav">
+      <button class="btn" onclick="goStep(1)"><i class="ti ti-arrow-left"></i> Back</button>
+      <button class="btn btn-black" onclick="goStep(3)">AI assist <i class="ti ti-arrow-right"></i></button>
+    </div>
+  </div>
+
+  <!-- STEP 3: AI ASSIST -->
+  <div class="step-panel" id="step-3">
+    <div id="api-banner" class="api-banner" style="display:none">
+      <i class="ti ti-key"></i>
+      <span class="api-banner-text">Enter Anthropic API key to enable AI assist</span>
+      <input type="password" id="api-key-input" placeholder="sk-ant-…"/>
+      <button class="btn btn-sm btn-black" onclick="saveKey()">Save key</button>
+      <span style="font-size:11px;color:var(--muted)">Stored in browser only</span>
+    </div>
+
     <div class="card">
-      <div class="sec-label">Describe the job</div>
-      <div class="fg" style="margin-bottom:12px">
-        <textarea id="job-desc" placeholder="e.g. Full kitchen reno — counter receptacles, under-cabinet lighting, dedicated fridge and microwave circuits, new range hood wiring. Also 200A panel upgrade in utility room."></textarea>
+      <div class="card-title">AI scoping assist</div>
+      <div class="info-note">
+        <strong>For custom, reno, or service jobs</strong> — describe the work below and AI will map it to catalogue items using Ontario Electrical Code awareness. Review and adjust anything before moving on. For new builds where you've added rooms above, this step is optional.
       </div>
-      <button class="btn btn-black" onclick="startAI()" id="analyze-btn">
-        <i class="ti ti-sparkles"></i> Analyze &amp; build assessment
-      </button>
+      <div class="fg"><label>Describe the job</label>
+        <textarea id="job-desc" rows="4" placeholder="e.g. Kitchen reno — new counter receptacles, dedicated fridge and microwave, replace 100A fuse panel with 200A breaker panel, add ESA permit. Existing rough-in being partially reused."></textarea>
+      </div>
+      <button class="btn btn-black" onclick="runAI()" id="ai-btn"><i class="ti ti-sparkles"></i> Analyze &amp; suggest items</button>
     </div>
 
     <div id="ai-area"></div>
+
+    <div class="step-nav">
+      <button class="btn" onclick="goStep(2)"><i class="ti ti-arrow-left"></i> Back</button>
+      <button class="btn btn-black" onclick="goStep(4)">Labour &amp; margin <i class="ti ti-arrow-right"></i></button>
+    </div>
   </div>
 
-  <!-- LINE ITEMS TAB -->
-  <div id="tab-items" class="panel">
+  <!-- STEP 4: LABOUR & MARGIN -->
+  <div class="step-panel" id="step-4">
     <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <div class="sec-label" style="margin:0">Line items</div>
-        <span id="item-count" style="font-size:12px;color:var(--muted)"></span>
+      <div class="card-title">Labour <span style="font-size:12px;font-weight:400;color:var(--muted)">(internal only — not shown to client)</span></div>
+      <div class="labour-note"><i class="ti ti-lock" style="font-size:12px"></i> Labour costs are for your internal calculation only. They do not appear on the client assessment document.</div>
+      <br/>
+      <div class="labour-head"><span>Role</span><span>Hours</span><span>Rate / hr</span><span style="text-align:right">Subtotal</span></div>
+      <div id="labour-rows"></div>
+      <button class="add-li-btn" onclick="addLabourRow()"><i class="ti ti-plus"></i> Add row</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Margin</div>
+      <div class="g2">
+        <div class="fg"><label>Low margin %</label><input type="number" id="margin-low" value="8" min="0" max="100" oninput="updateTotals()"/></div>
+        <div class="fg"><label>High margin %</label><input type="number" id="margin-high" value="15" min="0" max="100" oninput="updateTotals()"/></div>
       </div>
-      <div class="items-head">
-        <span>Description</span><span>Category</span><span>Qty</span><span>Unit price</span><span></span>
-      </div>
-      <div id="line-items-list"></div>
-      <button class="add-btn" onclick="addManualItem()"><i class="ti ti-plus"></i> Add item manually</button>
-      <div class="totals">
-        <div class="totals-inner">
-          <div class="t-row"><span>Subtotal</span><span id="subtotal">$0.00</span></div>
-          <div class="t-row"><span>HST (13%)</span><span id="tax">$0.00</span></div>
-          <div class="t-grand"><span>Total</span><span id="grand-total">$0.00</span></div>
+      <div class="info-note">Margin is applied to materials + labour to produce the client-facing cost range. Client sees the range only — no breakdown.</div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn" onclick="goStep(3)"><i class="ti ti-arrow-left"></i> Back</button>
+      <button class="btn btn-black" onclick="goStep(5)">Review <i class="ti ti-arrow-right"></i></button>
+    </div>
+  </div>
+
+  <!-- STEP 5: REVIEW -->
+  <div class="step-panel" id="step-5">
+    <div class="card">
+      <div class="card-title">
+        Line items
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-sm" onclick="goStep(2)"><i class="ti ti-pencil"></i> Edit rooms</button>
         </div>
       </div>
+      <div class="li-head"><span>Description</span><span>Category</span><span>Qty</span><span>Unit price</span><span></span></div>
+      <div id="all-line-items"></div>
+      <button class="add-li-btn" onclick="addManualItem()"><i class="ti ti-plus"></i> Add item manually</button>
     </div>
+
     <div class="card">
-      <div class="sec-label" style="margin-bottom:8px">Terms & notes</div>
-      <div class="fg">
-        <textarea id="terms-text" style="min-height:64px">Payment due within 30 days of invoice. This estimate is valid for 30 days from date of issue. All work performed to CSA and ESA standards. Permit costs included where noted.</textarea>
+      <div class="card-title">Summary</div>
+      <div class="totals-block">
+        <div class="t-row"><span>Materials</span><span id="total-materials">$0.00</span></div>
+        <div class="t-row"><span>Labour (internal)</span><span id="total-labour">$0.00</span></div>
+        <div class="t-row section"><span>Combined before margin</span><span id="total-combined">$0.00</span></div>
+        <div class="t-range"><span>Client estimate range</span><span id="total-range">$0 – $0</span></div>
+        <div class="t-row" style="font-size:12px;color:var(--muted)"><span>HST (13%) on range</span><span id="total-hst">$0 – $0</span></div>
       </div>
     </div>
-    <div class="action-bar">
-      <button class="btn btn-black" onclick="window.print()"><i class="ti ti-printer"></i> Print / save PDF</button>
-      <button class="btn" onclick="clearEstimate()"><i class="ti ti-trash"></i> Clear assessment</button>
+
+    <div class="card" id="client-card">
+      <div class="card-title">Client-facing assessment</div>
+      <div class="info-note">This is what the client sees — cost range only, no quantities or unit prices.</div>
+      <div class="fg"><label>Project description (for client)</label>
+        <textarea id="client-desc" rows="4" placeholder="The scope of work includes…"></textarea>
+      </div>
+      <div class="fg"><label>Terms &amp; notes</label>
+        <textarea id="terms-text" rows="3">Payment due within 30 days. This estimate is valid for 30 days from date of issue. All work performed to CSA and ESA standards. Permit costs included where noted. Estimate subject to change upon inspection of existing conditions.</textarea>
+      </div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn" onclick="goStep(4)"><i class="ti ti-arrow-left"></i> Back</button>
+      <button class="btn btn-black" onclick="window.print()"><i class="ti ti-printer"></i> Print / PDF</button>
     </div>
   </div>
 
-</div>
+</div><!-- /main -->
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
+const SB_URL='https://vojgddmlwakvhmbkzfld.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvamdkZG1sd2FrdmhtYmt6ZmxkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NDQ1MzAsImV4cCI6MjA5NzIyMDUzMH0.PGu1HeCZ3SsMgRyLC_s4xP8m3Qt73NlRyvzA-hFroEk';
 const TAX=0.13;
-let rooms=[],lineItems=[];
+const FT_TO_M=0.3048;
 
+// ── STATE ─────────────────────────────────────────────────────
+let catalogue={components:[],branches:[],protoassemblies:[],assemblies:[]};
+let jobType='newbuild';
+let rooms=[];      // [{id, asmId, asmName, label, w, l, lineItems:[]}]
+let addons=[];     // [{id, protoId, protoName, qty, lineItems:[]}]
+let aiItems=[];    // [{id, desc, cat, qty, price, codeNote}]
+let labourRows=[]; // [{id, role, hrs, rate}]
+let currentStep=1;
+
+// ── INIT ──────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded',async()=>{
+  document.getElementById('est-date').value=new Date().toISOString().split('T')[0];
+  checkApiKey();
+  await loadCatalogue();
+  populateSelectors();
+  addLabourRow('Electrician',0,85);
+  addLabourRow('Apprentice',0,45);
+  renderLabour();
+});
+
+async function loadCatalogue(){
+  try{
+    const [comps,branches,protos,asms]=await Promise.all([
+      dbGet('components?select=*&order=category,created_at'),
+      dbGet('branches?select=*&order=name'),
+      dbGet('protoassemblies?select=*&order=category,name'),
+      dbGet('assemblies?select=*&order=name'),
+    ]);
+    catalogue.components=comps;
+    catalogue.branches=branches;
+    catalogue.protoassemblies=protos.map(p=>({...p,components:safeJson(p.components,[])}));
+    catalogue.assemblies=asms.map(a=>({...a,fixed_components:safeJson(a.fixed_components,[]),rules:safeJson(a.rules,[])}));
+  }catch(e){showToast('Could not load catalogue: '+e.message);}
+}
+
+function safeJson(s,d){try{return s?JSON.parse(s):d;}catch{return d;}}
+
+async function dbGet(path){
+  const res=await fetch(`${SB_URL}/rest/v1/${path}`,{headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`}});
+  if(!res.ok)throw new Error(await res.text());
+  const t=await res.text();return t?JSON.parse(t):[];
+}
+
+function populateSelectors(){
+  // Spatial assemblies only (have rules)
+  const spatialAsms=catalogue.assemblies.filter(a=>(a.rules||[]).length>0);
+  const asmSel=document.getElementById('room-asm-sel');
+  asmSel.innerHTML='<option value="">— Select assembly —</option>'+spatialAsms.map(a=>`<option value="${a.id}">${a.name}</option>`).join('');
+  asmSel.addEventListener('change',previewRoom);
+  document.getElementById('room-w').addEventListener('input',previewRoom);
+  document.getElementById('room-l').addEventListener('input',previewRoom);
+
+  // All protoassemblies for add-ons
+  const protoSel=document.getElementById('addon-proto-sel');
+  // Group by category
+  const grouped={};
+  catalogue.protoassemblies.forEach(p=>{const k=p.category||'Other';if(!grouped[k])grouped[k]=[];grouped[k].push(p);});
+  let opts='<option value="">— Add protoassembly —</option>';
+  Object.keys(grouped).sort().forEach(cat=>{
+    opts+=`<optgroup label="${cat}">`;
+    grouped[cat].forEach(p=>{opts+=`<option value="${p.id}">${p.name}</option>`;});
+    opts+='</optgroup>';
+  });
+  protoSel.innerHTML=opts;
+}
+
+// ── STEP NAV ──────────────────────────────────────────────────
+function goStep(n){
+  document.querySelectorAll('.step-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('step-'+n).classList.add('active');
+  document.querySelectorAll('.step-pill').forEach((p,i)=>{
+    p.classList.remove('active','done');
+    if(i+1===n)p.classList.add('active');
+    else if(i+1<n)p.classList.add('done');
+  });
+  currentStep=n;
+  if(n===5){buildAllLineItems();renderAllLineItems();updateTotals();}
+  window.scrollTo(0,0);
+}
+
+function newAssessment(){
+  if(!confirm('Start a new assessment? Current data will be cleared.'))return;
+  rooms=[];addons=[];aiItems=[];labourRows=[];
+  document.getElementById('est-num').value='EST-001';
+  document.getElementById('est-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('cust-name').value='';
+  document.getElementById('job-addr').value='';
+  document.getElementById('job-notes').value='';
+  document.getElementById('job-desc').value='';
+  document.getElementById('ai-area').innerHTML='';
+  addLabourRow('Electrician',0,85);
+  addLabourRow('Apprentice',0,45);
+  renderLabour();
+  renderRooms();renderAddons();
+  goStep(1);
+}
+
+// ── JOB TYPE ──────────────────────────────────────────────────
+function setJobType(type,btn){
+  jobType=type;
+  document.querySelectorAll('.job-type-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ── CATALOGUE ENGINE ──────────────────────────────────────────
+// Evaluates assembly rules given dimensions, returns line items with real costs
+function evalFormula(formula,x){
+  try{
+    // Safe math evaluation — only allow numbers, operators, ceil, floor, round, min, max
+    const safe=formula.replace(/[^0-9x+\-*/().,%]/g,'').replace(/ceil/g,'Math.ceil').replace(/floor/g,'Math.floor').replace(/round/g,'Math.round').replace(/min/g,'Math.min').replace(/max/g,'Math.max');
+    // eslint-disable-next-line no-new-func
+    return Math.max(0,Number(new Function('x','return '+safe)(x)));
+  }catch{return 0;}
+}
+
+function calcProtoTotal(proto){
+  return (proto.components||[]).reduce((s,c)=>{
+    const comp=catalogue.components.find(x=>x.id===c.comp_id);
+    return s+(comp?(parseFloat(comp.unit_price)||0)*(parseFloat(c.qty)||1):0);
+  },0);
+}
+
+function evalAssembly(asm,w,l){
+  const perimeter=2*(w+l);
+  const area=w*l;
+  const lineItems=[];
+
+  // Fixed protoassemblies
+  (asm.fixed_components||[]).forEach(f=>{
+    const proto=catalogue.protoassemblies.find(x=>x.id===f.proto_id);
+    if(!proto)return;
+    const unitCost=calcProtoTotal(proto);
+    const qty=parseFloat(f.qty)||1;
+    lineItems.push({
+      id:Date.now()+Math.random(),
+      desc:proto.name,
+      cat:'material',
+      qty,
+      price:unitCost,
+      source:'catalogue',
+      codeNote:''
+    });
+  });
+
+  // Rules
+  (asm.rules||[]).forEach(r=>{
+    const dimVal=r.basis==='perimeter'?perimeter:r.basis==='area'?area:r.basis==='width'?w:l;
+    const rawQty=evalFormula(r.formula||'0',dimVal);
+    if(rawQty<=0)return;
+
+    if(r.type==='protoassembly'){
+      const proto=catalogue.protoassemblies.find(x=>x.id===r.ref_id);
+      if(!proto)return;
+      const unitCost=calcProtoTotal(proto);
+      lineItems.push({
+        id:Date.now()+Math.random(),
+        desc:proto.name,
+        cat:'material',
+        qty:rawQty,
+        price:unitCost,
+        source:'catalogue',
+        codeNote:''
+      });
+    } else if(r.type==='component'){
+      const comp=catalogue.components.find(x=>x.id===r.ref_id);
+      if(!comp)return;
+      // Unit conversion: formula outputs feet, component may be priced per metre
+      let qty=rawQty;
+      let unitPrice=parseFloat(comp.unit_price)||0;
+      if(comp.unit==='m'){
+        qty=rawQty*FT_TO_M; // convert feet to metres
+      }
+      lineItems.push({
+        id:Date.now()+Math.random(),
+        desc:(comp.description||comp.technical_name||'Wire')+(comp.unit==='m'?` (${rawQty.toFixed(1)} ft → ${qty.toFixed(1)} m)`:''),
+        cat:'material',
+        qty:parseFloat(qty.toFixed(2)),
+        price:unitPrice,
+        source:'catalogue',
+        codeNote:''
+      });
+    }
+  });
+
+  return lineItems;
+}
+
+// ── ROOMS ─────────────────────────────────────────────────────
+function previewRoom(){
+  const asmId=parseInt(document.getElementById('room-asm-sel').value);
+  const w=parseFloat(document.getElementById('room-w').value)||0;
+  const l=parseFloat(document.getElementById('room-l').value)||0;
+  const preview=document.getElementById('room-preview');
+  if(!asmId||!w||!l){preview.innerHTML='';return;}
+  const asm=catalogue.assemblies.find(x=>x.id===asmId);
+  if(!asm){preview.innerHTML='';return;}
+  const items=evalAssembly(asm,w,l);
+  if(!items.length){preview.innerHTML='<div class="info-note">No catalogue items generated — check assembly rules.</div>';return;}
+  const tags=items.map(i=>`<span class="room-tag ${i.desc.toLowerCase().includes('wire')||i.desc.toLowerCase().includes('cable')?'wire':''}">${i.qty>1?(Number.isInteger(i.qty)?i.qty:i.qty.toFixed(1))+'× ':''}${i.desc}</span>`).join('');
+  preview.innerHTML=`<div style="font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.06em;font-weight:500;">Preview — ${w}×${l} ft (perimeter ${2*(w+l)} ft, area ${w*l} sq ft)</div><div style="display:flex;flex-wrap:wrap;gap:4px;">${tags}</div>`;
+}
+
+function addRoom(){
+  const asmId=parseInt(document.getElementById('room-asm-sel').value);
+  const w=parseFloat(document.getElementById('room-w').value)||0;
+  const l=parseFloat(document.getElementById('room-l').value)||0;
+  const label=document.getElementById('room-label').value.trim();
+  if(!asmId){showToast('Select an assembly.');return;}
+  if(!w||!l){showToast('Enter width and length.');return;}
+  const asm=catalogue.assemblies.find(x=>x.id===asmId);
+  if(!asm)return;
+  const lineItems=evalAssembly(asm,w,l);
+  rooms.push({id:Date.now(),asmId,asmName:asm.name,label,w,l,lineItems});
+  document.getElementById('room-asm-sel').value='';
+  document.getElementById('room-w').value='';
+  document.getElementById('room-l').value='';
+  document.getElementById('room-label').value='';
+  document.getElementById('room-preview').innerHTML='';
+  renderRooms();
+}
+
+function removeRoom(id){rooms=rooms.filter(r=>r.id!==id);renderRooms();}
+
+function renderRooms(){
+  const el=document.getElementById('room-list');
+  if(!rooms.length){el.innerHTML='<div class="empty-hint"><i class="ti ti-layout-grid"></i>No rooms added yet — select an assembly and enter dimensions.</div>';return;}
+  el.innerHTML=rooms.map(r=>{
+    const name=r.label?`${r.asmName} — ${r.label}`:r.asmName;
+    const tags=r.lineItems.map(i=>`<span class="room-tag ${i.desc.toLowerCase().includes('wire')||i.desc.toLowerCase().includes('cable')?'wire':''}">${i.qty>1?(Number.isInteger(i.qty)?i.qty:i.qty.toFixed(1))+'× ':''}${i.desc}</span>`).join('');
+    const total=r.lineItems.reduce((s,i)=>s+i.qty*i.price,0);
+    return`<div class="room-item">
+      <div class="room-item-left">
+        <div class="room-item-name">${name}</div>
+        <div class="room-item-dims">${r.w} × ${r.l} ft · perimeter ${2*(r.w+r.l)} ft · area ${r.w*r.l} sq ft</div>
+        <div class="room-item-tags">${tags}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;">
+        <span style="font-size:13px;font-weight:600;color:var(--blue)">$${total.toFixed(2)}</span>
+        <button class="room-item-del" onclick="removeRoom(${r.id})"><i class="ti ti-x"></i></button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── ADD-ONS ───────────────────────────────────────────────────
+function addAddon(){
+  const protoId=parseInt(document.getElementById('addon-proto-sel').value);
+  if(!protoId){showToast('Select a protoassembly.');return;}
+  const proto=catalogue.protoassemblies.find(x=>x.id===protoId);
+  if(!proto)return;
+  const unitCost=calcProtoTotal(proto);
+  addons.push({
+    id:Date.now(),protoId,protoName:proto.name,qty:1,
+    lineItems:[{id:Date.now()+1,desc:proto.name,cat:'material',qty:1,price:unitCost,source:'catalogue',codeNote:''}]
+  });
+  document.getElementById('addon-proto-sel').value='';
+  renderAddons();
+}
+
+function removeAddon(id){addons=addons.filter(a=>a.id!==id);renderAddons();}
+
+function renderAddons(){
+  const el=document.getElementById('addon-list');
+  if(!addons.length){el.innerHTML='';return;}
+  el.innerHTML=addons.map(a=>{
+    const total=a.lineItems.reduce((s,i)=>s+i.qty*i.price,0);
+    return`<div class="addon-item">
+      <span class="addon-item-name">${a.protoName}</span>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span class="addon-item-cost">$${total.toFixed(2)}</span>
+        <button class="addon-item-del" onclick="removeAddon(${a.id})"><i class="ti ti-x"></i></button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── AI ASSIST ─────────────────────────────────────────────────
+function checkApiKey(){
+  const key=localStorage.getItem('dwe_api_key')||'';
+  document.getElementById('api-banner').style.display=key?'none':'flex';
+}
 function getApiKey(){return localStorage.getItem('dwe_api_key')||'';}
 function saveKey(){
   const k=document.getElementById('api-key-input').value.trim();
-  if(!k){showToast('Please enter a valid API key.');return;}
+  if(!k){showToast('Enter a valid API key.');return;}
   localStorage.setItem('dwe_api_key',k);
   document.getElementById('api-banner').style.display='none';
   showToast('API key saved ✓');
 }
 
-function showToast(msg,duration=3000){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),duration);
-}
-
-window.addEventListener('DOMContentLoaded',()=>{
-  if(getApiKey())document.getElementById('api-banner').style.display='none';
-  document.getElementById('est-date').value=new Date().toISOString().split('T')[0];
-  renderRooms();
-});
-
-function switchTab(t,btn){
-  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('tab-'+t).classList.add('active');
-  if(btn)btn.classList.add('active');
-  if(t==='items')renderLineItems();
-}
-function switchTabDirect(t){
-  const map={'build':0,'items':1};
-  document.querySelectorAll('.tab').forEach((b,i)=>{if(i===map[t])b.classList.add('active');else b.classList.remove('active');});
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('tab-'+t).classList.add('active');
-  if(t==='items')renderLineItems();
-}
-
-function addRoom(){
-  const type=document.getElementById('room-type').value;
-  const sqft=document.getElementById('room-sqft').value;
-  if(!type)return;
-  rooms.push({type,sqft:sqft||'?'});
-  document.getElementById('room-type').value='';
-  document.getElementById('room-sqft').value='';
-  renderRooms();
-}
-function removeRoom(i){rooms.splice(i,1);renderRooms();}
-function renderRooms(){
-  const el=document.getElementById('rooms-list');
-  if(!rooms.length){el.innerHTML='<span style="font-size:12px;color:var(--muted)">No rooms added yet</span>';return;}
-  el.innerHTML=rooms.map((r,i)=>`<span class="room-tag">${r.type} · ${r.sqft} sq ft<button onclick="removeRoom(${i})" aria-label="Remove">×</button></span>`).join('');
-}
-
-async function startAI(){
+async function runAI(){
   const key=getApiKey();
   if(!key){document.getElementById('api-banner').style.display='flex';showToast('Enter your API key first.');return;}
   const desc=document.getElementById('job-desc').value.trim();
-  if(!desc&&rooms.length===0){showToast('Add a room or describe the job first.');return;}
-  const btn=document.getElementById('analyze-btn');
-  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Analyzing...';
+  if(!desc){showToast('Describe the job first.');return;}
+  const btn=document.getElementById('ai-btn');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Analyzing…';
   const area=document.getElementById('ai-area');
-  area.innerHTML=`<div class="ai-box thinking"><div class="ai-label blue"><span class="spinner"></span> Reading job description</div><div class="ai-msg">Applying Ontario Electrical Code rules and building your assessment…</div></div>`;
-  const roomSummary=rooms.map(r=>`${r.type} (${r.sqft} sq ft)`).join(', ');
-  const prompt=`You are an expert Ontario licensed electrician estimating assistant for DW Electric, a professional electrical and lighting design company in Ontario, Canada.
+  area.innerHTML=`<div class="ai-box thinking"><div class="ai-label blue"><span class="spinner dark"></span> Reading job description</div><div class="ai-msg">Applying Ontario Electrical Code rules and mapping to your catalogue…</div></div>`;
 
-Rooms: ${roomSummary||'Not specified'}
-Job description: ${desc||'Not specified'}
+  // Build catalogue context for AI
+  const protoContext=catalogue.protoassemblies.map(p=>`${p.id}:${p.name}($${calcProtoTotal(p).toFixed(2)})`).join(', ');
+  const roomSummary=rooms.map(r=>`${r.asmName} ${r.w}×${r.l}ft`).join(', ');
+
+  const prompt=`You are an expert Ontario licensed electrician estimating assistant for DW Electric, a professional electrical contractor in Ontario, Canada.
+
+Job type: ${jobType}
+Rooms already added: ${roomSummary||'none'}
+Job description: ${desc}
+
+Available protoassemblies in catalogue (id:name:cost): ${protoContext||'none loaded'}
 
 Return ONLY valid JSON (no markdown, no explanation):
 {
   "clarifications": [{"id":"c1","question":"Question text","options":["Option A","Option B"]}],
-  "ready_items": [{"desc":"Item description","cat":"labour","qty":10,"price":95,"code_note":"OEC ref if applicable"}],
-  "summary": "One sentence summary"
+  "ready_items": [{"desc":"Item description","cat":"material","qty":1,"price":0,"proto_id":null,"code_note":"OEC ref if applicable"}],
+  "summary": "One sentence summary of scope"
 }
 
 Rules:
-- Max 3 clarification questions, only where answer meaningfully changes scope
-- Kitchen: OEC 26-712 counter receptacle spacing (1 per 900mm), GFCI within 1.5m of sink, dedicated 20A for fridge/microwave/dishwasher
-- Bathroom: OEC 26-710 GFCI on all receptacles, min 1 dedicated 20A circuit
-- Garage/workshop: OEC 26-724 GFCI on all receptacles
-- Panel upgrades: always include ESA permit ($150)
-- Electrician labour $95/hr, apprentice $65/hr
-- Add code_note only where OEC drives the requirement
-- Keep line items concise — max 20 items total, bundle similar work together`;
+- Max 2 clarification questions, only where answer meaningfully changes scope
+- Map work to catalogue protoassemblies where possible — use proto_id and real price from catalogue context
+- For items not in catalogue, estimate price and leave proto_id null
+- Ontario Electrical Code: kitchen counter receptacles OEC 26-712 every 900mm, GFCI within 1.5m of sink, bathroom GFCI OEC 26-710, garage GFCI OEC 26-724
+- Panel upgrades always include ESA permit
+- Keep items concise — max 15 items, bundle similar work
+- Never include labour as a line item — labour is entered separately`;
 
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:4000,messages:[{role:'user',content:prompt}]})});
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:3000,messages:[{role:'user',content:prompt}]})
+    });
     const data=await res.json();
     if(data.error)throw new Error(data.error.message);
     const text=data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
@@ -344,25 +732,29 @@ Rules:
     window._aiResult=parsed;window._pendingClarify={};
     renderAIResult(parsed);
   }catch(e){
-    area.innerHTML=`<div class="ai-box" style="border-color:#ffaaaa;background:var(--red-light)"><div class="ai-msg" style="color:var(--red)"><i class="ti ti-alert-circle"></i> Error: ${e.message}. Check your API key and try again.</div></div>`;
+    area.innerHTML=`<div class="ai-box error"><div class="ai-label red"><i class="ti ti-alert-circle"></i> Error</div><div class="ai-msg">${e.message}. Check your API key and try again.</div></div>`;
   }
-  btn.disabled=false;btn.innerHTML='<i class="ti ti-sparkles"></i> Analyze &amp; build assessment';
+  btn.disabled=false;btn.innerHTML='<i class="ti ti-sparkles"></i> Analyze &amp; suggest items';
 }
 
 function renderAIResult(parsed){
   const area=document.getElementById('ai-area');
-  let html=`<div class="ai-box thinking"><div class="ai-label blue"><i class="ti ti-check"></i> Job understood</div><div class="ai-msg">${parsed.summary||''}</div></div>`;
+  let html=`<div class="ai-box thinking"><div class="ai-label blue"><i class="ti ti-check"></i> Scope understood</div><div class="ai-msg">${parsed.summary||''}</div></div>`;
   if(parsed.clarifications&&parsed.clarifications.length>0){
-    html+=`<div class="ai-box clarify"><div class="ai-label amber"><i class="ti ti-help-circle"></i> A few quick questions before I build the assessment</div>`;
+    html+=`<div class="ai-box clarify"><div class="ai-label amber"><i class="ti ti-help-circle"></i> A couple of quick questions</div>`;
     parsed.clarifications.forEach(q=>{
       html+=`<div class="clarify-q"><p>${q.question}</p>`;
-      if(q.options&&q.options.length){html+=`<div class="options">`;q.options.forEach(opt=>{html+=`<button onclick="pickClarify('${q.id}',this,'${opt.replace(/'/g,"\\'")}'">${opt}</button>`;});html+=`</div>`;}
+      if(q.options&&q.options.length){
+        html+=`<div class="options">`;
+        q.options.forEach(opt=>{html+=`<button onclick="pickClarify('${q.id}',this,'${opt.replace(/'/g,"\\'")}'">${opt}</button>`;});
+        html+=`</div>`;
+      }
       html+=`</div>`;
     });
-    html+=`<button class="btn btn-black" style="margin-top:10px" onclick="confirmAndBuild()"><i class="ti ti-arrow-right"></i> Build assessment with these answers</button></div>`;
+    html+=`<button class="btn btn-black" style="margin-top:10px" onclick="confirmAndBuild()"><i class="ti ti-arrow-right"></i> Build with these answers</button></div>`;
   } else {
-    applyItems(parsed.ready_items||[]);
-    html+=`<div style="margin-top:0.5rem"><button class="btn btn-blue" onclick="switchTabDirect('items')"><i class="ti ti-list"></i> View line items →</button></div>`;
+    applyAIItems(parsed.ready_items||[]);
+    html+=`<div class="ai-box success" style="margin-top:0"><div class="ai-label green"><i class="ti ti-check"></i> Items added</div><div class="ai-msg">Suggested items added to your assessment. Review them in the next step.</div></div>`;
   }
   area.innerHTML=html;
 }
@@ -375,42 +767,175 @@ function pickClarify(id,btn,val){
 }
 
 function confirmAndBuild(){
-  const parsed=window._aiResult;
-  applyItems(parsed.ready_items||[]);
-  document.getElementById('ai-area').innerHTML+=`<div class="ai-box success" style="margin-top:1rem"><div class="ai-label green"><i class="ti ti-check"></i> Assessment built</div><div class="ai-msg">Line items generated. Switch to the Line Items tab to review and adjust pricing.</div></div><div style="margin-top:0.75rem"><button class="btn btn-blue" onclick="switchTabDirect('items')"><i class="ti ti-list"></i> View line items →</button></div>`;
+  applyAIItems(window._aiResult?.ready_items||[]);
+  document.getElementById('ai-area').innerHTML+=`<div class="ai-box success" style="margin-top:0.75rem"><div class="ai-label green"><i class="ti ti-check"></i> Items added</div><div class="ai-msg">Review in the next step.</div></div>`;
 }
 
-function applyItems(items){
-  items.forEach(i=>lineItems.push({id:Date.now()+Math.random(),desc:i.desc,cat:i.cat||'material',qty:i.qty||1,price:i.price||0,codeNote:i.code_note||''}));
-}
-
-function addManualItem(){lineItems.push({id:Date.now(),desc:'',cat:'material',qty:1,price:0,codeNote:''});renderLineItems();}
-function removeLineItem(id){lineItems=lineItems.filter(i=>i.id!==id);renderLineItems();}
-function updateLine(id,field,value){const i=lineItems.find(x=>x.id===id);if(i){i[field]=(field==='qty'||field==='price')?parseFloat(value)||0:value;updateTotals();}}
-
-function renderLineItems(){
-  const c=document.getElementById('line-items-list');if(!c)return;
-  c.innerHTML='';
-  lineItems.forEach(item=>{
-    const row=document.createElement('div');row.className='line-row';
-    row.innerHTML=`<div class="line-desc"><input type="text" placeholder="Description" value="${item.desc.replace(/"/g,'&quot;')}" oninput="updateLine(${item.id},'desc',this.value)"/>${item.codeNote?`<span class="code-note">${item.codeNote}</span>`:''}</div><select onchange="updateLine(${item.id},'cat',this.value)"><option value="labour" ${item.cat==='labour'?'selected':''}>Labour</option><option value="material" ${item.cat==='material'?'selected':''}>Material</option><option value="permit" ${item.cat==='permit'?'selected':''}>Permit</option><option value="other" ${item.cat==='other'?'selected':''}>Other</option></select><input type="number" min="0" step="0.5" value="${item.qty}" oninput="updateLine(${item.id},'qty',this.value)"/><input type="number" min="0" step="0.01" value="${item.price}" oninput="updateLine(${item.id},'price',this.value)" placeholder="0.00"/><button class="del-btn" onclick="removeLineItem(${item.id})" aria-label="Remove"><i class="ti ti-trash"></i></button>`;
-    c.appendChild(row);
+function applyAIItems(items){
+  items.forEach(i=>{
+    // If AI matched a protoassembly, use catalogue price; otherwise use AI price
+    let price=parseFloat(i.price)||0;
+    if(i.proto_id){
+      const proto=catalogue.protoassemblies.find(x=>x.id===i.proto_id);
+      if(proto)price=calcProtoTotal(proto);
+    }
+    aiItems.push({id:Date.now()+Math.random(),desc:i.desc||'',cat:i.cat||'material',qty:parseFloat(i.qty)||1,price,codeNote:i.code_note||''});
   });
+}
+
+// ── LABOUR ────────────────────────────────────────────────────
+function addLabourRow(role='',hrs=0,rate=0){
+  labourRows.push({id:Date.now()+Math.random(),role,hrs,rate});
+}
+
+function removeLabourRow(id){labourRows=labourRows.filter(r=>r.id!==id);renderLabour();}
+
+function updateLabour(id,field,value){
+  const r=labourRows.find(x=>x.id===id);
+  if(r){r[field]=field==='role'?value:parseFloat(value)||0;}
+  renderLabour();
+}
+
+function renderLabour(){
+  const el=document.getElementById('labour-rows');
+  el.innerHTML=labourRows.map(r=>{
+    const sub=(r.hrs||0)*(r.rate||0);
+    return`<div class="labour-row">
+      <input type="text" value="${r.role||''}" placeholder="e.g. Electrician" oninput="updateLabour(${r.id},'role',this.value)"/>
+      <input type="number" min="0" step="0.5" value="${r.hrs||''}" placeholder="hrs" oninput="updateLabour(${r.id},'hrs',this.value)"/>
+      <input type="number" min="0" step="1" value="${r.rate||''}" placeholder="$/hr" oninput="updateLabour(${r.id},'rate',this.value)"/>
+      <div class="labour-total">$${sub.toFixed(2)}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── LINE ITEMS ────────────────────────────────────────────────
+let manualItems=[];
+
+function buildAllLineItems(){
+  // Rooms
+  // Add-ons
+  // AI items
+  // Manual
+  // (already stored in rooms[], addons[], aiItems[], manualItems[])
+}
+
+function renderAllLineItems(){
+  const el=document.getElementById('all-line-items');
+  let html='';
+
+  // Rooms
+  rooms.forEach(r=>{
+    const name=r.label?`${r.asmName} — ${r.label}`:r.asmName;
+    html+=`<div class="li-section">
+      <div class="li-section-title">${name} <span style="font-weight:400;font-size:11px">${r.w}×${r.l} ft</span></div>`;
+    r.lineItems.forEach(item=>{
+      html+=renderLIRow(item,'room',r.id);
+    });
+    html+=`</div>`;
+  });
+
+  // Add-ons
+  if(addons.length){
+    html+=`<div class="li-section"><div class="li-section-title">Add-ons &amp; protoassemblies</div>`;
+    addons.forEach(a=>{
+      a.lineItems.forEach(item=>{html+=renderLIRow(item,'addon',a.id);});
+    });
+    html+=`</div>`;
+  }
+
+  // AI items
+  if(aiItems.length){
+    html+=`<div class="li-section"><div class="li-section-title">AI-suggested items</div>`;
+    aiItems.forEach(item=>{html+=renderLIRow(item,'ai',null);});
+    html+=`</div>`;
+  }
+
+  // Manual items
+  if(manualItems.length){
+    html+=`<div class="li-section"><div class="li-section-title">Manual items</div>`;
+    manualItems.forEach(item=>{html+=renderLIRow(item,'manual',null);});
+    html+=`</div>`;
+  }
+
+  if(!html){html='<div class="empty-hint"><i class="ti ti-list"></i>No line items yet — add rooms, add-ons, or use AI assist.</div>';}
+  el.innerHTML=html;
+}
+
+function renderLIRow(item,source,sourceId){
+  const cats=['material','permit','other'];
+  const catOpts=cats.map(c=>`<option value="${c}" ${item.cat===c?'selected':''}>${c}</option>`).join('');
+  const canEdit=source==='ai'||source==='manual';
+  const lineTotal=(item.qty||0)*(item.price||0);
+  if(canEdit){
+    return`<div class="li-row">
+      <input type="text" value="${(item.desc||'').replace(/"/g,'&quot;')}" placeholder="Description" oninput="updateItem('${source}',${item.id},'desc',this.value)"/>
+      <select onchange="updateItem('${source}',${item.id},'cat',this.value)">${catOpts}</select>
+      <input type="number" min="0" step="0.01" value="${item.qty||0}" oninput="updateItem('${source}',${item.id},'qty',this.value)"/>
+      <input type="number" min="0" step="0.01" value="${item.price||0}" oninput="updateItem('${source}',${item.id},'price',this.value)"/>
+      <button class="li-del" onclick="removeItem('${source}',${item.id})"><i class="ti ti-trash"></i></button>
+    </div>`;
+  } else {
+    // Catalogue items — show but don't make fully editable (go back to edit rooms)
+    return`<div class="li-row">
+      <div style="font-size:13px;padding:5px 8px;">${item.desc||''}${item.codeNote?`<div style="font-size:10px;color:var(--blue);font-style:italic">${item.codeNote}</div>`:''}</div>
+      <div style="font-size:12px;color:var(--muted);padding:5px 8px;">${item.cat||'material'}</div>
+      <div style="font-size:13px;padding:5px 8px;">${item.qty||0}</div>
+      <div style="font-size:13px;padding:5px 8px;">$${(item.price||0).toFixed(2)}</div>
+      <div style="font-size:12px;color:var(--muted);padding:5px 4px;text-align:right">$${lineTotal.toFixed(2)}</div>
+    </div>`;
+  }
+}
+
+function updateItem(source,id,field,value){
+  const arr=source==='ai'?aiItems:manualItems;
+  const item=arr.find(x=>x.id===id);
+  if(item){item[field]=field==='qty'||field==='price'?parseFloat(value)||0:value;}
   updateTotals();
-  const cnt=document.getElementById('item-count');
-  if(cnt)cnt.textContent=lineItems.length+' item'+(lineItems.length!==1?'s':'');
 }
 
+function removeItem(source,id){
+  if(source==='ai')aiItems=aiItems.filter(x=>x.id!==id);
+  else if(source==='manual')manualItems=manualItems.filter(x=>x.id!==id);
+  renderAllLineItems();updateTotals();
+}
+
+function addManualItem(){
+  manualItems.push({id:Date.now()+Math.random(),desc:'',cat:'material',qty:1,price:0,codeNote:''});
+  renderAllLineItems();updateTotals();
+}
+
+// ── TOTALS ────────────────────────────────────────────────────
 function updateTotals(){
-  const sub=lineItems.reduce((s,i)=>s+(i.qty*i.price),0);
-  const tax=sub*TAX;
-  const s=document.getElementById('subtotal'),t=document.getElementById('tax'),g=document.getElementById('grand-total');
-  if(s)s.textContent='$'+sub.toFixed(2);
-  if(t)t.textContent='$'+tax.toFixed(2);
-  if(g)g.textContent='$'+(sub+tax).toFixed(2);
+  let materials=0;
+
+  rooms.forEach(r=>{r.lineItems.forEach(i=>{materials+=i.qty*i.price;});});
+  addons.forEach(a=>{a.lineItems.forEach(i=>{materials+=i.qty*i.price;});});
+  aiItems.forEach(i=>{materials+=i.qty*i.price;});
+  manualItems.forEach(i=>{materials+=i.qty*i.price;});
+
+  const labour=labourRows.reduce((s,r)=>s+(r.hrs||0)*(r.rate||0),0);
+  const combined=materials+labour;
+  const marginLow=(parseFloat(document.getElementById('margin-low')?.value)||0)/100;
+  const marginHigh=(parseFloat(document.getElementById('margin-high')?.value)||0)/100;
+  const rangeLow=combined*(1+marginLow);
+  const rangeHigh=combined*(1+marginHigh);
+
+  const fmt=n=>'$'+n.toLocaleString('en-CA',{minimumFractionDigits:0,maximumFractionDigits:0});
+
+  document.getElementById('total-materials').textContent='$'+materials.toFixed(2);
+  document.getElementById('total-labour').textContent='$'+labour.toFixed(2);
+  document.getElementById('total-combined').textContent='$'+combined.toFixed(2);
+  document.getElementById('total-range').textContent=`${fmt(rangeLow)} – ${fmt(rangeHigh)}`;
+  document.getElementById('total-hst').textContent=`${fmt(rangeLow*TAX)} – ${fmt(rangeHigh*TAX)}`;
 }
 
-function clearEstimate(){if(confirm('Clear all line items?')){lineItems=[];renderLineItems();}}
+// ── TOAST ─────────────────────────────────────────────────────
+function showToast(msg,d=3000){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),d);
+}
 </script>
 </body>
 </html>
