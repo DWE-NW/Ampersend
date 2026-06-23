@@ -704,16 +704,15 @@ function showToast(msg,d=3000){const t=document.getElementById('toast');t.textCo
 // Handle place_dev param — if coming from development settings "Place on map"
 const _placeDevId=new URLSearchParams(location.search).get('place_dev');
 if(_placeDevId){
+  // Set IMMEDIATELY so openDevModal always sees it regardless of timing
   window._placeDevId=parseInt(_placeDevId);
   setTimeout(()=>{
-    // Enter draw mode WITHOUT clearing cells (startAddJob clears — do it manually)
     drawMode=true;
     pendingCells=null;
+    selCells.clear();
     document.getElementById('draw-bar').classList.add('show');
     document.getElementById('draw-cnt').textContent='0 selected';
-    // Update draw bar message for placement mode
     document.querySelector('#draw-bar .draw-msg').textContent='Select cells to place development on map, then click Development';
-    // Hide Job button — only Development makes sense here
     document.querySelector('#draw-bar .nbtn.primary').style.display='none';
     drawGrid();
   },800);
