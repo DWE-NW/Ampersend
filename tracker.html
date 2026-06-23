@@ -316,7 +316,7 @@ function dbToJob(r){
   };
 }
 
-let jobs=[],filters=new Set(['active','quoted','scheduled','complete','urgent']);
+let jobs=[],filters=new Set(['active','quoted','scheduled','complete','urgent','development']);
 let selId=null,pendingLL=null,editId=null,gridLayer=null,searchPin=null,searchTO=null;
 let drawMode=false,selCells=new Set(),pendingCells=null;
 let geocodedLL=null; // stores lat/lng from address geocode in modal
@@ -370,8 +370,8 @@ function drawGrid(){
   const cellMap={};
   jobs.forEach(j=>{
     if(!filters.has(j.status))return;
-    // FIX: skip jobs with no coordinates
     if(j.lat===null||j.lng===null)return;
+    // Always calculate cell position from lat/lng at CURRENT zoom — never use stored cell keys
     const row=Math.floor(j.lat/la),col=Math.floor(j.lng/lo),k=`${row}_${col}`;
     if(!cellMap[k])cellMap[k]=[];
     cellMap[k].push(j);
