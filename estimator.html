@@ -164,6 +164,50 @@
     .api-banner input{flex:1;min-width:180px;font-size:13px;padding:7px 10px;border:0.5px solid var(--border);border-radius:4px;font-family:inherit;background:var(--white);}
     .api-banner input:focus{outline:none;border-color:var(--blue);}
 
+    /* PROJECT PICKER */
+    .project-picker{background:var(--surface);border:0.5px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:12px;}
+    .project-picker-title{font-size:11px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+    .project-search-row{display:flex;gap:8px;}
+    .project-search-row input{flex:1;font-size:13px;padding:7px 10px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;}
+    .project-search-row input:focus{outline:none;border-color:var(--blue);}
+    .project-results{margin-top:8px;background:var(--white);border:0.5px solid var(--border);border-radius:4px;max-height:160px;overflow-y:auto;display:none;}
+    .project-results.show{display:block;}
+    .project-result-item{padding:8px 10px;font-size:13px;cursor:pointer;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+    .project-result-item:last-child{border-bottom:none;}
+    .project-result-item:hover{background:var(--surface);}
+    .project-result-name{font-weight:500;}
+    .project-result-addr{font-size:11px;color:var(--muted);}
+    .project-linked{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--green-light);border:0.5px solid var(--green);border-radius:4px;font-size:13px;margin-top:8px;}
+    .project-linked i{color:var(--green);}
+    .project-linked-name{font-weight:500;flex:1;}
+    .project-linked-clr{background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;line-height:1;}
+
+    /* PROFIT DISPLAY */
+    .profit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;}
+    .profit-cell{background:var(--surface);border-radius:4px;padding:10px 12px;}
+    .profit-cell-label{font-size:10px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+    .profit-cell-val{font-size:16px;font-weight:600;letter-spacing:-0.02em;}
+    .profit-cell-val.green{color:var(--green);}
+    .profit-cell-val.blue{color:var(--blue);}
+    .margin-toggle{display:flex;gap:6px;margin-bottom:12px;}
+    .margin-toggle-btn{flex:1;padding:8px;border:0.5px solid var(--border);border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;background:var(--surface);color:var(--muted);font-family:inherit;text-align:center;}
+    .margin-toggle-btn.active{background:var(--blue-light);border-color:var(--blue);color:var(--blue);}
+
+    /* SAVE BANNER */
+    .save-banner{background:var(--green-light);border:0.5px solid var(--green);border-radius:6px;padding:10px 14px;margin-bottom:12px;display:none;align-items:center;gap:10px;font-size:13px;}
+    .save-banner.show{display:flex;}
+    .save-banner i{color:var(--green);}
+
+    /* PRINT STYLES */
+    @media print{
+      nav,.step-bar,.step-nav,#step-1,#step-2,#step-3,#step-4{display:none!important;}
+      .main{padding:0;max-width:100%;}
+      #step-5{display:block!important;}
+      .card{border:none;padding:0;margin-bottom:1rem;}
+      #all-line-items,.totals-block{display:none;}
+      #print-client{display:block!important;}
+    }
+    #print-client{display:none;}
     .spinner{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:-2px;}
     .spinner.dark{border-color:rgba(26,110,255,0.2);border-top-color:var(--blue);}
     @keyframes spin{to{transform:rotate(360deg);}}
@@ -211,7 +255,34 @@
   <!-- STEP 1: JOB DETAILS -->
   <div class="step-panel active" id="step-1">
     <div class="card">
-      <div class="card-title">Job type</div>
+      <div class="card-title">Project link <span style="font-size:12px;font-weight:400;color:var(--red)">— required</span></div>
+      <div class="project-picker">
+        <div class="project-picker-title">Link to existing project or create new</div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+          <button class="btn btn-sm" id="link-existing-btn" onclick="showProjectSearch()" style="flex:1"><i class="ti ti-search"></i> Search existing project</button>
+          <button class="btn btn-sm" id="create-new-btn" onclick="showCreateProject()" style="flex:1"><i class="ti ti-plus"></i> Create new project</button>
+        </div>
+        <div id="project-search-wrap" style="display:none">
+          <div class="project-search-row">
+            <input type="text" id="project-search-input" placeholder="Search by customer name or address…" oninput="searchProjects()"/>
+          </div>
+          <div class="project-results" id="project-results"></div>
+        </div>
+        <div id="create-project-wrap" style="display:none">
+          <div class="g2">
+            <div class="fg"><label>Customer name</label><input id="new-proj-customer" placeholder="Jane Smith"/></div>
+            <div class="fg"><label>Address</label><input id="new-proj-address" placeholder="123 Main St, Belleville ON"/></div>
+          </div>
+        </div>
+        <div id="project-linked-display" style="display:none">
+          <div class="project-linked">
+            <i class="ti ti-check"></i>
+            <span class="project-linked-name" id="project-linked-name"></span>
+            <button class="project-linked-clr" onclick="clearProjectLink()">×</button>
+          </div>
+        </div>
+      </div>
+    </div>
       <div class="job-type-grid">
         <button class="job-type-btn active" data-type="newbuild" onclick="setJobType('newbuild',this)">
           <i class="ti ti-home-plus"></i>New build / addition
@@ -326,11 +397,32 @@
 
     <div class="card">
       <div class="card-title">Margin</div>
-      <div class="g2">
+      <div class="margin-toggle">
+        <button class="margin-toggle-btn active" id="margin-spread-btn" onclick="setMarginMode('spread',this)"><i class="ti ti-arrows-left-right"></i> Spread (range)</button>
+        <button class="margin-toggle-btn" id="margin-single-btn" onclick="setMarginMode('single',this)"><i class="ti ti-target"></i> Single price</button>
+      </div>
+      <div class="g2" id="margin-spread-fields">
         <div class="fg"><label>Low margin %</label><input type="number" id="margin-low" value="8" min="0" max="100" oninput="updateTotals()"/></div>
         <div class="fg"><label>High margin %</label><input type="number" id="margin-high" value="15" min="0" max="100" oninput="updateTotals()"/></div>
       </div>
-      <div class="info-note">Margin is applied to materials + labour to produce the client-facing cost range. Client sees the range only — no breakdown.</div>
+      <div style="display:none" id="margin-single-fields">
+        <div class="fg" style="max-width:200px"><label>Margin %</label><input type="number" id="margin-single" value="10" min="0" max="100" oninput="updateTotals()"/></div>
+      </div>
+      <div class="info-note">Margin applied to materials + labour. Client sees the price only — no breakdown.</div>
+      <div class="profit-grid" id="profit-grid">
+        <div class="profit-cell">
+          <div class="profit-cell-label">Cost basis</div>
+          <div class="profit-cell-val" id="profit-cost">$0</div>
+        </div>
+        <div class="profit-cell">
+          <div class="profit-cell-label">Client price</div>
+          <div class="profit-cell-val green" id="profit-revenue">$0</div>
+        </div>
+        <div class="profit-cell">
+          <div class="profit-cell-label">Your profit</div>
+          <div class="profit-cell-val blue" id="profit-profit">$0</div>
+        </div>
+      </div>
     </div>
 
     <div class="step-nav">
@@ -375,9 +467,57 @@
       </div>
     </div>
 
+    <div class="save-banner" id="save-banner">
+      <i class="ti ti-check"></i><span id="save-banner-msg">Assessment saved to project.</span>
+    </div>
+
     <div class="step-nav">
       <button class="btn" onclick="goStep(4)"><i class="ti ti-arrow-left"></i> Back</button>
-      <button class="btn btn-black" onclick="window.print()"><i class="ti ti-printer"></i> Print / PDF</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-black" onclick="saveAssessment()"><i class="ti ti-device-floppy"></i> Save to project</button>
+        <button class="btn" onclick="window.print()"><i class="ti ti-printer"></i> Client PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRINT-ONLY CLIENT VIEW -->
+  <div id="print-client">
+    <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:680px;margin:0 auto;padding:2rem;">
+      <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #1a1a1a;padding-bottom:1rem;margin-bottom:1.5rem;">
+        <div>
+          <div style="font-size:22px;font-weight:700;letter-spacing:-0.03em">DW—Electric</div>
+          <div style="font-size:12px;color:#888;margin-top:2px">535 County Rd. 46, Havelock, Ontario K0L 1Z0</div>
+          <div style="font-size:12px;color:#888">hello@dwelectric.ca · 705.778.3322</div>
+          <div style="font-size:12px;color:#888">HST: 106599178RT0001</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:11px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:#888;margin-bottom:4px">Assessment</div>
+          <div style="font-size:18px;font-weight:600" id="print-asm-num"></div>
+          <div style="font-size:12px;color:#888" id="print-date"></div>
+        </div>
+      </div>
+      <div style="margin-bottom:1.5rem;">
+        <div style="font-size:11px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:#888;margin-bottom:4px">Client</div>
+        <div style="font-size:15px;font-weight:600" id="print-customer"></div>
+        <div style="font-size:13px;color:#555" id="print-address"></div>
+      </div>
+      <div style="margin-bottom:1.5rem;">
+        <div style="font-size:11px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:#888;margin-bottom:8px">Project description</div>
+        <div style="font-size:13px;line-height:1.7;color:#333" id="print-desc"></div>
+      </div>
+      <div style="background:#f5f5f3;border-radius:6px;padding:1.25rem;margin-bottom:1.5rem;">
+        <div style="font-size:11px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:#888;margin-bottom:10px">Investment</div>
+        <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:600;margin-bottom:6px;">
+          <span>Estimated project cost</span><span id="print-price" style="color:#1a6eff"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;color:#888;">
+          <span>HST (13%)</span><span id="print-hst"></span>
+        </div>
+        <div style="border-top:1px solid #e2e2e2;margin-top:10px;padding-top:10px;display:flex;justify-content:space-between;font-size:16px;font-weight:700;">
+          <span>Total (incl. HST)</span><span id="print-total"></span>
+        </div>
+      </div>
+      <div style="font-size:12px;color:#888;line-height:1.6;border-top:0.5px solid #e2e2e2;padding-top:1rem;" id="print-terms"></div>
     </div>
   </div>
 
@@ -394,11 +534,15 @@ const FT_TO_M=0.3048;
 // ── STATE ─────────────────────────────────────────────────────
 let catalogue={components:[],branches:[],protoassemblies:[],assemblies:[]};
 let jobType='newbuild';
-let rooms=[];      // [{id, asmId, asmName, label, w, l, lineItems:[]}]
-let addons=[];     // [{id, protoId, protoName, qty, lineItems:[]}]
-let aiItems=[];    // [{id, desc, cat, qty, price, codeNote}]
-let labourRows=[]; // [{id, role, hrs, rate}]
+let rooms=[];
+let addons=[];
+let aiItems=[];
+let labourRows=[];
 let currentStep=1;
+let marginMode='spread';
+let linkedProjectId=null;
+let linkedAssessmentId=null;
+let allProjects=[];
 
 // ── INIT ──────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded',async()=>{
@@ -409,6 +553,35 @@ window.addEventListener('DOMContentLoaded',async()=>{
   addLabourRow('Electrician',0,85);
   addLabourRow('Apprentice',0,45);
   renderLabour();
+
+  // Load all projects for picker
+  try{
+    const rows=await dbGet('projects?select=id,customer,address,status&order=created_at.desc');
+    allProjects=rows;
+  }catch(e){console.error(e);}
+
+  // Check for project_id in URL
+  const params=new URLSearchParams(location.search);
+  const pid=params.get('project_id');
+  if(pid){
+    const proj=allProjects.find(p=>p.id===parseInt(pid));
+    if(proj){
+      linkProject(proj);
+      document.getElementById('cust-name').value=proj.customer||'';
+      document.getElementById('job-addr').value=proj.address||'';
+    }
+    // Try to load existing assessment for this project
+    try{
+      const asms=await dbGet(`assessments?project_id=eq.${pid}&order=created_at.desc&limit=1`);
+      if(asms&&asms[0])loadAssessmentData(asms[0]);
+    }catch(e){console.error(e);}
+  }
+
+  // Check for print=client param
+  if(params.get('print')==='client'){
+    goStep(5);
+    setTimeout(()=>{buildAllLineItems();renderAllLineItems();updateTotals();preparePrint();window.print();},400);
+  }
 });
 
 async function loadCatalogue(){
@@ -467,7 +640,7 @@ function goStep(n){
     else if(i+1<n)p.classList.add('done');
   });
   currentStep=n;
-  if(n===5){buildAllLineItems();renderAllLineItems();updateTotals();}
+  if(n===5){buildAllLineItems();renderAllLineItems();updateTotals();preparePrint();}
   window.scrollTo(0,0);
 }
 
@@ -499,11 +672,17 @@ function setJobType(type,btn){
 // Evaluates assembly rules given dimensions, returns line items with real costs
 function evalFormula(formula,x){
   try{
-    // Safe math evaluation — only allow numbers, operators, ceil, floor, round, min, max
-    const safe=formula.replace(/[^0-9x+\-*/().,%]/g,'').replace(/ceil/g,'Math.ceil').replace(/floor/g,'Math.floor').replace(/round/g,'Math.round').replace(/min/g,'Math.min').replace(/max/g,'Math.max');
+    const safe=formula.replace(/ceil/g,'Math.ceil').replace(/floor/g,'Math.floor').replace(/round/g,'Math.round').replace(/min/g,'Math.min').replace(/max/g,'Math.max').replace(/[^0-9x+\-*/().,%Math]/g,'');
     // eslint-disable-next-line no-new-func
-    return Math.max(0,Number(new Function('x','return '+safe)(x)));
+    const result=Number(new Function('x','return '+safe)(x));
+    return Math.max(0,result);
   }catch{return 0;}
+}
+
+function roundQty(n){
+  // If result is very close to an integer, round it
+  const rounded=Math.round(n);
+  return Math.abs(n-rounded)<0.001?rounded:parseFloat(n.toFixed(2));
 }
 
 function calcProtoTotal(proto){
@@ -538,7 +717,7 @@ function evalAssembly(asm,w,l){
   // Rules
   (asm.rules||[]).forEach(r=>{
     const dimVal=r.basis==='perimeter'?perimeter:r.basis==='area'?area:r.basis==='width'?w:l;
-    const rawQty=evalFormula(r.formula||'0',dimVal);
+    const rawQty=roundQty(evalFormula(r.formula||'0',dimVal));
     if(rawQty<=0)return;
 
     if(r.type==='protoassembly'){
@@ -561,7 +740,7 @@ function evalAssembly(asm,w,l){
       let qty=rawQty;
       let unitPrice=parseFloat(comp.unit_price)||0;
       if(comp.unit==='m'){
-        qty=rawQty*FT_TO_M; // convert feet to metres
+        qty=roundQty(rawQty*FT_TO_M);
       }
       lineItems.push({
         id:Date.now()+Math.random(),
@@ -908,7 +1087,6 @@ function addManualItem(){
 // ── TOTALS ────────────────────────────────────────────────────
 function updateTotals(){
   let materials=0;
-
   rooms.forEach(r=>{r.lineItems.forEach(i=>{materials+=i.qty*i.price;});});
   addons.forEach(a=>{a.lineItems.forEach(i=>{materials+=i.qty*i.price;});});
   aiItems.forEach(i=>{materials+=i.qty*i.price;});
@@ -916,18 +1094,195 @@ function updateTotals(){
 
   const labour=labourRows.reduce((s,r)=>s+(r.hrs||0)*(r.rate||0),0);
   const combined=materials+labour;
-  const marginLow=(parseFloat(document.getElementById('margin-low')?.value)||0)/100;
-  const marginHigh=(parseFloat(document.getElementById('margin-high')?.value)||0)/100;
-  const rangeLow=combined*(1+marginLow);
-  const rangeHigh=combined*(1+marginHigh);
 
-  const fmt=n=>'$'+n.toLocaleString('en-CA',{minimumFractionDigits:0,maximumFractionDigits:0});
+  let ml,mh;
+  if(marginMode==='single'){
+    ml=mh=(parseFloat(document.getElementById('margin-single')?.value)||0)/100;
+  } else {
+    ml=(parseFloat(document.getElementById('margin-low')?.value)||0)/100;
+    mh=(parseFloat(document.getElementById('margin-high')?.value)||0)/100;
+  }
+  const revLow=combined*(1+ml);
+  const revHigh=combined*(1+mh);
+  const profitLow=revLow-combined;
+  const profitHigh=revHigh-combined;
 
-  document.getElementById('total-materials').textContent='$'+materials.toFixed(2);
-  document.getElementById('total-labour').textContent='$'+labour.toFixed(2);
-  document.getElementById('total-combined').textContent='$'+combined.toFixed(2);
-  document.getElementById('total-range').textContent=`${fmt(rangeLow)} – ${fmt(rangeHigh)}`;
-  document.getElementById('total-hst').textContent=`${fmt(rangeLow*TAX)} – ${fmt(rangeHigh*TAX)}`;
+  const fmt=n=>'$'+Math.round(n).toLocaleString('en-CA');
+  const fmtRange=(lo,hi)=>lo===hi?fmt(lo):`${fmt(lo)} – ${fmt(hi)}`;
+
+  // Summary section
+  const mats=document.getElementById('total-materials');if(mats)mats.textContent='$'+materials.toFixed(2);
+  const lab=document.getElementById('total-labour');if(lab)lab.textContent='$'+labour.toFixed(2);
+  const comb=document.getElementById('total-combined');if(comb)comb.textContent='$'+combined.toFixed(2);
+  const range=document.getElementById('total-range');if(range)range.textContent=fmtRange(revLow,revHigh);
+  const hst=document.getElementById('total-hst');if(hst)hst.textContent=fmtRange(revLow*TAX,revHigh*TAX);
+
+  // Profit cells on Step 4
+  const pc=document.getElementById('profit-cost');if(pc)pc.textContent=fmt(combined);
+  const pr=document.getElementById('profit-revenue');if(pr)pr.textContent=fmtRange(revLow,revHigh);
+  const pp=document.getElementById('profit-profit');if(pp)pp.textContent=fmtRange(profitLow,profitHigh);
+}
+
+// ── PROJECT PICKER ────────────────────────────────────────────
+function showProjectSearch(){
+  document.getElementById('project-search-wrap').style.display='block';
+  document.getElementById('create-project-wrap').style.display='none';
+  document.getElementById('project-search-input').focus();
+}
+function showCreateProject(){
+  document.getElementById('create-project-wrap').style.display='block';
+  document.getElementById('project-search-wrap').style.display='none';
+}
+function searchProjects(){
+  const q=document.getElementById('project-search-input').value.toLowerCase();
+  const results=document.getElementById('project-results');
+  if(!q){results.classList.remove('show');return;}
+  const filtered=allProjects.filter(p=>(p.customer||'').toLowerCase().includes(q)||(p.address||'').toLowerCase().includes(q));
+  if(!filtered.length){results.innerHTML='<div style="padding:8px 10px;font-size:12px;color:var(--muted)">No projects found</div>';results.classList.add('show');return;}
+  results.innerHTML=filtered.slice(0,8).map(p=>`<div class="project-result-item" onclick="linkProject(${JSON.stringify(p).replace(/"/g,'&quot;')})">
+    <div><div class="project-result-name">${p.customer||'—'}</div><div class="project-result-addr">${p.address||''}</div></div>
+    <span style="font-size:10px;color:var(--muted);text-transform:capitalize">${p.status||''}</span>
+  </div>`).join('');
+  results.classList.add('show');
+}
+function linkProject(proj){
+  linkedProjectId=proj.id;
+  document.getElementById('project-linked-name').textContent=`${proj.customer||'Project'} — ${proj.address||''}`;
+  document.getElementById('project-linked-display').style.display='block';
+  document.getElementById('project-search-wrap').style.display='none';
+  document.getElementById('create-project-wrap').style.display='none';
+  document.getElementById('project-results').classList.remove('show');
+  // Auto-fill customer/address
+  if(proj.customer)document.getElementById('cust-name').value=proj.customer;
+  if(proj.address)document.getElementById('job-addr').value=proj.address;
+}
+function clearProjectLink(){
+  linkedProjectId=null;linkedAssessmentId=null;
+  document.getElementById('project-linked-display').style.display='none';
+}
+
+// ── MARGIN MODE ───────────────────────────────────────────────
+function setMarginMode(mode,btn){
+  marginMode=mode;
+  document.querySelectorAll('.margin-toggle-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('margin-spread-fields').style.display=mode==='spread'?'grid':'none';
+  document.getElementById('margin-single-fields').style.display=mode==='single'?'block':'none';
+  updateTotals();
+}
+
+// ── SAVE ASSESSMENT ───────────────────────────────────────────
+async function saveAssessment(){
+  // Create new project if needed
+  let projectId=linkedProjectId;
+  if(!projectId){
+    const newCust=document.getElementById('new-proj-customer')?.value.trim();
+    const newAddr=document.getElementById('new-proj-address')?.value.trim();
+    if(!newCust){showToast('Link a project or create a new one first.');return;}
+    try{
+      const rows=await dbPost('projects',{customer:newCust,address:newAddr||'',phone:'',email:'',type:'residential',status:'quoted',stage:0,notes:'',custom_fields:JSON.stringify({})});
+      if(rows&&rows[0]){projectId=rows[0].id;linkedProjectId=projectId;allProjects.push(rows[0]);}
+    }catch(e){showToast('Could not create project: '+e.message);return;}
+  }
+
+  const assessmentData={
+    project_id:projectId,
+    assessment_number:document.getElementById('est-num').value||'EST-001',
+    job_type:jobType,
+    customer:document.getElementById('cust-name').value||'',
+    address:document.getElementById('job-addr').value||'',
+    notes:document.getElementById('job-notes').value||'',
+    rooms:JSON.stringify(rooms),
+    addons:JSON.stringify(addons),
+    ai_items:JSON.stringify(aiItems),
+    manual_items:JSON.stringify(manualItems),
+    labour:JSON.stringify(labourRows),
+    margin_mode:marginMode,
+    margin_low:parseFloat(document.getElementById('margin-low')?.value)||8,
+    margin_high:marginMode==='single'?parseFloat(document.getElementById('margin-single')?.value)||10:parseFloat(document.getElementById('margin-high')?.value)||15,
+    client_description:document.getElementById('client-desc')?.value||'',
+    terms:document.getElementById('terms-text')?.value||'',
+    status:'draft'
+  };
+
+  try{
+    let saved;
+    if(linkedAssessmentId){
+      saved=await dbPatch(`assessments?id=eq.${linkedAssessmentId}`,assessmentData);
+    } else {
+      saved=await dbPost('assessments',assessmentData);
+      if(saved&&saved[0])linkedAssessmentId=saved[0].id;
+    }
+    // Update project status to quoted
+    await dbPatch(`projects?id=eq.${projectId}`,{status:'quoted'});
+    const banner=document.getElementById('save-banner');
+    document.getElementById('save-banner-msg').textContent='Assessment saved to project.';
+    banner.classList.add('show');
+    setTimeout(()=>banner.classList.remove('show'),4000);
+  }catch(e){showToast('Save failed: '+e.message);}
+}
+
+async function dbPost(table,data){
+  const res=await fetch(`${SB_URL}/rest/v1/${table}`,{method:'POST',headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(data)});
+  if(!res.ok)throw new Error(await res.text());
+  const t=await res.text();return t?JSON.parse(t):[];
+}
+async function dbPatch(path,data){
+  const res=await fetch(`${SB_URL}/rest/v1/${path}`,{method:'PATCH',headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(data)});
+  if(!res.ok)throw new Error(await res.text());
+  const t=await res.text();return t?JSON.parse(t):[];
+}
+
+function loadAssessmentData(asm){
+  linkedAssessmentId=asm.id;
+  if(asm.assessment_number)document.getElementById('est-num').value=asm.assessment_number;
+  if(asm.job_type){jobType=asm.job_type;document.querySelectorAll('.job-type-btn').forEach(b=>{b.classList.toggle('active',b.dataset.type===asm.job_type);});}
+  if(asm.customer)document.getElementById('cust-name').value=asm.customer;
+  if(asm.address)document.getElementById('job-addr').value=asm.address;
+  if(asm.notes)document.getElementById('job-notes').value=asm.notes;
+  if(asm.client_description)document.getElementById('client-desc').value=asm.client_description;
+  if(asm.terms)document.getElementById('terms-text').value=asm.terms;
+  const safeJ=s=>{try{return s?JSON.parse(s):[];}catch{return[];}};
+  rooms=safeJ(asm.rooms);
+  addons=safeJ(asm.addons);
+  aiItems=safeJ(asm.ai_items);
+  manualItems=safeJ(asm.manual_items);
+  labourRows=safeJ(asm.labour);
+  marginMode=asm.margin_mode||'spread';
+  if(asm.margin_low!=null){const el=document.getElementById('margin-low');if(el)el.value=asm.margin_low;}
+  if(asm.margin_high!=null){const el=document.getElementById('margin-high');if(el)el.value=asm.margin_high;}
+  renderLabour();renderRooms();renderAddons();
+  showToast('Assessment loaded ✓');
+}
+
+// ── PREPARE PRINT ─────────────────────────────────────────────
+function preparePrint(){
+  document.getElementById('print-asm-num').textContent=document.getElementById('est-num').value||'';
+  document.getElementById('print-date').textContent=document.getElementById('est-date').value||'';
+  document.getElementById('print-customer').textContent=document.getElementById('cust-name').value||'';
+  document.getElementById('print-address').textContent=document.getElementById('job-addr').value||'';
+  document.getElementById('print-desc').textContent=document.getElementById('client-desc').value||'Electrical work as per scope discussed.';
+  document.getElementById('print-terms').textContent=document.getElementById('terms-text').value||'';
+
+  // Get totals
+  let materials=0;
+  rooms.forEach(r=>{r.lineItems.forEach(i=>{materials+=i.qty*i.price;});});
+  addons.forEach(a=>{a.lineItems.forEach(i=>{materials+=i.qty*i.price;});});
+  aiItems.forEach(i=>{materials+=i.qty*i.price;});
+  manualItems.forEach(i=>{materials+=i.qty*i.price;});
+  const labour=labourRows.reduce((s,r)=>s+(r.hrs||0)*(r.rate||0),0);
+  const combined=materials+labour;
+  const ml=(parseFloat(document.getElementById('margin-low')?.value)||0)/100;
+  const mh=marginMode==='single'?(parseFloat(document.getElementById('margin-single')?.value)||0)/100:(parseFloat(document.getElementById('margin-high')?.value)||0)/100;
+  const revLow=combined*(1+ml);
+  const revHigh=marginMode==='single'?revLow:combined*(1+mh);
+  const fmt=n=>'$'+Math.round(n).toLocaleString('en-CA');
+  const priceStr=marginMode==='single'?fmt(revLow):`${fmt(revLow)} – ${fmt(revHigh)}`;
+  const hstLow=revLow*0.13,hstHigh=revHigh*0.13;
+  const totalLow=revLow+hstLow,totalHigh=revHigh+hstHigh;
+  document.getElementById('print-price').textContent=priceStr;
+  document.getElementById('print-hst').textContent=marginMode==='single'?fmt(hstLow):`${fmt(hstLow)} – ${fmt(hstHigh)}`;
+  document.getElementById('print-total').textContent=marginMode==='single'?fmt(totalLow):`${fmt(totalLow)} – ${fmt(totalHigh)}`;
 }
 
 // ── TOAST ─────────────────────────────────────────────────────

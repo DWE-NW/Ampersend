@@ -141,6 +141,8 @@
     .mbtn.primary:hover{background:#333;}
     .leaflet-control-zoom{border:0.5px solid var(--border)!important;border-radius:6px!important;overflow:hidden;}
     .leaflet-control-zoom a{color:var(--black)!important;}
+    .toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9000;background:var(--black);color:#fff;padding:10px 16px;border-radius:6px;font-size:13px;display:none;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,0.2);}
+    .toast.show{display:flex;}
   </style>
 </head>
 <body>
@@ -222,8 +224,8 @@
       <div class="dpb" id="dp-body"></div>
       <div class="dpa">
         <button class="dbtn" onclick="doEdit()"><i class="ti ti-edit"></i> Edit</button>
-        <button class="dbtn" onclick="doDelete()"><i class="ti ti-trash"></i> Delete</button>
-        <button class="dbtn primary" onclick="window.location.href='/estimator.html'"><i class="ti ti-file-dollar"></i> Estimate</button>
+        <button class="dbtn" id="dbtn-del" onclick="doDelete()"><i class="ti ti-trash"></i> Delete</button>
+        <button class="dbtn primary" id="dbtn-estimate" onclick="openEstimate()"><i class="ti ti-file-dollar"></i> Estimate</button>
       </div>
     </div>
   </div>
@@ -527,10 +529,29 @@ function doEdit(){
 
 async function doDelete(){
   if(!selId)return;
-  if(confirm('Remove this job?')){
+  const btn=document.getElementById('dbtn-del');
+  if(btn._confirming){
+    clearTimeout(btn._timer);
+    btn._confirming=false;
+    btn.innerHTML='<i class="ti ti-trash"></i> Delete';
+    btn.style.background='';btn.style.color='';btn.style.borderColor='';
     try{await dbFetch(`${TABLE}?id=eq.${selId}`,{method:'DELETE'});}catch(e){console.error(e);}
     closeDetail();await loadJobs();
+    return;
   }
+  btn._confirming=true;
+  btn.innerHTML='<i class="ti ti-trash"></i> Confirm?';
+  btn.style.background='#dc3545';btn.style.color='#fff';btn.style.borderColor='#dc3545';
+  btn._timer=setTimeout(()=>{
+    btn._confirming=false;
+    btn.innerHTML='<i class="ti ti-trash"></i> Delete';
+    btn.style.background='';btn.style.color='';btn.style.borderColor='';
+  },3000);
+}
+
+function openEstimate(){
+  if(!selId)return;
+  window.location.href=`/estimator.html?project_id=${selId}`;
 }
 
 function closeModal(){
@@ -541,13 +562,12 @@ function closeModal(){
 
 async function saveJob(){
   const cust=document.getElementById('f-cust').value.trim();
-  if(!cust){alert('Please enter a customer name.');return;}
+  if(!cust){showToast('Please enter a customer name.');return;}
   const addrVal=document.getElementById('f-addr').value.trim();
-  // Use geocoded coords if available, else pendingLL from draw, else null
   const ll=geocodedLL||pendingLL||null;
   if(!ll&&!editId){
-    // For new jobs, require address search
-    if(!addrVal){alert('Please enter an address and click Locate to place this job on the map.');return;}
+    if(!addrVal){showToast('Please enter an address and click Locate to place this job on the map.');return;}
+  }
   }
   const data={
     customer:cust,phone:document.getElementById('f-phone').value,
@@ -563,7 +583,7 @@ async function saveJob(){
     if(editId){await dbFetch(`${TABLE}?id=eq.${editId}`,{method:'PATCH',body:JSON.stringify(data)});}
     else{await dbFetch(`${TABLE}`,{method:'POST',body:JSON.stringify(data)});}
     await loadJobs();
-  }catch(e){alert('Error saving: '+e.message);}
+  }catch(e){showToast('Error saving: '+e.message);}
   closeModal();
 }
 
@@ -680,17 +700,23 @@ async function saveDev(){
 map.on('click',()=>{closeDetail();sr.classList.remove('show');});
 loadJobs();
 
+function showToast(msg,d=3000){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d);}
+
 // Handle place_dev param — if coming from development settings "Place on map"
 const _placeDevId=new URLSearchParams(location.search).get('place_dev');
 if(_placeDevId){
+  window._placeDevId=parseInt(_placeDevId);
   setTimeout(()=>{
-    startAddJob();
-    document.getElementById('draw-bar').innerHTML=document.getElementById('draw-bar').innerHTML.replace(
-      'Click cells to outline the area',
-      'Select cells to place development on map, then click Development'
-    );
-    // Pre-select development in modal when user clicks Development
-    window._placeDevId=parseInt(_placeDevId);
+    // Enter draw mode WITHOUT clearing cells (startAddJob clears — do it manually)
+    drawMode=true;
+    pendingCells=null;
+    document.getElementById('draw-bar').classList.add('show');
+    document.getElementById('draw-cnt').textContent='0 selected';
+    // Update draw bar message for placement mode
+    document.querySelector('#draw-bar .draw-msg').textContent='Select cells to place development on map, then click Development';
+    // Hide Job button — only Development makes sense here
+    document.querySelector('#draw-bar .nbtn.primary').style.display='none';
+    drawGrid();
   },800);
 }
 
@@ -752,6 +778,8 @@ async function doSearch(q){
 function flyTo(lat,lng,label){sinput.value=label;sr.classList.remove('show');sclr.style.display='block';if(searchPin)map.removeLayer(searchPin);map.flyTo([lat,lng],19,{duration:1.2});const icon=L.divIcon({className:'',html:`<div style="width:12px;height:12px;border-radius:50%;background:#1a6eff;border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3)"></div>`,iconSize:[12,12],iconAnchor:[6,6]});searchPin=L.marker([lat,lng],{icon}).addTo(map);}
 function clearSearch(){sinput.value='';sclr.style.display='none';sr.classList.remove('show');if(searchPin){map.removeLayer(searchPin);searchPin=null;}}
 </script>
+
+<div class="toast" id="toast"></div>
 
 <!-- ADD DEVELOPMENT MODAL -->
 <div class="overlay" id="dev-overlay">

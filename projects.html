@@ -12,7 +12,7 @@
       --border:#e2e2e2;--muted:#888;--blue-light:#e8f0ff;
       --sa:#1a6eff;--sq:#BA7517;--ss:#1e7e34;--sc:#888;--su:#dc3545;
     }
-    html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--black);background:var(--surface);}
+    html,body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--black);background:var(--surface);}
     nav{height:52px;background:var(--white);border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;position:sticky;top:0;z-index:100;}
     .nl{display:flex;align-items:center;gap:12px;}
     .logo{font-size:16px;font-weight:600;letter-spacing:-0.03em;color:var(--black);text-decoration:none;}
@@ -20,19 +20,19 @@
     .nsep{width:0.5px;height:18px;background:var(--border);}
     .ntitle{font-size:13px;font-weight:500;}
     .nr{display:flex;align-items:center;gap:8px;}
-    .nbtn{padding:6px 12px;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:var(--white);color:var(--black);display:flex;align-items:center;gap:5px;font-family:inherit;}
+    .nbtn{padding:6px 12px;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:var(--white);color:var(--black);display:flex;align-items:center;gap:5px;font-family:inherit;text-decoration:none;}
     .nbtn:hover{background:var(--surface);}
     .nbtn.primary{background:var(--black);color:#fff;border-color:var(--black);}
     .nbtn.primary:hover{background:#333;}
-
+    .nbtn.blue{background:var(--blue);color:#fff;border-color:var(--blue);}
+    .nbtn.danger{color:var(--su);}
+    .nbtn.danger:hover{background:#fff0f0;border-color:var(--su);}
     .main{padding:1.5rem;max-width:1400px;margin:0 auto;}
-
     .toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:10px;}
     .toolbar-left{display:flex;align-items:center;gap:8px;}
     .search-wrap{display:flex;align-items:center;gap:7px;background:var(--white);border:0.5px solid var(--border);border-radius:6px;padding:7px 10px;width:240px;}
     .search-wrap i{color:var(--muted);font-size:15px;}
     .search-wrap input{border:none;background:transparent;font-size:13px;color:var(--black);font-family:inherit;outline:none;width:100%;}
-    .search-wrap input::placeholder{color:var(--muted);}
     .filter-wrap{display:flex;gap:5px;}
     .fchip{padding:4px 10px;border-radius:99px;font-size:11px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:var(--white);color:var(--muted);font-family:inherit;}
     .fchip.on{color:#fff;border-color:transparent;}
@@ -41,17 +41,15 @@
     .fchip[data-s="scheduled"].on{background:var(--ss);}
     .fchip[data-s="complete"].on{background:var(--sc);}
     .fchip[data-s="urgent"].on{background:var(--su);}
-
     .table-wrap{background:var(--white);border:0.5px solid var(--border);border-radius:8px;overflow:hidden;}
     .tbl{width:100%;border-collapse:collapse;font-size:13px;}
-    .tbl th{font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);padding:9px 14px;border-bottom:0.5px solid var(--border);text-align:left;background:var(--surface);white-space:nowrap;position:relative;}
+    .tbl th{font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);padding:9px 14px;border-bottom:0.5px solid var(--border);text-align:left;background:var(--surface);white-space:nowrap;}
     .tbl th.sortable{cursor:pointer;}
     .tbl th.sortable:hover{color:var(--black);}
     .tbl td{padding:0;border-bottom:0.5px solid var(--border);vertical-align:top;}
     .tbl tr:last-child td{border-bottom:none;}
     .tbl tr:hover td{background:var(--surface);}
     .tbl tr.expanded td{background:var(--blue-light);}
-
     .td-inner{padding:10px 14px;display:flex;align-items:center;gap:8px;min-height:44px;}
     .status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
     .status-tag{font-size:10px;font-weight:500;text-transform:capitalize;padding:2px 7px;border-radius:3px;white-space:nowrap;}
@@ -59,7 +57,10 @@
     .prog-mini-seg{height:4px;width:16px;border-radius:1px;}
     .add-col-btn{padding:0 8px;background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;height:36px;display:flex;align-items:center;}
     .add-col-btn:hover{color:var(--blue);}
-
+    .fin-val{font-size:13px;font-weight:600;}
+    .fin-val.green{color:var(--ss);}
+    .fin-val.blue{color:var(--sa);}
+    .fin-none{font-size:12px;color:var(--border);}
     .exp-row td{padding:0!important;background:var(--blue-light)!important;}
     .exp-panel{padding:1.25rem 1.5rem;border-top:0.5px solid var(--border);}
     .exp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:1.25rem;}
@@ -71,7 +72,6 @@
     .exp-input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,110,255,0.08);}
     .exp-select{font-size:13px;padding:7px 9px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;width:100%;}
     .exp-select:focus{outline:none;border-color:var(--blue);}
-
     .prog-section{margin-bottom:1.25rem;}
     .prog-section-title{font-size:11px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
     .stage-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;}
@@ -85,13 +85,24 @@
     .prog-bar-full{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:4px;}
     .prog-bar-fill{height:6px;background:var(--sa);border-radius:3px;transition:width 0.3s;}
     .prog-pct{font-size:11px;color:var(--muted);}
-
+    /* ASSESSMENT SECTION */
+    .asm-section{background:var(--white);border:0.5px solid var(--border);border-radius:6px;padding:1rem;margin-bottom:1.25rem;}
+    .asm-section-title{font-size:11px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
+    .fin-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
+    .fin-cell{background:var(--surface);border-radius:4px;padding:10px 12px;}
+    .fin-cell-label{font-size:10px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+    .fin-cell-val{font-size:15px;font-weight:600;letter-spacing:-0.02em;}
+    .fin-cell-sub{font-size:10px;color:var(--muted);margin-top:2px;}
+    .fin-cell-val.green{color:var(--ss);}
+    .fin-cell-val.blue{color:var(--sa);}
+    .fin-cell-val.amber{color:var(--sq);}
+    .asm-actions{display:flex;gap:8px;flex-wrap:wrap;}
     .exp-actions{display:flex;align-items:center;gap:8px;padding-top:12px;border-top:0.5px solid var(--border);}
     .exp-save{padding:7px 18px;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:var(--black);color:#fff;font-family:inherit;}
     .exp-save:hover{background:#333;}
     .exp-del{padding:7px 14px;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:var(--white);color:var(--su);font-family:inherit;margin-left:auto;}
     .exp-del:hover{background:#fff0f0;border-color:var(--su);}
-
+    .exp-del.confirming{background:var(--su);color:#fff;border-color:var(--su);}
     .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:2000;display:none;align-items:center;justify-content:center;}
     .overlay.open{display:flex;}
     .modal{background:var(--white);border-radius:8px;width:360px;max-width:95vw;border:0.5px solid var(--border);}
@@ -108,11 +119,12 @@
     .mbtn:hover{background:var(--surface);}
     .mbtn.primary{background:var(--black);color:#fff;border-color:var(--black);}
     .mbtn.primary:hover{background:#333;}
-
     .empty-state{padding:4rem 2rem;text-align:center;color:var(--muted);font-size:13px;line-height:1.6;}
     .empty-state i{font-size:32px;display:block;margin-bottom:10px;opacity:0.3;}
     .load-state{padding:4rem 2rem;text-align:center;color:var(--muted);font-size:13px;}
     .error-banner{background:#fff0f0;border:0.5px solid var(--su);border-radius:6px;padding:10px 14px;font-size:12px;color:var(--su);margin-bottom:1rem;display:none;}
+    .toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9000;background:var(--black);color:#fff;padding:10px 16px;border-radius:6px;font-size:13px;display:none;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,0.2);}
+    .toast.show{display:flex;}
   </style>
 </head>
 <body>
@@ -133,7 +145,7 @@
   <div class="toolbar">
     <div class="toolbar-left">
       <div class="search-wrap">
-        <i class="ti ti-search" aria-hidden="true"></i>
+        <i class="ti ti-search"></i>
         <input type="text" id="search" placeholder="Search jobs..." oninput="renderTable()"/>
       </div>
       <div class="filter-wrap">
@@ -145,11 +157,10 @@
       </div>
     </div>
   </div>
-
   <div class="table-wrap">
     <table class="tbl" id="tbl">
       <thead id="thead"></thead>
-      <tbody id="tbody"><tr><td colspan="7"><div class="load-state">Loading jobs…</div></td></tr></tbody>
+      <tbody id="tbody"><tr><td colspan="9"><div class="load-state">Loading jobs…</div></td></tr></tbody>
     </table>
   </div>
 </div>
@@ -160,14 +171,10 @@
     <div class="mh"><span class="mh-t">Add custom field</span><button class="mh-x" onclick="closeModal()">×</button></div>
     <div class="mb">
       <div class="fg"><label>Field name</label><input id="f-fname" placeholder="e.g. Contract value, ESA number..."/></div>
-      <div class="fg">
-        <label>Field type</label>
+      <div class="fg"><label>Field type</label>
         <select id="f-ftype">
-          <option value="text">Text</option>
-          <option value="number">Number</option>
-          <option value="email">Email</option>
-          <option value="phone">Phone</option>
-          <option value="date">Date</option>
+          <option value="text">Text</option><option value="number">Number</option>
+          <option value="email">Email</option><option value="date">Date</option>
         </select>
       </div>
     </div>
@@ -178,43 +185,29 @@
   </div>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script>
 const SUPABASE_URL='https://vojgddmlwakvhmbkzfld.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvamdkZG1sd2FrdmhtYmt6ZmxkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NDQ1MzAsImV4cCI6MjA5NzIyMDUzMH0.PGu1HeCZ3SsMgRyLC_s4xP8m3Qt73NlRyvzA-hFroEk';
 const TABLE='projects';
 
-// STATUS COLOURS — used for dots, tags, and progress segments
-const SC={
-  active:'#1a6eff',
-  quoted:'#BA7517',
-  scheduled:'#1e7e34',
-  complete:'#888888',
-  urgent:'#dc3545'
-};
-const SB={
-  active:'rgba(26,110,255,0.12)',
-  quoted:'rgba(186,117,23,0.12)',
-  scheduled:'rgba(30,126,52,0.1)',
-  complete:'rgba(136,136,136,0.1)',
-  urgent:'rgba(220,53,69,0.12)'
-};
+const SC={active:'#1a6eff',quoted:'#BA7517',scheduled:'#1e7e34',complete:'#888888',urgent:'#dc3545'};
+const SB={active:'rgba(26,110,255,0.12)',quoted:'rgba(186,117,23,0.12)',scheduled:'rgba(30,126,52,0.1)',complete:'rgba(136,136,136,0.1)',urgent:'rgba(220,53,69,0.12)'};
 
 async function dbFetch(path,opts={}){
   const isWrite=opts.method&&opts.method!=='GET';
   const res=await fetch(`${SUPABASE_URL}/rest/v1/${path}`,{
-    headers:{
-      'apikey':SUPABASE_KEY,
-      'Authorization':`Bearer ${SUPABASE_KEY}`,
-      'Content-Type':'application/json',
-      ...(isWrite?{'Prefer':'return=representation'}:{}),
-      ...(opts.headers||{})
-    },
+    headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json',...(isWrite?{'Prefer':'return=representation'}:{}),...(opts.headers||{})},
     ...opts
   });
   if(!res.ok){const e=await res.text();throw new Error(e);}
-  const text=await res.text();
-  return text?JSON.parse(text):[];
+  const text=await res.text();return text?JSON.parse(text):[];
 }
+
+function safeJson(s,d){try{return s?JSON.parse(s):d;}catch{return d;}}
+function showError(msg){const b=document.getElementById('error-banner');b.textContent=msg;b.style.display='block';}
+function showToast(msg,d=3000){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d);}
 
 function dbToJob(r){
   return{
@@ -235,7 +228,7 @@ const STAGES={
   service:['Permit','Disconnect','Install','Inspection']
 };
 
-let jobs=[];
+let jobs=[],assessments=[];
 let filters=new Set(['active','quoted','scheduled','complete','urgent']);
 let expandedId=null;
 let sortCol='customer',sortDir=1;
@@ -246,23 +239,52 @@ let customColumns=[
   {key:'status',label:'Status',core:true},
   {key:'type',label:'Type',core:true},
   {key:'progress',label:'Progress',core:true},
+  {key:'revenue',label:'Revenue',core:true},
+  {key:'profit',label:'Profit',core:true},
 ];
-
-function showError(msg){
-  const b=document.getElementById('error-banner');
-  b.textContent=msg;b.style.display='block';
-}
 
 async function loadJobs(){
   try{
-    const rows=await dbFetch(`${TABLE}?select=*&order=created_at.desc`);
+    const[rows,asmRows]=await Promise.all([
+      dbFetch(`${TABLE}?select=*&order=created_at.desc`),
+      dbFetch(`assessments?select=id,project_id,margin_mode,margin_low,margin_high,rooms,addons,ai_items,manual_items,labour,assessment_number&order=created_at.desc`)
+    ]);
     jobs=rows.map(dbToJob);
+    assessments=asmRows.map(a=>({
+      ...a,
+      rooms:safeJson(a.rooms,[]),
+      addons:safeJson(a.addons,[]),
+      ai_items:safeJson(a.ai_items,[]),
+      manual_items:safeJson(a.manual_items,[]),
+      labour:safeJson(a.labour,[]),
+    }));
   }catch(e){
     console.error('Load error:',e);
-    showError('Could not load jobs from database. Check console for details.');
+    showError('Could not load jobs: '+e.message);
   }
   renderTable();
 }
+
+function getAssessmentForJob(jobId){return assessments.find(a=>a.project_id===jobId)||null;}
+
+function calcFinancials(asm){
+  if(!asm)return null;
+  let materials=0;
+  (asm.rooms||[]).forEach(r=>{(r.lineItems||[]).forEach(i=>{materials+=(i.qty||0)*(i.price||0);});});
+  (asm.addons||[]).forEach(a=>{(a.lineItems||[]).forEach(i=>{materials+=(i.qty||0)*(i.price||0);});});
+  (asm.ai_items||[]).forEach(i=>{materials+=(i.qty||0)*(i.price||0);});
+  (asm.manual_items||[]).forEach(i=>{materials+=(i.qty||0)*(i.price||0);});
+  const labour=(asm.labour||[]).reduce((s,r)=>s+(parseFloat(r.hrs)||0)*(parseFloat(r.rate)||0),0);
+  const combined=materials+labour;
+  const ml=(parseFloat(asm.margin_low)||0)/100;
+  const mh=(parseFloat(asm.margin_high)||0)/100;
+  const mode=asm.margin_mode||'spread';
+  const revLow=combined*(1+ml);
+  const revHigh=mode==='single'?revLow:combined*(1+mh);
+  return{materials,labour,combined,revLow,revHigh,profitLow:revLow-combined,profitHigh:revHigh-combined,mode};
+}
+
+function fmtCAD(n){return'$'+Math.round(n).toLocaleString('en-CA');}
 
 async function persistJob(j){
   const data={
@@ -278,13 +300,7 @@ async function persistJob(j){
 }
 
 function getStages(j){return j.customStages||(STAGES[j.type]||STAGES.residential);}
-
-function toggleF(btn){
-  const s=btn.dataset.s;
-  if(filters.has(s)){filters.delete(s);btn.classList.remove('on');}
-  else{filters.add(s);btn.classList.add('on');}
-  renderTable();
-}
+function toggleF(btn){const s=btn.dataset.s;if(filters.has(s)){filters.delete(s);btn.classList.remove('on');}else{filters.add(s);btn.classList.add('on');}renderTable();}
 
 function renderTable(){
   const q=document.getElementById('search').value.toLowerCase();
@@ -299,15 +315,18 @@ function renderTable(){
   });
 
   const thead=document.getElementById('thead');
+  const coreCols=customColumns.filter(c=>c.core&&c.key!=='revenue'&&c.key!=='profit');
+  const extraCols=customColumns.filter(c=>!c.core);
   thead.innerHTML=`<tr>
-    ${customColumns.map(c=>`<th class="sortable" onclick="setSort('${c.key}')">${c.label}${sortCol===c.key?`<i class="ti ti-chevron-${sortDir===1?'up':'down'}" style="font-size:10px;margin-left:4px"></i>`:''}</th>`).join('')}
-    ${customColumns.filter(c=>!c.core).map(c=>`<th>${c.label}</th>`).join('')}
-    <th><button class="add-col-btn" onclick="openModal()" title="Add custom field"><i class="ti ti-plus" aria-hidden="true"></i></button></th>
+    ${coreCols.map(c=>`<th class="sortable" onclick="setSort('${c.key}')">${c.label}${sortCol===c.key?`<i class="ti ti-chevron-${sortDir===1?'up':'down'}" style="font-size:10px;margin-left:4px"></i>`:''}</th>`).join('')}
+    ${extraCols.map(c=>`<th>${c.label}</th>`).join('')}
+    <th>Revenue</th><th>Profit</th>
+    <th><button class="add-col-btn" onclick="openModal()" title="Add custom field"><i class="ti ti-plus"></i></button></th>
   </tr>`;
 
   const tbody=document.getElementById('tbody');
   if(!filtered.length){
-    tbody.innerHTML=`<tr><td colspan="${customColumns.length+1}"><div class="empty-state"><i class="ti ti-clipboard-list"></i>No jobs found</div></td></tr>`;
+    tbody.innerHTML=`<tr><td colspan="9"><div class="empty-state"><i class="ti ti-clipboard-list"></i>No jobs found</div></td></tr>`;
     return;
   }
 
@@ -319,16 +338,20 @@ function renderTable(){
     const isExp=expandedId===j.id;
     const colour=SC[j.status]||'#888';
     const bg=SB[j.status]||'rgba(0,0,0,0.05)';
-
-    const mainRow=document.createElement('tr');
-    mainRow.className=isExp?'expanded':'';
-    mainRow.style.cursor='pointer';
-    mainRow.onclick=()=>toggleExpand(j.id);
+    const asm=getAssessmentForJob(j.id);
+    const fin=calcFinancials(asm);
 
     const progMini=j.status==='active'
       ?`<div class="prog-mini">${stages.map((_,i)=>`<div class="prog-mini-seg" style="background:${i<done?SC.active:'rgba(26,110,255,0.2)'}"></div>`).join('')}<span style="font-size:10px;color:var(--muted);margin-left:4px">${pct}%</span></div>`
       :`<span style="color:var(--muted);font-size:12px">—</span>`;
 
+    const revCell=fin?`<div class="fin-val green">${fin.mode==='single'?fmtCAD(fin.revLow):`${fmtCAD(fin.revLow)}–${fmtCAD(fin.revHigh)}`}</div>`:`<span class="fin-none">—</span>`;
+    const profCell=fin?`<div class="fin-val blue">${fin.mode==='single'?fmtCAD(fin.profitLow):`${fmtCAD(fin.profitLow)}–${fmtCAD(fin.profitHigh)}`}</div>`:`<span class="fin-none">—</span>`;
+
+    const mainRow=document.createElement('tr');
+    mainRow.className=isExp?'expanded':'';
+    mainRow.style.cursor='pointer';
+    mainRow.onclick=()=>toggleExpand(j.id);
     mainRow.innerHTML=`
       <td><div class="td-inner"><div class="status-dot" style="background:${colour}"></div>${j.customer||'—'}</div></td>
       <td><div class="td-inner">${j.address||'—'}</div></td>
@@ -336,7 +359,9 @@ function renderTable(){
       <td><div class="td-inner"><span class="status-tag" style="background:${bg};color:${colour}">${j.status}</span></div></td>
       <td><div class="td-inner" style="text-transform:capitalize">${j.type}</div></td>
       <td><div class="td-inner">${progMini}</div></td>
-      ${customColumns.filter(c=>!c.core).map(c=>`<td><div class="td-inner">${(j.customFields&&j.customFields[c.key])||'—'}</div></td>`).join('')}
+      ${extraCols.map(c=>`<td><div class="td-inner">${(j.customFields&&j.customFields[c.key])||'—'}</div></td>`).join('')}
+      <td><div class="td-inner">${revCell}</div></td>
+      <td><div class="td-inner">${profCell}</div></td>
       <td><div class="td-inner"><i class="ti ti-chevron-${isExp?'up':'down'}" style="color:var(--muted);font-size:14px"></i></div></td>
     `;
     tbody.appendChild(mainRow);
@@ -344,47 +369,74 @@ function renderTable(){
     if(isExp){
       const expRow=document.createElement('tr');
       expRow.className='exp-row';
-      expRow.innerHTML=`<td colspan="${customColumns.length+1}"></td>`;
+      expRow.innerHTML=`<td colspan="9"></td>`;
       expRow.onclick=e=>e.stopPropagation();
 
       const stages2=getStages(j);
       const done2=Math.min(j.stage||0,stages2.length);
       const pct2=Math.round(done2/stages2.length*100);
 
+      // Build assessment section
+      let asmHtml='';
+      if(asm&&fin){
+        const profitPct=fin.combined>0?Math.round((fin.profitLow/fin.combined)*100):0;
+        asmHtml=`
+          <div class="asm-section">
+            <div class="asm-section-title">
+              <span><i class="ti ti-file-dollar" style="margin-right:6px"></i>Assessment ${asm.assessment_number||''}</span>
+            </div>
+            <div class="fin-grid">
+              <div class="fin-cell">
+                <div class="fin-cell-label">Materials</div>
+                <div class="fin-cell-val">${fmtCAD(fin.materials)}</div>
+              </div>
+              <div class="fin-cell">
+                <div class="fin-cell-label">Labour (internal)</div>
+                <div class="fin-cell-val">${fmtCAD(fin.labour)}</div>
+              </div>
+              <div class="fin-cell">
+                <div class="fin-cell-label">Revenue</div>
+                <div class="fin-cell-val green">${fin.mode==='single'?fmtCAD(fin.revLow):`${fmtCAD(fin.revLow)} – ${fmtCAD(fin.revHigh)}`}</div>
+                <div class="fin-cell-sub">excl. HST</div>
+              </div>
+              <div class="fin-cell">
+                <div class="fin-cell-label">Profit</div>
+                <div class="fin-cell-val blue">${fin.mode==='single'?fmtCAD(fin.profitLow):`${fmtCAD(fin.profitLow)} – ${fmtCAD(fin.profitHigh)}`}</div>
+                <div class="fin-cell-sub">${profitPct}% margin</div>
+              </div>
+            </div>
+            <div class="asm-actions">
+              <button class="nbtn primary" onclick="window.location.href='/estimator.html?project_id=${j.id}'"><i class="ti ti-edit"></i> Edit assessment</button>
+              <button class="nbtn" onclick="printClientPDF(${j.id})"><i class="ti ti-file-download"></i> Client PDF</button>
+            </div>
+          </div>`;
+      } else {
+        asmHtml=`
+          <div class="asm-section">
+            <div class="asm-section-title"><span><i class="ti ti-file-dollar" style="margin-right:6px"></i>Assessment</span></div>
+            <div style="font-size:13px;color:var(--muted);margin-bottom:10px">No assessment yet for this project.</div>
+            <button class="nbtn primary" onclick="window.location.href='/estimator.html?project_id=${j.id}'"><i class="ti ti-plus"></i> Create assessment</button>
+          </div>`;
+      }
+
       expRow.querySelector('td').innerHTML=`<div class="exp-panel">
+        ${asmHtml}
         <div class="exp-grid" id="exp-grid-${j.id}">
-          <div class="exp-field">
-            <div class="exp-label">Customer</div>
-            <input class="exp-input" value="${j.customer}" onchange="updateField(${j.id},'customer',this.value)"/>
-          </div>
-          <div class="exp-field">
-            <div class="exp-label">Address</div>
-            <input class="exp-input" value="${j.address||''}" onchange="updateField(${j.id},'address',this.value)"/>
-          </div>
-          <div class="exp-field">
-            <div class="exp-label">Phone</div>
-            <input class="exp-input" value="${j.phone||''}" onchange="updateField(${j.id},'phone',this.value)"/>
-          </div>
-          <div class="exp-field">
-            <div class="exp-label">Email</div>
-            <input class="exp-input" type="email" value="${j.email||''}" onchange="updateField(${j.id},'email',this.value)"/>
-          </div>
-          <div class="exp-field">
-            <div class="exp-label">Status</div>
+          <div class="exp-field"><div class="exp-label">Customer</div><input class="exp-input" value="${j.customer}" onchange="updateField(${j.id},'customer',this.value)"/></div>
+          <div class="exp-field"><div class="exp-label">Address</div><input class="exp-input" value="${j.address||''}" onchange="updateField(${j.id},'address',this.value)"/></div>
+          <div class="exp-field"><div class="exp-label">Phone</div><input class="exp-input" value="${j.phone||''}" onchange="updateField(${j.id},'phone',this.value)"/></div>
+          <div class="exp-field"><div class="exp-label">Email</div><input class="exp-input" type="email" value="${j.email||''}" onchange="updateField(${j.id},'email',this.value)"/></div>
+          <div class="exp-field"><div class="exp-label">Status</div>
             <select class="exp-select" onchange="updateField(${j.id},'status',this.value)">
               ${['quoted','scheduled','active','urgent','complete'].map(s=>`<option value="${s}" ${j.status===s?'selected':''}>${s}</option>`).join('')}
             </select>
           </div>
-          <div class="exp-field">
-            <div class="exp-label">Job type</div>
+          <div class="exp-field"><div class="exp-label">Job type</div>
             <select class="exp-select" onchange="updateField(${j.id},'type',this.value);resetStages(${j.id})">
               ${['residential','commercial','panel','lighting','service'].map(t=>`<option value="${t}" ${j.type===t?'selected':''}>${t}</option>`).join('')}
             </select>
           </div>
-          <div class="exp-field" style="grid-column:1/-1">
-            <div class="exp-label">Notes</div>
-            <input class="exp-input" value="${j.notes||''}" onchange="updateField(${j.id},'notes',this.value)"/>
-          </div>
+          <div class="exp-field" style="grid-column:1/-1"><div class="exp-label">Notes</div><input class="exp-input" value="${j.notes||''}" onchange="updateField(${j.id},'notes',this.value)"/></div>
           ${customColumns.filter(c=>!c.core).map(c=>`
           <div class="exp-field">
             <div class="exp-label">${c.label} <button onclick="removeCustomCol('${c.key}')" title="Remove field"><i class="ti ti-x"></i></button></div>
@@ -406,14 +458,14 @@ function renderTable(){
                 ${i<done2?'<i class="ti ti-check" style="font-size:11px"></i>':''}
               </div>
               <input class="stage-name-input" value="${s}" onchange="updateStageName(${j.id},${i},this.value)"/>
-              <button class="stage-del" onclick="deleteStage(${j.id},${i})" title="Remove stage"><i class="ti ti-x"></i></button>
+              <button class="stage-del" onclick="deleteStage(${j.id},${i})"><i class="ti ti-x"></i></button>
             </div>`).join('')}
           </div>
         </div>
 
         <div class="exp-actions">
           <button class="exp-save" onclick="renderTable()">Done editing</button>
-          <button class="exp-del" onclick="deleteJob(${j.id})"><i class="ti ti-trash"></i> Delete job</button>
+          <button class="exp-del" id="del-${j.id}" onclick="confirmDeleteJob(${j.id},this)"><i class="ti ti-trash"></i> Delete job</button>
         </div>
       </div>`;
       tbody.appendChild(expRow);
@@ -424,47 +476,40 @@ function renderTable(){
 function toggleExpand(id){expandedId=expandedId===id?null:id;renderTable();}
 function setSort(col){if(sortCol===col)sortDir*=-1;else{sortCol=col;sortDir=1;}renderTable();}
 
-function updateField(id,field,value){
-  const j=jobs.find(x=>x.id===id);if(j){j[field]=value;persistJob(j);}
-}
-function updateCustomField(id,key,value){
-  const j=jobs.find(x=>x.id===id);
-  if(j){if(!j.customFields)j.customFields={};j.customFields[key]=value;persistJob(j);}
-}
-function resetStages(id){
-  const j=jobs.find(x=>x.id===id);if(j){j.customStages=null;j.stage=0;persistJob(j);}
-  renderTable();
-}
+function updateField(id,field,value){const j=jobs.find(x=>x.id===id);if(j){j[field]=value;persistJob(j);}}
+function updateCustomField(id,key,value){const j=jobs.find(x=>x.id===id);if(j){if(!j.customFields)j.customFields={};j.customFields[key]=value;persistJob(j);}}
+function resetStages(id){const j=jobs.find(x=>x.id===id);if(j){j.customStages=null;j.stage=0;persistJob(j);}renderTable();}
 function toggleStage(id,idx){
   const j=jobs.find(x=>x.id===id);if(!j)return;
-  const stages=getStages(j);
-  const done=Math.min(j.stage||0,stages.length);
-  j.stage=idx<done?idx:idx+1;
-  persistJob(j);renderTable();
+  const stages=getStages(j);const done=Math.min(j.stage||0,stages.length);
+  j.stage=idx<done?idx:idx+1;persistJob(j);renderTable();
 }
-function updateStageName(id,idx,value){
-  const j=jobs.find(x=>x.id===id);if(!j)return;
-  if(!j.customStages)j.customStages=[...getStages(j)];
-  j.customStages[idx]=value;persistJob(j);
+function updateStageName(id,idx,value){const j=jobs.find(x=>x.id===id);if(!j)return;if(!j.customStages)j.customStages=[...getStages(j)];j.customStages[idx]=value;persistJob(j);}
+function addStage(id){const j=jobs.find(x=>x.id===id);if(!j)return;if(!j.customStages)j.customStages=[...getStages(j)];j.customStages.push('New stage');persistJob(j);renderTable();}
+function deleteStage(id,idx){const j=jobs.find(x=>x.id===id);if(!j)return;if(!j.customStages)j.customStages=[...getStages(j)];j.customStages.splice(idx,1);if(j.stage>j.customStages.length)j.stage=j.customStages.length;persistJob(j);renderTable();}
+
+let _pendingDel={};
+function confirmDeleteJob(id,btn){
+  const key='job-'+id;
+  if(_pendingDel[key]){
+    clearTimeout(_pendingDel[key]);delete _pendingDel[key];
+    btn.classList.remove('confirming');
+    doDeleteJob(id);return;
+  }
+  btn.classList.add('confirming');
+  btn.innerHTML='<i class="ti ti-trash"></i> Confirm delete?';
+  _pendingDel[key]=setTimeout(()=>{
+    btn.classList.remove('confirming');
+    btn.innerHTML='<i class="ti ti-trash"></i> Delete job';
+    delete _pendingDel[key];
+  },3000);
 }
-function addStage(id){
-  const j=jobs.find(x=>x.id===id);if(!j)return;
-  if(!j.customStages)j.customStages=[...getStages(j)];
-  j.customStages.push('New stage');persistJob(j);renderTable();
-}
-function deleteStage(id,idx){
-  const j=jobs.find(x=>x.id===id);if(!j)return;
-  if(!j.customStages)j.customStages=[...getStages(j)];
-  j.customStages.splice(idx,1);
-  if(j.stage>j.customStages.length)j.stage=j.customStages.length;
-  persistJob(j);renderTable();
-}
-async function deleteJob(id){
-  if(!confirm('Delete this job permanently?'))return;
+async function doDeleteJob(id){
   try{await dbFetch(`${TABLE}?id=eq.${id}`,{method:'DELETE'});}
-  catch(e){console.error(e);}
-  expandedId=null;await loadJobs();
+  catch(e){console.error(e);return;}
+  expandedId=null;await loadJobs();showToast('Job deleted');
 }
+
 async function addJob(){
   const data={customer:'New job',address:'',phone:'',email:'',type:'residential',status:'quoted',stage:0,notes:'',custom_fields:JSON.stringify({})};
   try{
@@ -474,22 +519,29 @@ async function addJob(){
     setTimeout(()=>document.querySelector('.exp-panel .exp-input')?.focus(),100);
   }catch(e){console.error(e);showError('Could not create job: '+e.message);}
 }
+
 function openModal(){document.getElementById('overlay').classList.add('open');}
 function closeModal(){document.getElementById('overlay').classList.remove('open');}
 function saveField(){
   const name=document.getElementById('f-fname').value.trim();if(!name)return;
   const type=document.getElementById('f-ftype').value;
   const key='cf_'+name.toLowerCase().replace(/\s+/g,'_');
-  if(customColumns.find(c=>c.key===key)){alert('A field with that name already exists.');return;}
+  if(customColumns.find(c=>c.key===key)){showToast('A field with that name already exists.');return;}
   customColumns.push({key,label:name,type,core:false});
   jobs.forEach(j=>{if(!j.customFields)j.customFields={};});
   closeModal();document.getElementById('f-fname').value='';renderTable();
 }
 function removeCustomCol(key){
-  if(!confirm('Remove this field from all jobs?'))return;
   customColumns=customColumns.filter(c=>c.key!==key);
   jobs.forEach(j=>{if(j.customFields)delete j.customFields[key];});
   renderTable();
+}
+
+function printClientPDF(jobId){
+  const asm=getAssessmentForJob(jobId);
+  const job=jobs.find(j=>j.id===jobId);
+  if(!asm||!job){showToast('No assessment found for this project.');return;}
+  window.location.href=`/estimator.html?project_id=${jobId}&print=client`;
 }
 
 loadJobs();
