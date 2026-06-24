@@ -688,14 +688,17 @@ function buildProtoCard(p){
 
   const compRows=comps.map(c=>{
     const comp=components.find(x=>x.id===c.comp_id);if(!comp)return'';
-    const isWire=(comp.category||'').toLowerCase().includes('wire')||(comp.description||'').toLowerCase().includes('nmd')||(comp.description||'').toLowerCase().includes('teck');
+    const isWire=(comp.category||'').toLowerCase().includes('wire')||(comp.description||'').toLowerCase().includes('nmd')||(comp.description||'').toLowerCase().includes('teck')||(comp.category||'').toLowerCase().includes('conduit')||(comp.description||'').toLowerCase().includes('pvc')||(comp.description||'').toLowerCase().includes('conduit');
     const rule=c.qty_rule||'fixed';
-    const lineTotal=(rule==='circuit_feed'||rule==='service_feed')?0:(parseFloat(comp.unit_price)||0)*(parseFloat(c.qty)||1);
-    const qtyField=(rule==='circuit_feed'||rule==='service_feed')
-      ?`<span style="font-size:11px;color:${rule==='service_feed'?'#f97316':'#6366f1'};font-weight:500;padding:0 4px">auto</span>`
+    const offset=parseFloat(c.qty_offset)||0;
+    const isAuto=rule==='circuit_feed'||rule==='service_feed';
+    const colour=rule==='service_feed'?'#f97316':'#6366f1';
+    const lineTotal=isAuto?0:(parseFloat(comp.unit_price)||0)*(parseFloat(c.qty)||1);
+    const qtyField=isAuto
+      ?`<div style="display:flex;align-items:center;gap:3px"><span style="font-size:11px;color:${colour};font-weight:500">dist</span><span style="font-size:11px;color:var(--muted)">+</span><input class="sub-qty" type="number" min="0" step="0.5" value="${offset}" title="Fixed offset (m) added to distance" onchange="updateProtoCompOffset(${p.id},${c.comp_id},this.value)" style="width:44px"/><span style="font-size:10px;color:var(--muted)">m</span></div>`
       :`<input class="sub-qty" type="number" min="0" step="0.01" value="${c.qty}" onchange="updateProtoCompQty(${p.id},${c.comp_id},this.value)"/>`;
     const ruleNote=rule==='circuit_feed'?`<span style="font-size:10px;color:#6366f1;margin-left:4px">circuit feed</span>`:rule==='service_feed'?`<span style="font-size:10px;color:#f97316;margin-left:4px">service feed</span>`:'';
-    return`<div class="sub-row" style="grid-template-columns:2fr 90px 70px 80px 28px">
+    return`<div class="sub-row" style="grid-template-columns:2fr 100px 110px 80px 28px">
       <div class="sub-name">${esc(comp.description||comp.technical_name||'—')}${ruleNote}</div>
       ${isWire?`<select class="sub-qty-rule" onchange="updateProtoCompRule(${p.id},${c.comp_id},this.value)">
         <option value="fixed"${rule==='fixed'?' selected':''}>Fixed</option>
@@ -703,7 +706,7 @@ function buildProtoCard(p){
         <option value="service_feed"${rule==='service_feed'?' selected':''}>Service feed</option>
       </select>`:`<span></span>`}
       ${qtyField}
-      <div class="sub-cost" style="text-align:right">${(rule==='circuit_feed'||rule==='service_feed')?`<span style="color:${rule==='service_feed'?'#f97316':'#6366f1'};font-size:11px">∝ dist</span>`:`$${lineTotal.toFixed(2)}`}</div>
+      <div class="sub-cost" style="text-align:right">${isAuto?`<span style="color:${colour};font-size:11px">∝ dist${offset?'+'+offset:''}</span>`:`$${lineTotal.toFixed(2)}`}</div>
       <button class="sub-del" onclick="removeProtoComp(${p.id},${c.comp_id})"><i class="ti ti-x"></i></button>
     </div>`;
   }).join('');
@@ -729,7 +732,7 @@ function buildProtoCard(p){
       </div>
       <div class="sub-section">
         <div class="sub-section-label">Components</div>
-        ${comps.length?`<div class="sub-head" style="grid-template-columns:2fr 90px 70px 80px 28px"><span>Component</span><span>Rule</span><span style="text-align:right">Qty</span><span style="text-align:right">Cost</span><span></span></div>${compRows}`:'<div style="font-size:13px;color:var(--muted);padding:4px 0 8px">No components yet.</div>'}
+        ${comps.length?`<div class="sub-head" style="grid-template-columns:2fr 100px 110px 80px 28px"><span>Component</span><span>Rule</span><span style="text-align:right">Qty / offset</span><span style="text-align:right">Cost</span><span></span></div>${compRows}`:'<div style="font-size:13px;color:var(--muted);padding:4px 0 8px">No components yet.</div>'}
         <div class="sub-add-row">
           <select class="sub-select" id="csel-${p.id}"><option value="">Add component…</option>${compOpts}</select>
           <button class="nbtn" onclick="addProtoComp(${p.id})"><i class="ti ti-plus"></i> Add</button>
@@ -748,6 +751,11 @@ function buildProtoCard(p){
 
 function toggleProto(id){expandedProtoId=expandedProtoId===id?null:id;renderProtos();}
 function updateProtoField(id,field,value){const p=protoassemblies.find(x=>x.id===id);if(p)p[field]=value;}
+function updateProtoCompOffset(pid,cid,value){
+  const p=protoassemblies.find(x=>x.id===pid);if(!p)return;
+  const c=p.components.find(x=>x.comp_id===cid);if(c)c.qty_offset=parseFloat(value)||0;
+  renderProtos();
+}
 function updateProtoCompRule(pid,cid,rule){
   const p=protoassemblies.find(x=>x.id===pid);if(!p)return;
   const c=p.components.find(x=>x.comp_id===cid);if(c)c.qty_rule=rule;
