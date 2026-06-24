@@ -247,6 +247,43 @@
     .lighting-dot.placed-3:hover{background:#0d9488;}
     .lighting-dot.placed-4:hover{background:#9333ea;}
 
+    .zone-card{background:var(--white);border:0.5px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:8px;}
+    .zone-card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
+    .zone-card-title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;}
+    .zone-card-meta{font-size:11px;color:var(--muted);margin-top:2px;}
+    .zone-item{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-top:0.5px solid var(--border);}
+    .zone-item-name{font-size:12px;display:flex;align-items:center;gap:6px;}
+    .zone-wire-badge{font-size:10px;background:#eff6ff;color:#3b82f6;padding:1px 5px;border-radius:3px;font-weight:500;}
+    .zone-qty-input{font-size:12px;padding:3px 6px;border:0.5px solid var(--border);border-radius:4px;font-family:inherit;}
+
+    /* FLOOR PLAN */
+    .fp-toolbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+    .fp-tool-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-right:2px;}
+    .fp-tools{display:flex;gap:4px;flex-wrap:wrap;}
+    .fp-tool-btn{font-size:12px;padding:5px 10px;border-radius:5px;border:1.5px solid var(--border);background:var(--white);cursor:pointer;font-family:inherit;font-weight:500;transition:all 0.1s;white-space:nowrap;}
+    .fp-tool-btn:hover{border-color:#aaa;}
+    .fp-tool-btn.active{border-color:var(--black);background:var(--black);color:#fff;}
+    .fp-eraser{color:var(--muted);}
+    .fp-floor-tab{font-size:12px;font-weight:500;padding:5px 14px;border-radius:5px;border:1.5px solid var(--border);background:var(--white);cursor:pointer;font-family:inherit;transition:all 0.1s;}
+    .fp-floor-tab.active{background:var(--black);color:#fff;border-color:var(--black);}
+    .fp-floor-tab:hover:not(.active){border-color:#aaa;}
+    .fp-canvas-wrap{border:0.5px solid var(--border);border-radius:6px;background:#fafaf9;margin-bottom:12px;display:flex;align-items:center;justify-content:center;padding:8px;}
+    .fp-canvas{display:grid;width:fit-content;user-select:none;}
+    .fp-cell{box-sizing:border-box;border-right:0.5px solid #e8e8e8;border-bottom:0.5px solid #e8e8e8;cursor:crosshair;transition:opacity 0.05s;}
+    .fp-cell:hover{opacity:0.75;}
+    .fp-canvas-empty{background:transparent;border:none;cursor:default;pointer-events:none;}
+    .fp-zone-cell{background:#e2e8f0;border-right:0.5px solid #cbd5e1;border-bottom:0.5px solid #cbd5e1;cursor:crosshair;}
+    .fp-exterior{background:#ececec;border-color:#ddd;cursor:crosshair;}
+    .fp-tool-locked{opacity:0.35;cursor:not-allowed!important;color:var(--muted)!important;background:var(--surface)!important;border-color:var(--border)!important;}
+    .fp-cell.fp-panel{background:#1a1a1a!important;}
+    .fp-cell.fp-meter{background:#f97316!important;}
+    .fp-legend{display:flex;flex-direction:column;gap:6px;}
+    .fp-legend-row{display:flex;align-items:center;justify-content:space-between;font-size:12px;padding:6px 10px;background:var(--surface);border-radius:5px;border:0.5px solid var(--border);}
+    .fp-legend-left{display:flex;align-items:center;gap:8px;}
+    .fp-legend-swatch{width:14px;height:14px;border-radius:3px;flex-shrink:0;}
+    .fp-legend-name{font-weight:500;}
+    .fp-legend-dist{color:var(--muted);font-size:11px;}
+
     @media(max-width:600px){
       .job-type-grid{grid-template-columns:1fr 1fr;}
       .g4,.g3{grid-template-columns:1fr 1fr;}
@@ -274,9 +311,10 @@
 <div class="step-bar">
   <div class="step-pill active" id="pill-1" onclick="goStep(1)"><span class="step-num">1</span> Job details</div>
   <div class="step-pill" id="pill-2" onclick="goStep(2)"><span class="step-num">2</span> Rooms &amp; assemblies</div>
-  <div class="step-pill" id="pill-3" onclick="goStep(3)"><span class="step-num">3</span> AI assist</div>
-  <div class="step-pill" id="pill-4" onclick="goStep(4)"><span class="step-num">4</span> Labour &amp; margin</div>
-  <div class="step-pill" id="pill-5" onclick="goStep(5)"><span class="step-num">5</span> Review</div>
+  <div class="step-pill" id="pill-3" onclick="goStep(3)"><span class="step-num">3</span> Floor plan</div>
+  <div class="step-pill" id="pill-4" onclick="goStep(4)"><span class="step-num">4</span> AI assist</div>
+  <div class="step-pill" id="pill-5" onclick="goStep(5)"><span class="step-num">5</span> Labour &amp; margin</div>
+  <div class="step-pill" id="pill-6" onclick="goStep(6)"><span class="step-num">6</span> Review</div>
 </div>
 
 <div class="main">
@@ -343,6 +381,31 @@
       </div>
       <div class="fg"><label>Internal notes</label><textarea id="job-notes" placeholder="e.g. New build, 1,800 sq ft bungalow, forced air gas, client supplied fixtures in master…"></textarea></div>
     </div>
+    <div class="card">
+      <div class="card-title">House footprint <span style="font-size:12px;font-weight:400;color:var(--muted)">— used for floor plan &amp; homerun distances</span></div>
+      <div class="g3">
+        <div class="fg"><label>Overall width (ft)</label><input type="number" id="house-w" min="10" max="200" placeholder="50" oninput="onFootprintChange()"/></div>
+        <div class="fg"><label>Overall length (ft)</label><input type="number" id="house-l" min="10" max="200" placeholder="30" oninput="onFootprintChange()"/></div>
+        <div class="fg"><label>Number of floors</label><input type="number" id="house-floors" min="1" max="4" value="1" placeholder="1"/></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Exterior areas <span style="font-size:12px;font-weight:400;color:var(--muted)">— backyards, side yards, outbuilding pads</span></div>
+      <div id="ext-area-list" style="margin-bottom:8px;display:flex;flex-direction:column;gap:6px;"></div>
+      <div class="add-room-row">
+        <div class="fg"><label>Name</label><input id="ext-area-name" placeholder="e.g. Backyard, Side yard"/></div>
+        <div class="fg" style="max-width:120px"><label>Side</label>
+          <select id="ext-area-side">
+            <option value="bottom">Bottom</option>
+            <option value="top">Top</option>
+            <option value="left">Left</option>
+            <option value="right">Right</option>
+          </select>
+        </div>
+        <div class="fg" style="max-width:100px"><label>Depth (ft)</label><input type="number" id="ext-area-depth" min="1" placeholder="40"/></div>
+        <button class="btn btn-black btn-sm" onclick="addExtArea()" style="margin-bottom:1px"><i class="ti ti-plus"></i> Add</button>
+      </div>
+    </div>
     <div class="step-nav">
       <div></div>
       <button class="btn btn-black" onclick="goStep(2)">Rooms &amp; assemblies <i class="ti ti-arrow-right"></i></button>
@@ -373,6 +436,29 @@
       </div>
     </div>
 
+
+    <div class="card" id="exterior-asm-card">
+      <div class="card-title">Exterior assemblies <span style="font-size:12px;font-weight:400;color:var(--muted)">— sheds, hot tubs, outbuildings</span></div>
+      <div id="ext-room-list"></div>
+      <div class="add-room-panel" id="ext-add-panel">
+        <div class="sec-label">Add to exterior area</div>
+        <div class="add-room-row">
+          <div class="fg" style="max-width:150px"><label>Area</label>
+            <select id="ext-room-area-sel"></select>
+          </div>
+          <div class="fg"><label>Assembly</label>
+            <select id="ext-room-asm-sel">
+              <option value="">— Select assembly —</option>
+            </select>
+          </div>
+          <div class="fg" style="max-width:90px"><label>Width (ft)</label><input type="number" id="ext-room-w" min="1" placeholder="12"/></div>
+          <div class="fg" style="max-width:90px"><label>Length (ft)</label><input type="number" id="ext-room-l" min="1" placeholder="14"/></div>
+          <div class="fg" style="max-width:120px"><label>Label</label><input id="ext-room-label" placeholder="e.g. Shed"/></div>
+          <button class="btn btn-black btn-sm" onclick="addExtRoom()" style="margin-bottom:1px"><i class="ti ti-plus"></i> Add</button>
+        </div>
+      </div>
+    </div>
+
     <div class="card">
       <div class="card-title">
         Add-ons <span style="font-size:12px;font-weight:400;color:var(--muted)">— fixed protoassemblies (panel, service, dedicated circuits, etc.)</span>
@@ -386,12 +472,40 @@
 
     <div class="step-nav">
       <button class="btn" onclick="goStep(1)"><i class="ti ti-arrow-left"></i> Back</button>
-      <button class="btn btn-black" onclick="goStep(3)">AI assist <i class="ti ti-arrow-right"></i></button>
+      <button class="btn btn-black" onclick="goStep(3)">Floor plan <i class="ti ti-arrow-right"></i></button>
+    </div>
+  </div>
+  <div class="step-panel" id="step-3">
+    <div class="card">
+      <div class="card-title">Floor plan <span style="font-size:12px;font-weight:400;color:var(--muted)">— paint rooms to estimate homerun distances</span></div>
+      <div class="info-note">Select a room or marker from the toolbar, then click or drag on the grid to paint. Each cell = 1 sq ft. This is approximate — room dimensions from Step 2 remain the source of truth.</div>
+
+      <!-- Floor tabs -->
+      <div id="fp-floor-tabs" style="display:flex;gap:4px;margin-bottom:10px;"></div>
+
+      <!-- Toolbar -->
+      <div class="fp-toolbar" id="fp-toolbar">
+        <div class="fp-tool-label">Paint:</div>
+        <div class="fp-tools" id="fp-tools"></div>
+        <button class="fp-tool-btn fp-eraser" id="fp-eraser-btn" onclick="setFpTool('eraser')"><i class="ti ti-eraser"></i> Erase</button>
+        <button class="fp-tool-btn" onclick="clearFloorPlan()" style="margin-left:4px;color:var(--red)"><i class="ti ti-trash"></i> Clear</button>
+      </div>
+
+      <!-- Canvas -->
+      <div class="fp-canvas-wrap" id="fp-canvas-wrap"></div>
+
+      <!-- Legend / distances -->
+      <div id="fp-legend" class="fp-legend"></div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn" onclick="goStep(2)"><i class="ti ti-arrow-left"></i> Back</button>
+      <button class="btn btn-black" onclick="goStep(4)">AI assist <i class="ti ti-arrow-right"></i></button>
     </div>
   </div>
 
-  <!-- STEP 3: AI ASSIST -->
-  <div class="step-panel" id="step-3">
+  <!-- STEP 4: AI ASSIST -->
+  <div class="step-panel" id="step-4">
     <div id="api-banner" class="api-banner" style="display:none">
       <i class="ti ti-key"></i>
       <span class="api-banner-text">Enter Anthropic API key to enable AI assist</span>
@@ -414,13 +528,13 @@
     <div id="ai-area"></div>
 
     <div class="step-nav">
-      <button class="btn" onclick="goStep(2)"><i class="ti ti-arrow-left"></i> Back</button>
-      <button class="btn btn-black" onclick="goStep(4)">Labour &amp; margin <i class="ti ti-arrow-right"></i></button>
+      <button class="btn" onclick="goStep(3)"><i class="ti ti-arrow-left"></i> Back</button>
+      <button class="btn btn-black" onclick="goStep(5)">Labour &amp; margin <i class="ti ti-arrow-right"></i></button>
     </div>
   </div>
 
-  <!-- STEP 4: LABOUR & MARGIN -->
-  <div class="step-panel" id="step-4">
+  <!-- STEP 5: LABOUR & MARGIN -->
+  <div class="step-panel" id="step-5">
     <div class="card">
       <div class="card-title">Labour <span style="font-size:12px;font-weight:400;color:var(--muted)">(internal only — not shown to client)</span></div>
       <div class="labour-note"><i class="ti ti-lock" style="font-size:12px"></i> Labour costs are for your internal calculation only. They do not appear on the client assessment document.</div>
@@ -461,13 +575,13 @@
     </div>
 
     <div class="step-nav">
-      <button class="btn" onclick="goStep(3)"><i class="ti ti-arrow-left"></i> Back</button>
-      <button class="btn btn-black" onclick="goStep(5)">Review <i class="ti ti-arrow-right"></i></button>
+      <button class="btn" onclick="goStep(4)"><i class="ti ti-arrow-left"></i> Back</button>
+      <button class="btn btn-black" onclick="goStep(6)">Review <i class="ti ti-arrow-right"></i></button>
     </div>
   </div>
 
-  <!-- STEP 5: REVIEW -->
-  <div class="step-panel" id="step-5">
+  <!-- STEP 6: REVIEW -->
+  <div class="step-panel" id="step-6">
     <div class="card">
       <div class="card-title">
         Line items
@@ -507,7 +621,7 @@
     </div>
 
     <div class="step-nav">
-      <button class="btn" onclick="goStep(4)"><i class="ti ti-arrow-left"></i> Back</button>
+      <button class="btn" onclick="goStep(5)"><i class="ti ti-arrow-left"></i> Back</button>
       <div style="display:flex;gap:8px;">
         <button class="btn btn-black" onclick="saveAssessment()"><i class="ti ti-device-floppy"></i> Save to project</button>
         <button class="btn" onclick="window.print()"><i class="ti ti-printer"></i> Client PDF</button>
@@ -614,7 +728,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
 
   // Check for print=client param
   if(params.get('print')==='client'){
-    goStep(5);
+    goStep(6);
     setTimeout(()=>{buildAllLineItems();renderAllLineItems();updateTotals();preparePrint();window.print();},400);
   }
 });
@@ -663,6 +777,11 @@ function populateSelectors(){
     opts+='</optgroup>';
   });
   protoSel.innerHTML=opts;
+  // Exterior assemblies selector — all assemblies
+  const extAsmSel=document.getElementById('ext-room-asm-sel');
+  if(extAsmSel){
+    extAsmSel.innerHTML='<option value="">— Select assembly —</option>'+catalogue.assemblies.map(a=>`<option value="${a.id}">${a.name}</option>`).join('');
+  }
 }
 
 // ── STEP NAV ──────────────────────────────────────────────────
@@ -675,7 +794,8 @@ function goStep(n){
     else if(i+1<n)p.classList.add('done');
   });
   currentStep=n;
-  if(n===5){buildAllLineItems();renderAllLineItems();updateTotals();preparePrint();}
+  if(n===3){initFloorPlan();}
+  if(n===6){buildAllLineItems();renderAllLineItems();updateTotals();preparePrint();}
   window.scrollTo(0,0);
 }
 
@@ -873,6 +993,7 @@ function setRoomFixture(roomId,group,protoId){
   } else {
     delete r.lightingGrid.fixtureByGroup[group];
   }
+  renderRooms();
   updateTotals();
 }
 
@@ -921,7 +1042,580 @@ function getLightingLineItems(room){
     }
   });
 
+  return [...items, ...getLightingWireItems(room)];
+}
+// Estimates 14/2 NMD90 for each fixture group based on node positions in the 5x5 grid
+// Grid is 5x5 (indices 0-24, centre=12→index99). We map to room dimensions.
+function getLightingWireItems(room){
+  const grid=room.lightingGrid;
+  if(!grid||!grid.nodes||!grid.nodes.length)return[];
+  const items=[];
+  const w=room.w||10, l=room.l||10;
+  // Find 14/2 wire component or protoassembly
+  const wireProto=catalogue.protoassemblies.find(p=>
+    /14.2|14\/2/i.test(p.name)&&/nmd|wire|cable/i.test(p.name)
+  );
+  if(!wireProto)return[];
+  const unitPrice=calcProtoTotal(wireProto);
+  const groupsUsed=[...new Set(grid.nodes.map(n=>n.group))];
+
+  groupsUsed.forEach(g=>{
+    const nodes=grid.nodes.filter(n=>n.group===g);
+    if(!nodes.length)return;
+    // Map grid index to room coordinates (ft)
+    // 5x5 grid, index 0-24, centre=99
+    const toCoord=idx=>{
+      if(idx===99)return{x:w/2,y:l/2}; // centre
+      // Map perimeter index (0-23) to 5x5 grid position excluding centre
+      const positions=[
+        {r:0,c:0},{r:0,c:1},{r:0,c:2},{r:0,c:3},{r:0,c:4},
+        {r:1,c:0},{r:1,c:1},{r:1,c:2},{r:1,c:3},{r:1,c:4},
+        {r:2,c:0},{r:2,c:1},           {r:2,c:3},{r:2,c:4},
+        {r:3,c:0},{r:3,c:1},{r:3,c:2},{r:3,c:3},{r:3,c:4},
+        {r:4,c:0},{r:4,c:1},{r:4,c:2},{r:4,c:3},{r:4,c:4}
+      ];
+      const pos=positions[idx]||{r:2,c:2};
+      return{x:(pos.c/4)*w, y:(pos.r/4)*l};
+    };
+
+    const coords=nodes.map(n=>toCoord(n.index));
+    // Switch drop: assume switch at corner (0,0), drop to 4ft height
+    const switchDropFt=Math.min(w,l)*0.1+4; // rough corner-to-first-fixture
+    // Chain through fixtures (greedy nearest-neighbour)
+    let chainFt=0;
+    const remaining=[...coords];
+    let current=remaining.shift();
+    while(remaining.length){
+      let nearest=remaining.reduce((best,c)=>{
+        const d=Math.sqrt(Math.pow(c.x-current.x,2)+Math.pow(c.y-current.y,2));
+        return d<best.d?{c,d}:{...best};
+      },{c:remaining[0],d:Infinity});
+      chainFt+=nearest.d;
+      current=nearest.c;
+      remaining.splice(remaining.indexOf(nearest.c),1);
+    }
+    const totalFt=switchDropFt+chainFt;
+    const totalM=Math.ceil(totalFt*0.3048*1.15); // ft→m + 15% waste
+    if(totalM>0){
+      items.push({
+        id:Date.now()+Math.random(),
+        desc:`${wireProto.name} — lighting group ${g} (${totalM} m)`,
+        cat:'material',qty:totalM,price:unitPrice,
+        source:'lighting-wire',codeNote:''
+      });
+    }
+  });
   return items;
+}
+
+// ── HOMERUN WIRE LINE ITEMS ───────────────────────────────────
+// Wire gauge lookup
+function findWireProto(gauge){
+  return catalogue.protoassemblies.find(p=>
+    p.name.includes(gauge)&&/nmd|wire|cable/i.test(p.name)
+  );
+}
+
+// Only dedicated circuits get individual homeruns here.
+// GP 15A circuits are handled by getGPCircuitLineItems.
+function getHomerunLineItems(){
+  const items=[];
+  if(!fpPanelCell||fpPanelFloor===null)return items;
+
+  // Find dedicated protoassemblies in add-ons (those with a breaker in name/category)
+  // and generate a homerun wire item for each based on avg room distance
+  const dedicatedAddons=addons.filter(a=>{
+    const name=(a.protoName||'').toLowerCase();
+    return /30a|50a|40a|60a|dedicated|dryer|range|hot.?tub|sauna|spa|oven|cooktop|ac|air.cond|ev.?charg/i.test(name);
+  });
+
+  // Use average homerun distance from painted rooms as estimate
+  const allPaintedRooms=[...rooms,...extRooms];
+  const distances=allPaintedRooms.map(r=>getHomerunDistance(r.id)||getExtRoomHomerunDistance(r.id)||0).filter(d=>d>0);
+  const avgDist=distances.length?distances.reduce((a,b)=>a+b,0)/distances.length:15; // default 15ft if none painted
+
+  dedicatedAddons.forEach(a=>{
+    // Determine wire gauge from amperage in name
+    let gauge='12/2';
+    const name=a.protoName||'';
+    if(/50a|60a|hot.?tub|sauna|spa|range|oven/i.test(name)) gauge='8/3';
+    else if(/30a|dryer|ac|ev/i.test(name)) gauge='10/3';
+    else if(/40a/i.test(name)) gauge='8/3';
+
+    const wireProto=findWireProto(gauge);
+    if(!wireProto)return;
+    const distM=Math.ceil(avgDist*0.3048*1.1);
+    items.push({
+      id:Date.now()+Math.random(),
+      desc:`${gauge} NMD90 homerun — ${a.protoName} (~${distM} m)`,
+      cat:'material',qty:distM,price:calcProtoTotal(wireProto),
+      source:'homerun',codeNote:''
+    });
+  });
+
+  // Exterior room dedicated feeds
+  extRooms.forEach(r=>{
+    const dist=getExtRoomHomerunDistance(r.id);
+    if(!dist)return;
+    const distM=Math.ceil(dist*0.3048*1.1);
+    // Check if any line item suggests a dedicated circuit
+    const hasDedicated=r.lineItems.some(i=>/30a|50a|40a|60a|dedicated/i.test(i.desc));
+    const gauge=hasDedicated?'10/3':'14/2';
+    const wireProto=findWireProto(gauge);
+    if(!wireProto)return;
+    const name=r.label||r.asmName;
+    items.push({
+      id:Date.now()+Math.random(),
+      desc:`${gauge} NMD90 feed — ${name} (~${distM} m)`,
+      cat:'material',qty:distM,price:calcProtoTotal(wireProto),
+      source:'homerun',codeNote:''
+    });
+  });
+
+  return items;
+}
+
+// ── GP CIRCUIT COUNTING ───────────────────────────────────────
+// Counts all 15A devices across all rooms, calculates circuits needed
+function getGPCircuitLineItems(){
+  const items=[];
+  // Count all 15A devices (receptacles + switches) across all rooms
+  let totalDevices15A=0;
+  const allRooms=[...rooms,...extRooms];
+  allRooms.forEach(r=>{
+    r.lineItems.forEach(i=>{
+      const desc=(i.desc||'').toLowerCase();
+      if(desc.includes('15a')||desc.includes('15 a')){
+        totalDevices15A+=Math.round(i.qty)||1;
+      }
+    });
+  });
+  if(!totalDevices15A)return items;
+
+  const circuits=Math.ceil(totalDevices15A/12);
+
+  // Find AFCI/GFCI breaker protoassembly
+  const breakerProto=catalogue.protoassemblies.find(p=>
+    /afci|gfci|15a.*breaker|breaker.*15a/i.test(p.name)
+  );
+  // Find 14/2 wire
+  const wireProto=findWireProto('14/2');
+
+  if(breakerProto){
+    items.push({
+      id:Date.now()+Math.random(),
+      desc:`15A AFCI/GFCI Breaker (${circuits} circuits × ${Math.ceil(totalDevices15A/circuits)} devices avg)`,
+      cat:'material',qty:circuits,price:calcProtoTotal(breakerProto),
+      source:'gp-circuit',codeNote:'OEC 26-650'
+    });
+  }
+
+  // Homerun wire per circuit — use average homerun distance if panel placed
+  if(wireProto&&fpPanelCell){
+    const paintedRooms=allRooms.filter(r=>getHomerunDistance(r.id)||getExtRoomHomerunDistance(r.id));
+    if(paintedRooms.length){
+      const avgDist=paintedRooms.reduce((s,r)=>{
+        const d=getHomerunDistance(r.id)||getExtRoomHomerunDistance(r.id)||0;
+        return s+d;
+      },0)/paintedRooms.length;
+      const avgM=Math.ceil(avgDist*0.3048*1.1);
+      items.push({
+        id:Date.now()+Math.random(),
+        desc:`14/2 NMD90 GP homerun (${circuits} circuits × ~${avgM} m avg)`,
+        cat:'material',qty:circuits*avgM,price:calcProtoTotal(wireProto),
+        source:'gp-circuit',codeNote:''
+      });
+    }
+  }
+
+  return items;
+}
+
+// ── DETECTOR COUNTS ───────────────────────────────────────────
+function getDetectorLineItems(){
+  const items=[];
+  const floors=parseInt(document.getElementById('house-floors')?.value)||1;
+
+  // Count bedrooms
+  const bedroomCount=rooms.filter(r=>
+    r.asmName.toLowerCase().includes('bedroom')||
+    (r.label||'').toLowerCase().includes('bedroom')||
+    (r.label||'').toLowerCase().includes('bed')
+  ).length;
+
+  // Carbon/Smoke/Strobe: 1 per floor
+  const comboProto=catalogue.protoassemblies.find(p=>
+    /carbon|co.*smoke|smoke.*co|combination.*detector/i.test(p.name)
+  );
+  // Smoke/Strobe only: 1 per bedroom
+  const smokeProto=catalogue.protoassemblies.find(p=>
+    /smoke|strobe/i.test(p.name)&&!/carbon|co\b/i.test(p.name)
+  );
+
+  if(comboProto&&floors>0){
+    items.push({
+      id:Date.now()+Math.random(),
+      desc:`${comboProto.name} (${floors} floor${floors>1?'s':''})`,
+      cat:'material',qty:floors,price:calcProtoTotal(comboProto),
+      source:'detectors',codeNote:'OEC 760'
+    });
+  }
+  if(smokeProto&&bedroomCount>0){
+    items.push({
+      id:Date.now()+Math.random(),
+      desc:`${smokeProto.name} — bedrooms (${bedroomCount})`,
+      cat:'material',qty:bedroomCount,price:calcProtoTotal(smokeProto),
+      source:'detectors',codeNote:'OEC 760'
+    });
+  }
+
+  return items;
+}
+
+// ── COMPUTED LINE ITEMS (all auto items combined) ─────────────
+function getComputedLineItems(){
+  return[
+    ...getHomerunLineItems(),
+    ...getGPCircuitLineItems(),
+    ...getDetectorLineItems(),
+  ];
+}
+
+// ── FLOOR PLAN ────────────────────────────────────────────────
+let fpFloorCells={};
+let fpTool=null;
+let fpPainting=false;
+let fpActiveFloor=1;
+let fpPanelFloor=null;
+let fpPanelCell=null;
+let fpMeterCell=null;
+
+const FP_ROOM_COLOURS=['#6366f1','#14b8a6','#f97316','#a855f7','#0ea5e9','#84cc16','#f43f5e','#eab308','#64748b','#06b6d4'];
+const FLOOR_HEIGHT_FT=9;
+
+function fpCurrentCells(){
+  if(!fpFloorCells[fpActiveFloor])fpFloorCells[fpActiveFloor]={};
+  return fpFloorCells[fpActiveFloor];
+}
+
+function onFootprintChange(){if(currentStep===3)initFloorPlan();}
+
+window.addEventListener('resize',()=>{
+  if(currentStep===3){
+    const hw=parseInt(document.getElementById('house-w').value)||0;
+    const hl=parseInt(document.getElementById('house-l').value)||0;
+    if(hw&&hl)buildFpCanvas(hw,hl);
+  }
+});
+
+function initFloorPlan(){
+  const hw=parseInt(document.getElementById('house-w').value)||0;
+  const hl=parseInt(document.getElementById('house-l').value)||0;
+  const floors=parseInt(document.getElementById('house-floors').value)||1;
+  if(!hw||!hl){
+    document.getElementById('fp-canvas-wrap').innerHTML='<div style="padding:2rem;color:var(--muted);font-size:13px;text-align:center">Enter house width and length in Step 1 to enable the floor plan.</div>';
+    document.getElementById('fp-tools').innerHTML='';
+    document.getElementById('fp-legend').innerHTML='';
+    return;
+  }
+  for(let f=1;f<=floors;f++){if(!fpFloorCells[f])fpFloorCells[f]={};}
+  if(typeof fpActiveFloor!=='number'||fpActiveFloor>floors)fpActiveFloor=1;
+  buildFpToolbar();
+  buildFpFloorTabs(floors);
+  setTimeout(()=>buildFpCanvas(hw,hl),50);
+  renderFpLegend();
+}
+
+function buildFpFloorTabs(floors){
+  const wrap=document.getElementById('fp-floor-tabs');
+  if(!wrap)return;
+  let html='';
+  for(let f=1;f<=floors;f++){
+    html+=`<button class="fp-floor-tab${fpActiveFloor===f?' active':''}" onclick="switchFpFloor(${f})">Floor ${f}</button>`;
+  }
+  wrap.innerHTML=html;
+}
+
+function switchFpFloor(f){
+  fpActiveFloor=f;
+  const hw=parseInt(document.getElementById('house-w').value)||0;
+  const hl=parseInt(document.getElementById('house-l').value)||0;
+  const floors=parseInt(document.getElementById('house-floors').value)||1;
+  buildFpFloorTabs(floors);
+  buildFpToolbar();
+  if(hw&&hl)buildFpCanvas(hw,hl);
+  renderFpLegend();
+}
+
+function buildFpToolbar(){
+  const tools=document.getElementById('fp-tools');
+  if(!tools)return;
+  const isPanelFloor=(fpPanelFloor===null||fpPanelFloor===fpActiveFloor);
+  let html='';
+  if(isPanelFloor){
+    html+=`<button class="fp-tool-btn${fpTool==='panel'?' active':''}" onclick="setFpTool('panel')"><i class="ti ti-bolt"></i> Panel</button>`;
+    html+=`<button class="fp-tool-btn${fpTool==='meter'?' active':''}" onclick="setFpTool('meter')" style="color:#f97316"><i class="ti ti-current-location"></i> Meter</button>`;
+  } else {
+    html+=`<span style="font-size:11px;color:var(--muted);padding:4px 6px">Panel & meter on Floor ${fpPanelFloor}</span>`;
+  }
+  html+=`<span style="width:1px;background:var(--border);margin:0 4px;align-self:stretch;display:inline-block"></span>`;
+  // Interior rooms
+  rooms.forEach((r,i)=>{
+    const name=r.label?r.label:r.asmName;
+    const colour=FP_ROOM_COLOURS[i%FP_ROOM_COLOURS.length];
+    const otherFloor=Object.entries(fpFloorCells).find(([f,fc])=>parseInt(f)!==fpActiveFloor&&Object.values(fc).some(v=>v.type==='room'&&v.roomId===r.id));
+    if(otherFloor){
+      if(fpTool===r.id)fpTool=null;
+      html+=`<button class="fp-tool-btn fp-tool-locked" disabled title="Already on Floor ${otherFloor[0]}">${name} <span style="font-size:10px">(F${otherFloor[0]})</span></button>`;
+    } else {
+      html+=`<button class="fp-tool-btn${fpTool===r.id?' active':''}" onclick="setFpTool(${r.id})" style="${fpTool===r.id?'':'color:'+colour+';border-color:'+colour+'20;background:'+colour+'12'}">${name}</button>`;
+    }
+  });
+  // Exterior rooms — grouped by area, only paintable on their zone
+  if(extRooms.length){
+    html+=`<span style="width:1px;background:var(--border);margin:0 4px;align-self:stretch;display:inline-block"></span>`;
+    exteriorAreas.forEach(area=>{
+      const areaRooms=extRooms.filter(r=>r.areaId===area.id);
+      if(!areaRooms.length)return;
+      areaRooms.forEach((r,i)=>{
+        const name=r.label||r.asmName;
+        const colour='#64748b';
+        html+=`<button class="fp-tool-btn${fpTool===r.id?' active':''}" onclick="setFpTool(${r.id})" style="${fpTool===r.id?'':'color:'+colour+';border-color:'+colour+'20;background:'+colour+'12'}" title="${area.name}"><i class="ti ti-map-pin" style="font-size:10px"></i> ${name}</button>`;
+      });
+    });
+  }
+  if(!rooms.length&&!extRooms.length)html+=`<span style="font-size:12px;color:var(--muted)">Add rooms in Step 2 first</span>`;
+  tools.innerHTML=html;
+  const eb=document.getElementById('fp-eraser-btn');
+  if(eb)eb.classList.toggle('active',fpTool==='eraser');
+}
+
+function setFpTool(t){fpTool=t;buildFpToolbar();}
+
+function buildFpCanvas(w,l){
+  const wrap=document.getElementById('fp-canvas-wrap');
+  if(!wrap)return;
+  const card=wrap.closest('.card')||document.querySelector('.main');
+  const availW=(card?card.clientWidth:760)-32;
+  const availH=Math.min(window.innerHeight*0.62,600);
+  const geo=getHouseGeometry(w,l);
+  const {totalCols,totalRows,houseOriginCol,houseOriginRow,hExtLeft,hExtRight,hExtTop,hExtBot}=geo;
+  const cellByW=Math.floor(availW/totalCols);
+  const cellByH=Math.floor(availH/totalRows);
+  const cellSize=Math.max(4,Math.min(cellByW,cellByH,18));
+  const cells=fpCurrentCells();
+
+  const cellMap=[];
+  for(let gr=0;gr<totalRows;gr++){cellMap[gr]=[];for(let gc=0;gc<totalCols;gc++)cellMap[gr][gc]={type:'empty',key:null};}
+
+  // House exterior ring
+  for(let gc=hExtLeft;gc<=hExtRight;gc++){
+    cellMap[hExtTop][gc]={type:'house-ext',key:`ext:${gc-hExtLeft},0`};
+    cellMap[hExtBot][gc]={type:'house-ext',key:`ext:${gc-hExtLeft},${l+1}`};
+  }
+  for(let gr=hExtTop+1;gr<hExtBot;gr++){
+    cellMap[gr][hExtLeft]={type:'house-ext',key:`ext:0,${gr-hExtTop}`};
+    cellMap[gr][hExtRight]={type:'house-ext',key:`ext:${w+1},${gr-hExtTop}`};
+  }
+  // House interior
+  for(let gr=0;gr<l;gr++)
+    for(let gc=0;gc<w;gc++)
+      cellMap[houseOriginRow+gr][houseOriginCol+gc]={type:'house-int',key:`${gc},${gr}`};
+
+  // Exterior areas — fully paintable, keyed as zone:areaId:col,row
+  exteriorAreas.forEach(a=>{
+    const aW=(a.side==='top'||a.side==='bottom')?w:a.depth;
+    const aH=(a.side==='top'||a.side==='bottom')?a.depth:l;
+    let zOriginCol,zOriginRow;
+    switch(a.side){
+      case'top':    zOriginCol=houseOriginCol; zOriginRow=hExtTop-a.depth; break;
+      case'bottom': zOriginCol=houseOriginCol; zOriginRow=hExtBot+1;       break;
+      case'left':   zOriginCol=hExtLeft-a.depth; zOriginRow=houseOriginRow; break;
+      case'right':  zOriginCol=hExtRight+1;    zOriginRow=houseOriginRow;  break;
+    }
+    for(let gr=0;gr<aH;gr++)
+      for(let gc=0;gc<aW;gc++){
+        const canvR=zOriginRow+gr,canvC=zOriginCol+gc;
+        if(canvR>=0&&canvR<totalRows&&canvC>=0&&canvC<totalCols)
+          cellMap[canvR][canvC]={type:'ext-zone',areaId:a.id,key:`zone:${a.id}:${gc},${gr}`};
+      }
+  });
+
+  let html=`<div class="fp-canvas" style="display:grid;grid-template-columns:repeat(${totalCols},${cellSize}px);grid-template-rows:repeat(${totalRows},${cellSize}px);width:${totalCols*cellSize}px;height:${totalRows*cellSize}px;">`;
+  for(let gr=0;gr<totalRows;gr++){
+    for(let gc=0;gc<totalCols;gc++){
+      const cm=cellMap[gr][gc];
+      if(cm.type==='empty'){html+=`<div class="fp-cell fp-canvas-empty" style="width:${cellSize}px;height:${cellSize}px;"></div>`;continue;}
+      const key=cm.key;
+      const cell=cells[key];
+      let bg='',cls='fp-cell';
+      if(cm.type==='house-ext'){
+        cls+=' fp-exterior';
+        if(cell?.type==='meter'){bg='background:#f97316';cls+=' fp-meter';}
+      } else if(cm.type==='house-int'){
+        if(cell?.type==='panel'){bg='background:#1a1a1a';cls+=' fp-panel';}
+        else if(cell?.type==='room'){
+          const idx=rooms.findIndex(r=>r.id===cell.roomId);
+          bg=`background:${idx>=0?FP_ROOM_COLOURS[idx%FP_ROOM_COLOURS.length]:'#ccc'}`;
+        }
+      } else if(cm.type==='ext-zone'){
+        cls+=' fp-zone-cell';
+        if(cell?.type==='room'){
+          const allRooms=[...rooms,...extRooms];
+          const idx=allRooms.findIndex(r=>r.id===cell.roomId);
+          bg=`background:${idx>=0?FP_ROOM_COLOURS[idx%FP_ROOM_COLOURS.length]:'#64748b'}`;
+        }
+      }
+      html+=`<div class="${cls}" data-key="${key}" data-celltype="${cm.type}" data-areaid="${cm.areaId||''}" style="width:${cellSize}px;height:${cellSize}px;${bg}" onmousedown="fpDown('${key}')" onmouseover="fpOver('${key}')"></div>`;
+    }
+  }
+  html+='</div>';
+  wrap.innerHTML=html;
+  wrap.querySelector('.fp-canvas').onmouseup=()=>{fpPainting=false;};
+}
+function fpDown(key){if(!fpTool)return;fpPainting=true;fpPaintCell(key);}
+
+function fpOver(key){
+  if(!fpPainting||!fpTool)return;
+  if(fpTool==='panel'||fpTool==='meter')return;
+  fpPaintCell(key);
+}
+
+function fpPaintCell(key){
+  const cells=fpCurrentCells();
+  const isExt=key.startsWith('ext:');
+  const isZoneCell=key.startsWith('zone:');
+  const el=document.querySelector(`[data-key="${key}"]`);
+  const cellType=el?.dataset?.celltype||'';
+
+  // Determine if tool is an ext room tool
+  const toolRoom=[...rooms,...extRooms].find(r=>r.id===fpTool);
+  const isExtRoomTool=toolRoom&&extRooms.some(r=>r.id===fpTool);
+
+  if(fpTool==='eraser'){
+    if(cells[key]?.type==='panel'){fpPanelCell=null;fpPanelFloor=null;}
+    if(cells[key]?.type==='meter')fpMeterCell=null;
+    delete cells[key];
+  } else if(fpTool==='panel'){
+    if(cellType!=='house-int')return;
+    if(fpPanelCell&&fpPanelFloor){
+      const old=`${fpPanelCell.col},${fpPanelCell.row}`;
+      if(fpFloorCells[fpPanelFloor]?.[old]?.type==='panel')delete fpFloorCells[fpPanelFloor][old];
+    }
+    const [col,row]=key.split(',').map(Number);
+    cells[key]={type:'panel'};
+    fpPanelCell={col,row};
+    fpPanelFloor=fpActiveFloor;
+  } else if(fpTool==='meter'){
+    if(cellType!=='house-ext')return;
+    if(fpPanelFloor&&fpPanelFloor!==fpActiveFloor)return;
+    if(fpMeterCell&&fpPanelFloor){
+      const old=`ext:${fpMeterCell.col},${fpMeterCell.row}`;
+      if(fpFloorCells[fpPanelFloor]?.[old]?.type==='meter')delete fpFloorCells[fpPanelFloor][old];
+    }
+    const parts=key.replace('ext:','').split(',').map(Number);
+    cells[key]={type:'meter'};
+    fpMeterCell={col:parts[0],row:parts[1]};
+  } else if(isExtRoomTool){
+    // Ext room tools can only paint on their area's zone cells
+    if(cellType!=='ext-zone')return;
+    const extRoom=extRooms.find(r=>r.id===fpTool);
+    const cellAreaId=parseInt(el?.dataset?.areaid||'0');
+    if(extRoom&&cellAreaId!==extRoom.areaId)return;
+    cells[key]={type:'room',roomId:fpTool};
+  } else {
+    // Interior room tools can only paint on house interior
+    if(cellType!=='house-int')return;
+    cells[key]={type:'room',roomId:fpTool};
+  }
+
+  // Update cell visually
+  if(el){
+    el.className='fp-cell'+(cellType==='house-ext'?' fp-exterior':cellType==='ext-zone'?' fp-zone-cell':'');
+    el.style.background='';
+    const c=cells[key];
+    if(c){
+      if(c.type==='panel'){el.classList.add('fp-panel');el.style.background='#1a1a1a';}
+      else if(c.type==='meter'){el.classList.add('fp-meter');el.style.background='#f97316';}
+      else if(c.type==='room'){
+        const allRooms=[...rooms,...extRooms];
+        const idx=allRooms.findIndex(r=>r.id===c.roomId);
+        el.style.background=idx>=0?FP_ROOM_COLOURS[idx%FP_ROOM_COLOURS.length]:'#ccc';
+      }
+    } else if(cellType==='ext-zone'){
+      el.style.background='';
+    }
+  }
+  renderFpLegend();
+  renderExtRooms();
+}
+
+function clearFloorPlan(){
+  if(!confirm('Clear floor plan for all floors?'))return;
+  fpFloorCells={};fpPanelCell=null;fpPanelFloor=null;fpMeterCell=null;
+  const floors=parseInt(document.getElementById('house-floors').value)||1;
+  for(let f=1;f<=floors;f++)fpFloorCells[f]={};
+  const hw=parseInt(document.getElementById('house-w').value)||0;
+  const hl=parseInt(document.getElementById('house-l').value)||0;
+  if(hw&&hl)buildFpCanvas(hw,hl);
+  renderFpLegend();
+}
+
+function getRoomCentroid(roomId){
+  for(const [floorNum,cells] of Object.entries(fpFloorCells)){
+    const matching=Object.entries(cells).filter(([k,v])=>!k.startsWith('ext:')&&v.type==='room'&&v.roomId===roomId);
+    if(matching.length){
+      const cols=matching.map(([k])=>parseInt(k.split(',')[0]));
+      const rows=matching.map(([k])=>parseInt(k.split(',')[1]));
+      return{col:cols.reduce((a,b)=>a+b,0)/cols.length,row:rows.reduce((a,b)=>a+b,0)/rows.length,floor:parseInt(floorNum)};
+    }
+  }
+  return null;
+}
+
+function fpDist(a,b){return Math.round(Math.sqrt(Math.pow(a.col-b.col,2)+Math.pow(a.row-b.row,2)));}
+
+function getHomerunDistance(roomId){
+  if(!fpPanelCell||fpPanelFloor===null)return null;
+  const centroid=getRoomCentroid(roomId);
+  if(!centroid)return null;
+  const planDist=fpDist(centroid,fpPanelCell);
+  const floorOffset=Math.abs(centroid.floor-fpPanelFloor)*FLOOR_HEIGHT_FT;
+  return planDist+floorOffset;
+}
+
+function getServiceDistance(){
+  if(!fpPanelCell||!fpMeterCell||fpPanelFloor===null)return null;
+  return fpDist(fpPanelCell,{col:fpMeterCell.col-1,row:fpMeterCell.row-1});
+}
+
+function renderFpLegend(){
+  const el=document.getElementById('fp-legend');
+  if(!el)return;
+  let html='';
+  const svcDist=getServiceDistance();
+  if(fpPanelCell){
+    html+=`<div class="fp-legend-row"><div class="fp-legend-left"><div class="fp-legend-swatch" style="background:#1a1a1a"></div><span class="fp-legend-name">Panel</span><span style="font-size:11px;color:var(--muted)">Floor ${fpPanelFloor}</span></div><span class="fp-legend-dist">${fpMeterCell?svcDist+' ft to meter':'Place meter on exterior border'}</span></div>`;
+  }
+  if(fpMeterCell){
+    html+=`<div class="fp-legend-row"><div class="fp-legend-left"><div class="fp-legend-swatch" style="background:#f97316"></div><span class="fp-legend-name">Meter</span><span style="font-size:11px;color:var(--muted)">exterior</span></div><span class="fp-legend-dist">${fpPanelCell?svcDist+' ft to panel':'Place panel first'}</span></div>`;
+  }
+  rooms.forEach((r,i)=>{
+    const name=r.label?`${r.asmName} — ${r.label}`:r.asmName;
+    const colour=FP_ROOM_COLOURS[i%FP_ROOM_COLOURS.length];
+    const dist=getHomerunDistance(r.id);
+    const centroid=getRoomCentroid(r.id);
+    const cellCount=Object.values(fpFloorCells).reduce((s,fc)=>s+Object.values(fc).filter(v=>v.type==='room'&&v.roomId===r.id).length,0);
+    html+=`<div class="fp-legend-row"><div class="fp-legend-left"><div class="fp-legend-swatch" style="background:${colour}"></div><span class="fp-legend-name">${name}</span><span style="font-size:11px;color:var(--muted)">${cellCount?cellCount+' cells'+(centroid?' · Floor '+centroid.floor:''):''}</span></div><span class="fp-legend-dist">${dist!==null?'~'+dist+' ft homerun':(fpPanelCell?'Not painted':'Place panel first')}</span></div>`;
+  });
+  extRooms.forEach((r,i)=>{
+    const name=r.label?`${r.asmName} — ${r.label}`:r.asmName;
+    const dist=getExtRoomHomerunDistance(r.id);
+    const area=exteriorAreas.find(a=>a.id===r.areaId);
+    const colour='#64748b';
+    html+=`<div class="fp-legend-row"><div class="fp-legend-left"><div class="fp-legend-swatch" style="background:${colour}"></div><span class="fp-legend-name">${name}</span><span style="font-size:11px;color:var(--muted)">${area?' · '+area.name:''}</span></div><span class="fp-legend-dist">${dist!==null?'~'+dist+' ft feed':(fpPanelCell?'Not painted':'Place panel first')}</span></div>`;
+  });
+  el.innerHTML=html;
 }
 
 function renderRooms(){
@@ -1010,20 +1704,151 @@ function addAddon(){
 
 function removeAddon(id){addons=addons.filter(a=>a.id!==id);renderAddons();}
 
-function renderAddons(){
-  const el=document.getElementById('addon-list');
-  if(!addons.length){el.innerHTML='';return;}
-  el.innerHTML=addons.map(a=>{
-    const total=a.lineItems.reduce((s,i)=>s+i.qty*i.price,0);
-    return`<div class="addon-item">
-      <span class="addon-item-name">${a.protoName}</span>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <span class="addon-item-cost">$${total.toFixed(2)}</span>
-        <button class="addon-item-del" onclick="removeAddon(${a.id})"><i class="ti ti-x"></i></button>
-      </div>
-    </div>`;
-  }).join('');
+// ── EXTERIOR AREAS ───────────────────────────────────────────
+let exteriorAreas=[];
+let extRooms=[];
+
+function addExtArea(){
+  const name=document.getElementById('ext-area-name').value.trim();
+  const side=document.getElementById('ext-area-side').value;
+  const depth=parseInt(document.getElementById('ext-area-depth').value)||0;
+  if(!name){showToast('Enter an area name.');return;}
+  if(!depth){showToast('Enter a depth.');return;}
+  exteriorAreas.push({id:Date.now(),name,side,depth});
+  document.getElementById('ext-area-name').value='';
+  document.getElementById('ext-area-depth').value='';
+  renderExtAreaList();
+  renderExtRooms();
+  if(currentStep===3)initFloorPlan();
 }
+
+function removeExtArea(id){
+  exteriorAreas=exteriorAreas.filter(a=>a.id!==id);
+  extRooms=extRooms.filter(r=>r.areaId!==id);
+  Object.values(fpFloorCells).forEach(fc=>{
+    Object.keys(fc).forEach(k=>{if(fc[k]?.areaId===id)delete fc[k];});
+  });
+  delete fpFloorCells[`ext:${id}`];
+  renderExtAreaList();
+  renderExtRooms();
+  if(currentStep===3)initFloorPlan();
+}
+
+function renderExtAreaList(){
+  const el=document.getElementById('ext-area-list');
+  if(!el)return;
+  if(!exteriorAreas.length){el.innerHTML='';return;}
+  const sideLabels={top:'Top',bottom:'Bottom',left:'Left',right:'Right'};
+  el.innerHTML=exteriorAreas.map(a=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--surface);border:0.5px solid var(--border);border-radius:5px;"><span style="font-size:13px;font-weight:500">${a.name}</span><div style="display:flex;align-items:center;gap:10px;"><span style="font-size:11px;color:var(--muted)">${sideLabels[a.side]} · ${a.depth} ft deep</span><button class="addon-item-del" onclick="removeExtArea(${a.id})"><i class="ti ti-x"></i></button></div></div>`).join('');
+}
+
+function addExtRoom(){
+  const areaId=parseInt(document.getElementById('ext-room-area-sel').value);
+  const asmId=parseInt(document.getElementById('ext-room-asm-sel').value);
+  const w=parseFloat(document.getElementById('ext-room-w').value)||0;
+  const l=parseFloat(document.getElementById('ext-room-l').value)||0;
+  const label=document.getElementById('ext-room-label').value.trim();
+  if(!areaId){showToast('Select an exterior area.');return;}
+  if(!asmId){showToast('Select an assembly.');return;}
+  if(!w||!l){showToast('Enter dimensions.');return;}
+  const asm=catalogue.assemblies.find(x=>x.id===asmId);
+  if(!asm)return;
+  const lineItems=evalAssembly(asm,w,l);
+  extRooms.push({id:Date.now(),areaId,asmId,asmName:asm.name,w,l,label,lineItems,lightingGrid:{nodes:[],fixtureByGroup:{}}});
+  document.getElementById('ext-room-w').value='';
+  document.getElementById('ext-room-l').value='';
+  document.getElementById('ext-room-label').value='';
+  renderExtRooms();
+  updateTotals();
+}
+
+function removeExtRoom(id){
+  extRooms=extRooms.filter(r=>r.id!==id);
+  renderExtRooms();
+  updateTotals();
+}
+
+function getHouseGeometry(w,l){
+  let extraTop=0,extraBottom=0,extraLeft=0,extraRight=0;
+  exteriorAreas.forEach(a=>{
+    if(a.side==='top')    extraTop   =Math.max(extraTop,   a.depth);
+    if(a.side==='bottom') extraBottom=Math.max(extraBottom,a.depth);
+    if(a.side==='left')   extraLeft  =Math.max(extraLeft,  a.depth);
+    if(a.side==='right')  extraRight =Math.max(extraRight, a.depth);
+  });
+  const EXT=1;
+  const houseOriginCol=extraLeft+EXT;
+  const houseOriginRow=extraTop+EXT;
+  return{
+    extraTop,extraBottom,extraLeft,extraRight,
+    houseOriginCol,houseOriginRow,
+    hExtLeft:houseOriginCol-1,hExtRight:houseOriginCol+w,
+    hExtTop:houseOriginRow-1,hExtBot:houseOriginRow+l,
+    totalCols:extraLeft+EXT+w+EXT+extraRight,
+    totalRows:extraTop+EXT+l+EXT+extraBottom
+  };
+}
+
+function getExtRoomHomerunDistance(roomId){
+  if(!fpPanelCell||fpPanelFloor===null)return null;
+  const hw=parseInt(document.getElementById('house-w').value)||1;
+  const hl=parseInt(document.getElementById('house-l').value)||1;
+  const geo=getHouseGeometry(hw,hl);
+  for(const [tabKey,cells] of Object.entries(fpFloorCells)){
+    const matching=Object.entries(cells).filter(([k,v])=>!k.startsWith('ext:')&&v.type==='room'&&v.roomId===roomId);
+    if(!matching.length)continue;
+    const cols=matching.map(([k])=>parseInt(k.split(',')[0]));
+    const rows=matching.map(([k])=>parseInt(k.split(',')[1]));
+    const centroid={col:cols.reduce((a,b)=>a+b,0)/cols.length,row:rows.reduce((a,b)=>a+b,0)/rows.length};
+    const area=exteriorAreas.find(a=>`ext:${a.id}`===tabKey);
+    let canvasCentroid;
+    if(area){
+      let zOriginCol,zOriginRow;
+      switch(area.side){
+        case'top':    zOriginCol=geo.houseOriginCol; zOriginRow=geo.hExtTop-area.depth; break;
+        case'bottom': zOriginCol=geo.houseOriginCol; zOriginRow=geo.hExtBot+1;          break;
+        case'left':   zOriginCol=geo.hExtLeft-area.depth; zOriginRow=geo.houseOriginRow; break;
+        case'right':  zOriginCol=geo.hExtRight+1;    zOriginRow=geo.houseOriginRow;     break;
+      }
+      canvasCentroid={col:zOriginCol+centroid.col,row:zOriginRow+centroid.row};
+    } else {
+      canvasCentroid={col:geo.houseOriginCol+centroid.col,row:geo.houseOriginRow+centroid.row};
+    }
+    const panelCanvas={col:geo.houseOriginCol+fpPanelCell.col,row:geo.houseOriginRow+fpPanelCell.row};
+    const floorOffset=area?0:Math.abs(parseInt(tabKey)-fpPanelFloor)*FLOOR_HEIGHT_FT;
+    return fpDist(canvasCentroid,panelCanvas)+floorOffset;
+  }
+  return null;
+}
+
+function renderExtRooms(){
+  const el=document.getElementById('ext-room-list');
+  if(!el)return;
+  const areaSel=document.getElementById('ext-room-area-sel');
+  const panel=document.getElementById('ext-add-panel');
+  if(areaSel) areaSel.innerHTML=exteriorAreas.map(a=>`<option value="${a.id}">${a.name}</option>`).join('');
+  if(panel) panel.style.display=exteriorAreas.length?'block':'none';
+  if(!extRooms.length){el.innerHTML='';return;}
+  const byArea={};
+  extRooms.forEach(r=>{if(!byArea[r.areaId])byArea[r.areaId]=[];byArea[r.areaId].push(r);});
+  let html='';
+  exteriorAreas.forEach(area=>{
+    const areaRooms=byArea[area.id]||[];
+    if(!areaRooms.length)return;
+    html+=`<div style="margin-bottom:12px;"><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:6px;">${area.name}</div>`;
+    areaRooms.forEach(r=>{
+      const name=r.label?`${r.asmName} — ${r.label}`:r.asmName;
+      const tags=r.lineItems.map(i=>`<span class="room-tag">${i.qty>1?(Number.isInteger(i.qty)?i.qty:i.qty.toFixed(1))+'x ':'' }${i.desc}</span>`).join('');
+      const lightItems=getLightingLineItems(r);
+      const dist=getExtRoomHomerunDistance(r.id);
+      const total=r.lineItems.reduce((s,i)=>s+i.qty*i.price,0)+lightItems.reduce((s,i)=>s+i.qty*i.price,0);
+      html+=`<div class="room-item" style="margin-bottom:6px;"><div class="room-item-left"><div class="room-item-name">${name}</div><div class="room-item-dims">${r.w} x ${r.l} ft${dist!==null?' · ~'+dist+' ft from panel':''}</div><div class="room-item-tags">${tags}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;"><span style="font-size:13px;font-weight:600;color:var(--blue)">$${total.toFixed(2)}</span><button class="room-item-del" onclick="removeExtRoom(${r.id})"><i class="ti ti-x"></i></button></div></div>`;
+    });
+    html+='</div>';
+  });
+  el.innerHTML=html;
+}
+
 
 // ── AI ASSIST ─────────────────────────────────────────────────
 function checkApiKey(){
@@ -1197,12 +2022,32 @@ function renderAllLineItems(){
     html+=`</div>`;
   });
 
+  // Exterior assemblies
+  if(extRooms.length){
+    extRooms.forEach(r=>{
+      const name=r.label?`${r.asmName} — ${r.label}`:r.asmName;
+      const area=exteriorAreas.find(a=>a.id===r.areaId);
+      html+=`<div class="li-section"><div class="li-section-title"><i class="ti ti-map-pin" style="font-size:11px"></i> ${area?area.name+' — ':''}${name}</div>`;
+      r.lineItems.forEach(item=>{html+=renderLIRow(item,'room',r.id);});
+      getLightingLineItems(r).forEach(item=>{html+=renderLIRow(item,'room',r.id);});
+      html+=`</div>`;
+    });
+  }
+
   // Add-ons
   if(addons.length){
     html+=`<div class="li-section"><div class="li-section-title">Add-ons &amp; protoassemblies</div>`;
     addons.forEach(a=>{
       a.lineItems.forEach(item=>{html+=renderLIRow(item,'addon',a.id);});
     });
+    html+=`</div>`;
+  }
+
+  // Computed auto items (homeruns, GP circuits, detectors)
+  const computed=getComputedLineItems();
+  if(computed.length){
+    html+=`<div class="li-section"><div class="li-section-title"><i class="ti ti-cpu" style="font-size:11px"></i> Auto-calculated</div>`;
+    computed.forEach(item=>{html+=renderLIRow(item,'computed',null);});
     html+=`</div>`;
   }
 
@@ -1275,6 +2120,8 @@ function updateTotals(){
     getLightingLineItems(r).forEach(i=>{materials+=i.qty*i.price;});
   });
   addons.forEach(a=>{a.lineItems.forEach(i=>{materials+=i.qty*i.price;});});
+  extRooms.forEach(r=>{r.lineItems.forEach(i=>{materials+=i.qty*i.price;});getLightingLineItems(r).forEach(i=>{materials+=i.qty*i.price;});});
+  getComputedLineItems().forEach(i=>{materials+=i.qty*i.price;});
   aiItems.forEach(i=>{materials+=i.qty*i.price;});
   manualItems.forEach(i=>{materials+=i.qty*i.price;});
 
@@ -1382,6 +2229,8 @@ async function saveAssessment(){
     notes:document.getElementById('job-notes').value||'',
     rooms:JSON.stringify(rooms),
     addons:JSON.stringify(addons),
+    exteriorAreas:JSON.stringify(exteriorAreas),
+    extRooms:JSON.stringify(extRooms),
     ai_items:JSON.stringify(aiItems),
     manual_items:JSON.stringify(manualItems),
     labour:JSON.stringify(labourRows),
@@ -1390,6 +2239,10 @@ async function saveAssessment(){
     margin_high:marginMode==='single'?parseFloat(document.getElementById('margin-single')?.value)||10:parseFloat(document.getElementById('margin-high')?.value)||15,
     client_description:document.getElementById('client-desc')?.value||'',
     terms:document.getElementById('terms-text')?.value||'',
+    house_w:parseInt(document.getElementById('house-w')?.value)||0,
+    house_l:parseInt(document.getElementById('house-l')?.value)||0,
+    house_floors:parseInt(document.getElementById('house-floors')?.value)||1,
+    floor_plan:JSON.stringify({cells:fpFloorCells,panelCell:fpPanelCell,panelFloor:fpPanelFloor,meterCell:fpMeterCell}),
     status:'draft'
   };
 
@@ -1433,13 +2286,22 @@ function loadAssessmentData(asm){
   const safeJ=s=>{try{return s?JSON.parse(s):[];}catch{return[];}};
   rooms=safeJ(asm.rooms);
   addons=safeJ(asm.addons);
+  exteriorAreas=safeJ(asm.exteriorAreas);
+  extRooms=safeJ(asm.extRooms);
   aiItems=safeJ(asm.ai_items);
   manualItems=safeJ(asm.manual_items);
   labourRows=safeJ(asm.labour);
   marginMode=asm.margin_mode||'spread';
   if(asm.margin_low!=null){const el=document.getElementById('margin-low');if(el)el.value=asm.margin_low;}
   if(asm.margin_high!=null){const el=document.getElementById('margin-high');if(el)el.value=asm.margin_high;}
-  renderLabour();renderRooms();renderAddons();
+  // Restore house footprint
+  if(asm.house_w){document.getElementById('house-w').value=asm.house_w;}
+  if(asm.house_l){document.getElementById('house-l').value=asm.house_l;}
+  if(asm.house_floors){document.getElementById('house-floors').value=asm.house_floors;}
+  // Restore floor plan state
+  const fp=safeJ(asm.floor_plan);
+  if(fp&&fp.cells){fpFloorCells=fp.cells;fpPanelCell=fp.panelCell||null;fpPanelFloor=fp.panelFloor||null;fpMeterCell=fp.meterCell||null;}
+  renderLabour();renderRooms();renderAddons();renderExtAreaList();renderExtRooms();
   showToast('Assessment loaded ✓');
 }
 
@@ -1459,6 +2321,8 @@ function preparePrint(){
     getLightingLineItems(r).forEach(i=>{materials+=i.qty*i.price;});
   });
   addons.forEach(a=>{a.lineItems.forEach(i=>{materials+=i.qty*i.price;});});
+  extRooms.forEach(r=>{r.lineItems.forEach(i=>{materials+=i.qty*i.price;});getLightingLineItems(r).forEach(i=>{materials+=i.qty*i.price;});});
+  getComputedLineItems().forEach(i=>{materials+=i.qty*i.price;});
   aiItems.forEach(i=>{materials+=i.qty*i.price;});
   manualItems.forEach(i=>{materials+=i.qty*i.price;});
   const labour=labourRows.reduce((s,r)=>s+(r.hrs||0)*(r.rate||0),0);
