@@ -851,6 +851,8 @@ function roundQty(n){
 
 function calcProtoTotal(proto){
   return (proto.components||[]).reduce((s,c)=>{
+    const rule=c.qty_rule||'fixed';
+    if(rule==='circuit_feed'||rule==='service_feed')return s;
     const comp=catalogue.components.find(x=>x.id===c.comp_id);
     return s+(comp?(parseFloat(comp.unit_price)||0)*(parseFloat(c.qty)||1):0);
   },0);
@@ -1145,61 +1147,44 @@ function weightedAvgDistance(routingFactor=1.2){
 // OR detected by amperage keywords in add-ons
 function getDedicatedFeedItems(){
   const items=[];
+  const avgDist=weightedAvgDistance(1.2);
 
-  // Rooms — look for protoassembly components marked with qty_rule='circuit_feed'
+  const getFeedWires=proto=>{
+    if(!proto||!proto.components)return[];
+    return proto.components.filter(c=>(c.qty_rule||'fixed')==='circuit_feed').map(c=>({
+      comp:catalogue.components.find(x=>x.id===c.comp_id),c
+    })).filter(x=>x.comp);
+  };
+
   const allRooms=[...rooms,...extRooms];
   allRooms.forEach(r=>{
     const dist=getHomerunDistance(r.id)||getExtRoomHomerunDistance(r.id)||0;
     if(!dist)return;
     const distM=Math.ceil(dist*0.3048*1.1);
-    // Find any line item that came from a proto with a circuit_feed component
-    // For now detect by line item description containing amperage + breaker keywords
-    r.lineItems.forEach(i=>{
-      const desc=(i.desc||'').toLowerCase();
-      let gauge=null;
-      if(/20a.*ded|ded.*20a|20a.*circuit|fridge|dishwash|microwave|garb/i.test(desc)) gauge='12/2';
-      else if(/30a|dryer|ac\b|air.cond|ev.charg/i.test(desc)) gauge='10/3';
-      else if(/40a|50a|range|oven|hot.tub|spa|sauna|cooktop/i.test(desc)) gauge='8/3';
-      if(!gauge)return;
-      const comp=findWireComponent(gauge.replace('/',' NMD').replace('/','/')); // "12/2 NMD90" etc
-      const wire=findWireComponent(gauge);
-      if(!wire)return;
-      const name=r.label?`${r.asmName} — ${r.label}`:r.asmName;
-      items.push({
-        id:Date.now()+Math.random(),
-        desc:`${wire.description||gauge+' NMD90'} circuit feed — ${name} (~${distM} m)`,
-        cat:'material',qty:distM,price:componentPrice(wire),
-        source:'circuit-feed',codeNote:''
+    const name=r.label?`${r.asmName} — ${r.label}`:r.asmName;
+    const asm=catalogue.assemblies.find(a=>a.id===r.asmId);
+    const protos=[];
+    if(asm)(asm.fixed_components||[]).forEach(f=>{const p=catalogue.protoassemblies.find(x=>x.id===f.proto_id);if(p)protos.push(p);});
+    protos.forEach(proto=>{
+      getFeedWires(proto).forEach(({comp})=>{
+        items.push({id:Date.now()+Math.random(),desc:`${comp.description||comp.technical_name} circuit feed — ${name} (~${distM} m)`,cat:'material',qty:distM,price:parseFloat(comp.unit_price)||0,source:'circuit-feed',codeNote:''});
       });
     });
   });
 
-  // Add-ons — dedicated circuit protoassemblies
-  const avgDist=weightedAvgDistance(1.2);
   if(avgDist>0){
     addons.forEach(a=>{
-      const name=(a.protoName||'').toLowerCase();
-      let gauge=null;
-      if(/30a|dryer|ac\b|ev.charg/i.test(name)) gauge='10/3';
-      else if(/40a|50a|range|oven|hot.tub|spa|sauna/i.test(name)) gauge='8/3';
-      else if(/20a|dedicated/i.test(name)) gauge='12/2';
-      if(!gauge)return;
-      const wire=findWireComponent(gauge);
-      if(!wire)return;
+      const proto=catalogue.protoassemblies.find(x=>x.id===a.protoId);
+      if(!proto)return;
       const distM=Math.ceil(avgDist*0.3048*1.1);
-      items.push({
-        id:Date.now()+Math.random(),
-        desc:`${wire.description||gauge+' NMD90'} circuit feed — ${a.protoName} (~${distM} m)`,
-        cat:'material',qty:distM,price:componentPrice(wire),
-        source:'circuit-feed',codeNote:''
+      getFeedWires(proto).forEach(({comp})=>{
+        items.push({id:Date.now()+Math.random(),desc:`${comp.description||comp.technical_name} circuit feed — ${a.protoName} (~${distM} m)`,cat:'material',qty:distM,price:parseFloat(comp.unit_price)||0,source:'circuit-feed',codeNote:''});
       });
     });
   }
 
   return items;
 }
-
-// GP branch circuit feeds — 14/2 per circuit, weighted avg distance × 1.2
 function getGPCircuitLineItems(){
   const items=[];
   const allRooms=[...rooms,...extRooms];
@@ -1286,9 +1271,36 @@ function getDetectorLineItems(){
   return items;
 }
 
+// ── SERVICE FEED (meter → panel) ──────────────────────────────
+function getServiceFeedItems(){
+  const items=[];
+  const svcDist=getServiceDistance(); // ft, from floor plan
+  if(!svcDist)return items;
+  const distM=Math.ceil(svcDist*0.3048*1.1);
+
+  // Find panel protoassemblies in add-ons
+  addons.forEach(a=>{
+    const proto=catalogue.protoassemblies.find(x=>x.id===a.protoId);
+    if(!proto)return;
+    (proto.components||[]).forEach(c=>{
+      if((c.qty_rule||'fixed')!=='service_feed')return;
+      const comp=catalogue.components.find(x=>x.id===c.comp_id);
+      if(!comp)return;
+      items.push({
+        id:Date.now()+Math.random(),
+        desc:`${comp.description||comp.technical_name} service feed — ${a.protoName} (~${distM} m)`,
+        cat:'material',qty:distM,price:parseFloat(comp.unit_price)||0,
+        source:'service-feed',codeNote:''
+      });
+    });
+  });
+  return items;
+}
+
 // ── COMPUTED LINE ITEMS ───────────────────────────────────────
 function getComputedLineItems(){
   return[
+    ...getServiceFeedItems(),
     ...getDedicatedFeedItems(),
     ...getGPCircuitLineItems(),
     ...getDetectorLineItems(),
