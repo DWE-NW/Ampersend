@@ -219,29 +219,33 @@
     .empty-hint i{font-size:28px;display:block;margin-bottom:8px;opacity:0.3;}
 
     /* LIGHTING GRID */
-    .lighting-grid-wrap{background:var(--surface);border:0.5px solid var(--border);border-radius:0 0 6px 6px;border-top:none;padding:12px 14px;}
-    .lighting-grid-header{font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+    .lighting-grid-wrap{background:var(--surface);border:0.5px solid var(--border);border-radius:0 0 6px 6px;border-top:none;padding:14px 16px;}
+    .lighting-grid-header{font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
     .lighting-grid-header i{font-size:12px;}
-    .lighting-colour-rows{display:flex;flex-direction:column;gap:8px;}
+    .lighting-colour-rows{display:flex;flex-direction:column;gap:10px;}
     .lighting-colour-row{display:flex;align-items:center;gap:10px;}
-    .lighting-colour-label{font-size:13px;font-weight:600;width:58px;flex-shrink:0;cursor:pointer;padding:4px 6px;border-radius:4px;border:1.5px solid transparent;transition:border-color 0.1s;}
+    .lighting-colour-label{font-size:12px;font-weight:600;width:64px;min-width:64px;flex-shrink:0;cursor:pointer;padding:3px 6px;border-radius:4px;border:1.5px solid transparent;transition:border-color 0.1s;white-space:nowrap;}
     .lighting-colour-label:hover{opacity:0.8;}
     .lighting-colour-label.active{border-color:currentColor;}
-    .lighting-colour-label.c1{color:#3b82f6;}
-    .lighting-colour-label.c2{color:#ef4444;}
-    .lighting-colour-label.c3{color:#22c55e;}
-    .lighting-colour-label.c4{color:#ca8a04;}
-    .lighting-colour-count{font-size:11px;color:var(--muted);width:52px;flex-shrink:0;}
-    .lighting-fixture-sel{flex:1;font-size:12px;padding:4px 8px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;}
+    .lighting-colour-label.c1{color:#6366f1;}
+    .lighting-colour-label.c2{color:#f97316;}
+    .lighting-colour-label.c3{color:#14b8a6;}
+    .lighting-colour-label.c4{color:#a855f7;}
+    .lighting-colour-count{font-size:11px;color:var(--muted);width:44px;min-width:44px;flex-shrink:0;}
+    .lighting-fixture-sel{flex:1;min-width:0;font-size:12px;padding:4px 8px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:var(--black);font-family:inherit;}
     .lighting-fixture-sel:focus{outline:none;border-color:var(--blue);}
-    .lighting-dot-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:172px;min-width:172px;}
-    .lighting-dot{width:100%;aspect-ratio:1;border-radius:50%;background:#d4d4d4;border:2px solid transparent;cursor:pointer;transition:all 0.1s;}
-    .lighting-dot:hover{background:#bbb;}
-    .lighting-dot.placed-1{background:#3b82f6;border-color:#2563eb;}
-    .lighting-dot.placed-2{background:#ef4444;border-color:#dc2626;}
-    .lighting-dot.placed-3{background:#22c55e;border-color:#16a34a;}
-    .lighting-dot.placed-4{background:#eab308;border-color:#ca8a04;}
-    .lighting-dot.placed-1:hover,.lighting-dot.placed-2:hover,.lighting-dot.placed-3:hover,.lighting-dot.placed-4:hover{opacity:0.7;}
+    .lighting-dot-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;width:140px;min-width:140px;}
+    .lighting-dot{width:100%;aspect-ratio:1;border-radius:50%;background:#d4d4d4;cursor:pointer;transition:all 0.12s;}
+    .lighting-dot-centre{background:#e5e5e5;box-shadow:0 0 0 2px #ccc inset;}
+    .lighting-dot:hover{background:#aaa;}
+    .lighting-dot.placed-1{background:#6366f1;}
+    .lighting-dot.placed-2{background:#f97316;}
+    .lighting-dot.placed-3{background:#14b8a6;}
+    .lighting-dot.placed-4{background:#a855f7;}
+    .lighting-dot.placed-1:hover{background:#4f46e5;}
+    .lighting-dot.placed-2:hover{background:#ea6c00;}
+    .lighting-dot.placed-3:hover{background:#0d9488;}
+    .lighting-dot.placed-4:hover{background:#9333ea;}
 
     @media(max-width:600px){
       .job-type-grid{grid-template-columns:1fr 1fr;}
@@ -932,7 +936,7 @@ function renderRooms(){
     const activeGroup=roomActiveGroup[r.id]||1;
 
     // Colour rows — show fixture selector for each colour
-    const colours=[{g:1,label:'Blue',cls:'c1'},{g:2,label:'Red',cls:'c2'},{g:3,label:'Green',cls:'c3'},{g:4,label:'Yellow',cls:'c4'}];
+    const colours=[{g:1,label:'Fixture 1',cls:'c1'},{g:2,label:'Fixture 2',cls:'c2'},{g:3,label:'Fixture 3',cls:'c3'},{g:4,label:'Fixture 4',cls:'c4'}];
     const lightingProtos=catalogue.protoassemblies.filter(p=>(p.category||'').toLowerCase()==='lighting');
 
     const colourRows=colours.map(c=>{
@@ -949,11 +953,18 @@ function renderRooms(){
       </div>`;
     }).join('');
 
-    // Dot grid
-    const dots=Array.from({length:16},(_,i)=>{
-      const placed=grid.nodes.find(n=>n.index===i);
+    // 5×5 grid: 25 cells. Centre = cell 12. Perimeter indices 0-15 map to non-centre cells.
+    // Cell order: 0..24, skip cell 12 for perimeter, cell 12 = centre node (index 99)
+    const cells=Array.from({length:25},(_,cell)=>{
+      if(cell===12){
+        const centrePlaced=grid.nodes.find(n=>n.index===99);
+        const cls=centrePlaced?`placed-${centrePlaced.group}`:'';
+        return`<div class="lighting-dot lighting-dot-centre ${cls}" onclick="toggleLightingNode(${r.id},99)" title="Centre"></div>`;
+      }
+      const perimIdx=cell<12?cell:cell-1;
+      const placed=grid.nodes.find(n=>n.index===perimIdx);
       const cls=placed?`placed-${placed.group}`:'';
-      return`<div class="lighting-dot ${cls}" onclick="toggleLightingNode(${r.id},${i})"></div>`;
+      return`<div class="lighting-dot ${cls}" onclick="toggleLightingNode(${r.id},${perimIdx})"></div>`;
     }).join('');
 
     return`<div style="margin-bottom:8px;">
@@ -971,7 +982,7 @@ function renderRooms(){
       <div class="lighting-grid-wrap">
         <div class="lighting-grid-header"><i class="ti ti-bulb"></i> Lighting layout</div>
         <div style="display:flex;gap:20px;align-items:stretch;">
-          <div class="lighting-dot-grid" id="grid-${r.id}">${dots}</div>
+          <div class="lighting-dot-grid lighting-dot-grid-5">${cells}</div>
           <div style="flex:1;display:flex;flex-direction:column;justify-content:space-between;">
             <div class="lighting-colour-rows">${colourRows}</div>
           </div>
