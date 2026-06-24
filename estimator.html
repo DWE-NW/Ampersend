@@ -382,7 +382,7 @@
       <div class="fg"><label>Internal notes</label><textarea id="job-notes" placeholder="e.g. New build, 1,800 sq ft bungalow, forced air gas, client supplied fixtures in master…"></textarea></div>
     </div>
     <div class="card">
-      <div class="card-title">House footprint <span style="font-size:12px;font-weight:400;color:var(--muted)">— used for floor plan &amp; homerun distances</span></div>
+      <div class="card-title">House footprint <span style="font-size:12px;font-weight:400;color:var(--muted)">— used for floor plan &amp; circuit feed distances</span></div>
       <div class="g3">
         <div class="fg"><label>Overall width (ft)</label><input type="number" id="house-w" min="10" max="200" placeholder="50" oninput="onFootprintChange()"/></div>
         <div class="fg"><label>Overall length (ft)</label><input type="number" id="house-l" min="10" max="200" placeholder="30" oninput="onFootprintChange()"/></div>
@@ -1108,121 +1108,140 @@ function getLightingWireItems(room){
   return items;
 }
 
-// ── HOMERUN WIRE LINE ITEMS ───────────────────────────────────
-// Wire gauge lookup
-function findWireProto(gauge){
-  return catalogue.protoassemblies.find(p=>
-    p.name.includes(gauge)&&/nmd|wire|cable/i.test(p.name)
+// ── CIRCUIT FEED (formerly homerun) ──────────────────────────
+// Wire lookup — searches components by description
+function findWireComponent(gauge){
+  // Match by description e.g. "14/2 NMD90", "12/2 NMD90", "10/3 NMD90"
+  return catalogue.components.find(c=>
+    c.description&&c.description.includes(gauge)
   );
 }
 
-// Only dedicated circuits get individual homeruns here.
-// GP 15A circuits are handled by getGPCircuitLineItems.
-function getHomerunLineItems(){
+// Unit price of a component directly
+function componentPrice(comp){
+  return parseFloat(comp?.unit_price)||0;
+}
+
+// Weighted average panel distance across all painted rooms, weighted by device count
+// routingFactor accounts for real-world circuit routing being longer than straight-line
+function weightedAvgDistance(routingFactor=1.2){
+  const allRooms=[...rooms,...extRooms];
+  let totalWeight=0, weightedSum=0;
+  allRooms.forEach(r=>{
+    const dist=getHomerunDistance(r.id)||getExtRoomHomerunDistance(r.id)||0;
+    if(!dist)return;
+    // Weight = number of 15A devices in this room
+    const devices=r.lineItems.reduce((s,i)=>{
+      return s+(/15a|15 a/i.test(i.desc)?Math.round(i.qty)||1:0);
+    },0)||1;
+    weightedSum+=dist*devices;
+    totalWeight+=devices;
+  });
+  if(!totalWeight)return 0;
+  return(weightedSum/totalWeight)*routingFactor;
+}
+
+// Dedicated circuit feeds — one per protoassembly that has a 'circuit_feed' rule
+// OR detected by amperage keywords in add-ons
+function getDedicatedFeedItems(){
   const items=[];
-  if(!fpPanelCell||fpPanelFloor===null)return items;
 
-  // Find dedicated protoassemblies in add-ons (those with a breaker in name/category)
-  // and generate a homerun wire item for each based on avg room distance
-  const dedicatedAddons=addons.filter(a=>{
-    const name=(a.protoName||'').toLowerCase();
-    return /30a|50a|40a|60a|dedicated|dryer|range|hot.?tub|sauna|spa|oven|cooktop|ac|air.cond|ev.?charg/i.test(name);
-  });
-
-  // Use average homerun distance from painted rooms as estimate
-  const allPaintedRooms=[...rooms,...extRooms];
-  const distances=allPaintedRooms.map(r=>getHomerunDistance(r.id)||getExtRoomHomerunDistance(r.id)||0).filter(d=>d>0);
-  const avgDist=distances.length?distances.reduce((a,b)=>a+b,0)/distances.length:15; // default 15ft if none painted
-
-  dedicatedAddons.forEach(a=>{
-    // Determine wire gauge from amperage in name
-    let gauge='12/2';
-    const name=a.protoName||'';
-    if(/50a|60a|hot.?tub|sauna|spa|range|oven/i.test(name)) gauge='8/3';
-    else if(/30a|dryer|ac|ev/i.test(name)) gauge='10/3';
-    else if(/40a/i.test(name)) gauge='8/3';
-
-    const wireProto=findWireProto(gauge);
-    if(!wireProto)return;
-    const distM=Math.ceil(avgDist*0.3048*1.1);
-    items.push({
-      id:Date.now()+Math.random(),
-      desc:`${gauge} NMD90 homerun — ${a.protoName} (~${distM} m)`,
-      cat:'material',qty:distM,price:calcProtoTotal(wireProto),
-      source:'homerun',codeNote:''
-    });
-  });
-
-  // Exterior room dedicated feeds
-  extRooms.forEach(r=>{
-    const dist=getExtRoomHomerunDistance(r.id);
+  // Rooms — look for protoassembly components marked with qty_rule='circuit_feed'
+  const allRooms=[...rooms,...extRooms];
+  allRooms.forEach(r=>{
+    const dist=getHomerunDistance(r.id)||getExtRoomHomerunDistance(r.id)||0;
     if(!dist)return;
     const distM=Math.ceil(dist*0.3048*1.1);
-    // Check if any line item suggests a dedicated circuit
-    const hasDedicated=r.lineItems.some(i=>/30a|50a|40a|60a|dedicated/i.test(i.desc));
-    const gauge=hasDedicated?'10/3':'14/2';
-    const wireProto=findWireProto(gauge);
-    if(!wireProto)return;
-    const name=r.label||r.asmName;
-    items.push({
-      id:Date.now()+Math.random(),
-      desc:`${gauge} NMD90 feed — ${name} (~${distM} m)`,
-      cat:'material',qty:distM,price:calcProtoTotal(wireProto),
-      source:'homerun',codeNote:''
+    // Find any line item that came from a proto with a circuit_feed component
+    // For now detect by line item description containing amperage + breaker keywords
+    r.lineItems.forEach(i=>{
+      const desc=(i.desc||'').toLowerCase();
+      let gauge=null;
+      if(/20a.*ded|ded.*20a|20a.*circuit|fridge|dishwash|microwave|garb/i.test(desc)) gauge='12/2';
+      else if(/30a|dryer|ac\b|air.cond|ev.charg/i.test(desc)) gauge='10/3';
+      else if(/40a|50a|range|oven|hot.tub|spa|sauna|cooktop/i.test(desc)) gauge='8/3';
+      if(!gauge)return;
+      const comp=findWireComponent(gauge.replace('/',' NMD').replace('/','/')); // "12/2 NMD90" etc
+      const wire=findWireComponent(gauge);
+      if(!wire)return;
+      const name=r.label?`${r.asmName} — ${r.label}`:r.asmName;
+      items.push({
+        id:Date.now()+Math.random(),
+        desc:`${wire.description||gauge+' NMD90'} circuit feed — ${name} (~${distM} m)`,
+        cat:'material',qty:distM,price:componentPrice(wire),
+        source:'circuit-feed',codeNote:''
+      });
     });
   });
+
+  // Add-ons — dedicated circuit protoassemblies
+  const avgDist=weightedAvgDistance(1.2);
+  if(avgDist>0){
+    addons.forEach(a=>{
+      const name=(a.protoName||'').toLowerCase();
+      let gauge=null;
+      if(/30a|dryer|ac\b|ev.charg/i.test(name)) gauge='10/3';
+      else if(/40a|50a|range|oven|hot.tub|spa|sauna/i.test(name)) gauge='8/3';
+      else if(/20a|dedicated/i.test(name)) gauge='12/2';
+      if(!gauge)return;
+      const wire=findWireComponent(gauge);
+      if(!wire)return;
+      const distM=Math.ceil(avgDist*0.3048*1.1);
+      items.push({
+        id:Date.now()+Math.random(),
+        desc:`${wire.description||gauge+' NMD90'} circuit feed — ${a.protoName} (~${distM} m)`,
+        cat:'material',qty:distM,price:componentPrice(wire),
+        source:'circuit-feed',codeNote:''
+      });
+    });
+  }
 
   return items;
 }
 
-// ── GP CIRCUIT COUNTING ───────────────────────────────────────
-// Counts all 15A devices across all rooms, calculates circuits needed
+// GP branch circuit feeds — 14/2 per circuit, weighted avg distance × 1.2
 function getGPCircuitLineItems(){
   const items=[];
-  // Count all 15A devices (receptacles + switches) across all rooms
-  let totalDevices15A=0;
   const allRooms=[...rooms,...extRooms];
+
+  // Count all 15A devices
+  let totalDevices15A=0;
+  const devicesByRoom=[];
   allRooms.forEach(r=>{
+    let count=0;
     r.lineItems.forEach(i=>{
-      const desc=(i.desc||'').toLowerCase();
-      if(desc.includes('15a')||desc.includes('15 a')){
-        totalDevices15A+=Math.round(i.qty)||1;
-      }
+      if(/15a|15 a/i.test(i.desc)) count+=Math.round(i.qty)||1;
     });
+    totalDevices15A+=count;
+    if(count>0)devicesByRoom.push({r,count});
   });
   if(!totalDevices15A)return items;
 
   const circuits=Math.ceil(totalDevices15A/12);
 
-  // Find AFCI/GFCI breaker protoassembly
+  // Breaker
   const breakerProto=catalogue.protoassemblies.find(p=>
     /afci|gfci|15a.*breaker|breaker.*15a/i.test(p.name)
   );
-  // Find 14/2 wire
-  const wireProto=findWireProto('14/2');
-
   if(breakerProto){
     items.push({
       id:Date.now()+Math.random(),
-      desc:`15A AFCI/GFCI Breaker (${circuits} circuits × ${Math.ceil(totalDevices15A/circuits)} devices avg)`,
+      desc:`15A AFCI/GFCI Breaker — ${circuits} branch circuit${circuits>1?'s':''} (${totalDevices15A} devices ÷ 12)`,
       cat:'material',qty:circuits,price:calcProtoTotal(breakerProto),
       source:'gp-circuit',codeNote:'OEC 26-650'
     });
   }
 
-  // Homerun wire per circuit — use average homerun distance if panel placed
-  if(wireProto&&fpPanelCell){
-    const paintedRooms=allRooms.filter(r=>getHomerunDistance(r.id)||getExtRoomHomerunDistance(r.id));
-    if(paintedRooms.length){
-      const avgDist=paintedRooms.reduce((s,r)=>{
-        const d=getHomerunDistance(r.id)||getExtRoomHomerunDistance(r.id)||0;
-        return s+d;
-      },0)/paintedRooms.length;
+  // Feed wire — weighted avg distance × 1.2 routing factor
+  const wire=findWireComponent('14/2');
+  if(wire&&fpPanelCell){
+    const avgDist=weightedAvgDistance(1.2);
+    if(avgDist>0){
       const avgM=Math.ceil(avgDist*0.3048*1.1);
       items.push({
         id:Date.now()+Math.random(),
-        desc:`14/2 NMD90 GP homerun (${circuits} circuits × ~${avgM} m avg)`,
-        cat:'material',qty:circuits*avgM,price:calcProtoTotal(wireProto),
+        desc:`${wire.description||'14/2 NMD90'} branch circuit feeds — ${circuits} circuits × ~${avgM} m (weighted avg × 1.2)`,
+        cat:'material',qty:circuits*avgM,price:componentPrice(wire),
         source:'gp-circuit',codeNote:''
       });
     }
@@ -1236,18 +1255,14 @@ function getDetectorLineItems(){
   const items=[];
   const floors=parseInt(document.getElementById('house-floors')?.value)||1;
 
-  // Count bedrooms
   const bedroomCount=rooms.filter(r=>
     r.asmName.toLowerCase().includes('bedroom')||
-    (r.label||'').toLowerCase().includes('bedroom')||
     (r.label||'').toLowerCase().includes('bed')
   ).length;
 
-  // Carbon/Smoke/Strobe: 1 per floor
   const comboProto=catalogue.protoassemblies.find(p=>
-    /carbon|co.*smoke|smoke.*co|combination.*detector/i.test(p.name)
+    /carbon|co.*smoke|smoke.*co|combination/i.test(p.name)
   );
-  // Smoke/Strobe only: 1 per bedroom
   const smokeProto=catalogue.protoassemblies.find(p=>
     /smoke|strobe/i.test(p.name)&&!/carbon|co\b/i.test(p.name)
   );
@@ -1268,14 +1283,13 @@ function getDetectorLineItems(){
       source:'detectors',codeNote:'OEC 760'
     });
   }
-
   return items;
 }
 
-// ── COMPUTED LINE ITEMS (all auto items combined) ─────────────
+// ── COMPUTED LINE ITEMS ───────────────────────────────────────
 function getComputedLineItems(){
   return[
-    ...getHomerunLineItems(),
+    ...getDedicatedFeedItems(),
     ...getGPCircuitLineItems(),
     ...getDetectorLineItems(),
   ];
@@ -1606,7 +1620,7 @@ function renderFpLegend(){
     const dist=getHomerunDistance(r.id);
     const centroid=getRoomCentroid(r.id);
     const cellCount=Object.values(fpFloorCells).reduce((s,fc)=>s+Object.values(fc).filter(v=>v.type==='room'&&v.roomId===r.id).length,0);
-    html+=`<div class="fp-legend-row"><div class="fp-legend-left"><div class="fp-legend-swatch" style="background:${colour}"></div><span class="fp-legend-name">${name}</span><span style="font-size:11px;color:var(--muted)">${cellCount?cellCount+' cells'+(centroid?' · Floor '+centroid.floor:''):''}</span></div><span class="fp-legend-dist">${dist!==null?'~'+dist+' ft homerun':(fpPanelCell?'Not painted':'Place panel first')}</span></div>`;
+    html+=`<div class="fp-legend-row"><div class="fp-legend-left"><div class="fp-legend-swatch" style="background:${colour}"></div><span class="fp-legend-name">${name}</span><span style="font-size:11px;color:var(--muted)">${cellCount?cellCount+' cells'+(centroid?' · Floor '+centroid.floor:''):''}</span></div><span class="fp-legend-dist">${dist!==null?'~'+dist+' ft to panel':(fpPanelCell?'Not painted':'Place panel first')}</span></div>`;
   });
   extRooms.forEach((r,i)=>{
     const name=r.label?`${r.asmName} — ${r.label}`:r.asmName;
@@ -1703,6 +1717,26 @@ function addAddon(){
 }
 
 function removeAddon(id){addons=addons.filter(a=>a.id!==id);renderAddons();}
+
+function renderAddons(){
+  const el=document.getElementById('addon-list');
+  if(!el)return;
+  if(!addons.length){el.innerHTML='';return;}
+  el.innerHTML=addons.map(a=>{
+    const total=a.lineItems.reduce((s,i)=>s+i.qty*i.price,0);
+    const tags=a.lineItems.map(i=>`<span class="room-tag">${i.qty>1?(Number.isInteger(i.qty)?i.qty:i.qty.toFixed(1))+'× ':''}${i.desc}</span>`).join('');
+    return`<div class="room-item" style="margin-bottom:6px;">
+      <div class="room-item-left">
+        <div class="room-item-name">${a.protoName}</div>
+        <div class="room-item-tags">${tags}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;">
+        <span style="font-size:13px;font-weight:600;color:var(--blue)">$${total.toFixed(2)}</span>
+        <button class="room-item-del" onclick="removeAddon(${a.id})"><i class="ti ti-x"></i></button>
+      </div>
+    </div>`;
+  }).join('');
+}
 
 // ── EXTERIOR AREAS ───────────────────────────────────────────
 let exteriorAreas=[];

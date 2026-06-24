@@ -136,6 +136,7 @@
     .sub-row{display:grid;gap:8px;align-items:center;padding:5px 0;border-bottom:0.5px solid var(--surface);}
     .sub-row:last-child{border-bottom:none;}
     .sub-name{font-size:13px;}
+    .sub-qty-rule{font-size:11px;padding:2px 4px;border:0.5px solid var(--border);border-radius:4px;background:var(--white);color:#6366f1;font-family:inherit;cursor:pointer;}
     .sub-qty{font-size:13px;padding:4px 7px;border:0.5px solid var(--border);border-radius:4px;font-family:inherit;width:100%;text-align:right;}
     .sub-qty:focus{outline:none;border-color:var(--blue);}
     .sub-cost{font-size:13px;color:var(--muted);text-align:right;}
@@ -675,7 +676,11 @@ function renderProtos(){
 function buildProtoCard(p){
   const isOpen=expandedProtoId===p.id;
   const comps=p.components||[];
-  const total=comps.reduce((s,c)=>{const comp=components.find(x=>x.id===c.comp_id);return s+(comp?(parseFloat(comp.unit_price)||0)*(parseFloat(c.qty)||1):0);},0);
+  const total=comps.reduce((s,c)=>{
+    if((c.qty_rule||'fixed')==='circuit_feed')return s;
+    const comp=components.find(x=>x.id===c.comp_id);
+    return s+(comp?(parseFloat(comp.unit_price)||0)*(parseFloat(c.qty)||1):0);
+  },0);
   const branch=branches.find(x=>x.id===p.branch_id);
   const compOpts=components.map(c=>`<option value="${c.id}">${esc(c.description||c.technical_name||'Unnamed')} (${c.unit})</option>`).join('');
   const branchOpts='<option value="">None</option>'+branches.map(b=>`<option value="${b.id}" ${p.branch_id===b.id?'selected':''}>${esc(b.name)}</option>`).join('');
@@ -683,11 +688,21 @@ function buildProtoCard(p){
 
   const compRows=comps.map(c=>{
     const comp=components.find(x=>x.id===c.comp_id);if(!comp)return'';
-    const lineTotal=(parseFloat(comp.unit_price)||0)*(parseFloat(c.qty)||1);
-    return`<div class="sub-row" style="grid-template-columns:2fr 70px 80px 28px">
-      <div class="sub-name">${esc(comp.description||comp.technical_name||'—')}</div>
-      <input class="sub-qty" type="number" min="0" step="0.01" value="${c.qty}" onchange="updateProtoCompQty(${p.id},${c.comp_id},this.value)"/>
-      <div class="sub-cost" style="text-align:right">$${lineTotal.toFixed(2)}</div>
+    const isWire=(comp.category||'').toLowerCase().includes('wire')||(comp.description||'').toLowerCase().includes('nmd')||(comp.description||'').toLowerCase().includes('teck');
+    const rule=c.qty_rule||'fixed';
+    const lineTotal=rule==='circuit_feed'?0:(parseFloat(comp.unit_price)||0)*(parseFloat(c.qty)||1);
+    const qtyField=rule==='circuit_feed'
+      ?`<span style="font-size:11px;color:#6366f1;font-weight:500;padding:0 4px">auto</span>`
+      :`<input class="sub-qty" type="number" min="0" step="0.01" value="${c.qty}" onchange="updateProtoCompQty(${p.id},${c.comp_id},this.value)"/>`;
+    const ruleNote=rule==='circuit_feed'?`<span style="font-size:10px;color:#6366f1;margin-left:4px">circuit feed</span>`:'';
+    return`<div class="sub-row" style="grid-template-columns:2fr 90px 70px 80px 28px">
+      <div class="sub-name">${esc(comp.description||comp.technical_name||'—')}${ruleNote}</div>
+      ${isWire?`<select class="sub-qty-rule" onchange="updateProtoCompRule(${p.id},${c.comp_id},this.value)">
+        <option value="fixed"${rule==='fixed'?' selected':''}>Fixed</option>
+        <option value="circuit_feed"${rule==='circuit_feed'?' selected':''}>Circuit feed</option>
+      </select>`:`<span></span>`}
+      ${qtyField}
+      <div class="sub-cost" style="text-align:right">${rule==='circuit_feed'?'<span style="color:#6366f1;font-size:11px">∝ dist</span>':`$${lineTotal.toFixed(2)}`}</div>
       <button class="sub-del" onclick="removeProtoComp(${p.id},${c.comp_id})"><i class="ti ti-x"></i></button>
     </div>`;
   }).join('');
@@ -713,7 +728,7 @@ function buildProtoCard(p){
       </div>
       <div class="sub-section">
         <div class="sub-section-label">Components</div>
-        ${comps.length?`<div class="sub-head" style="grid-template-columns:2fr 70px 80px 28px"><span>Component</span><span style="text-align:right">Qty</span><span style="text-align:right">Cost</span><span></span></div>${compRows}`:'<div style="font-size:13px;color:var(--muted);padding:4px 0 8px">No components yet.</div>'}
+        ${comps.length?`<div class="sub-head" style="grid-template-columns:2fr 90px 70px 80px 28px"><span>Component</span><span>Rule</span><span style="text-align:right">Qty</span><span style="text-align:right">Cost</span><span></span></div>${compRows}`:'<div style="font-size:13px;color:var(--muted);padding:4px 0 8px">No components yet.</div>'}
         <div class="sub-add-row">
           <select class="sub-select" id="csel-${p.id}"><option value="">Add component…</option>${compOpts}</select>
           <button class="nbtn" onclick="addProtoComp(${p.id})"><i class="ti ti-plus"></i> Add</button>
@@ -732,13 +747,18 @@ function buildProtoCard(p){
 
 function toggleProto(id){expandedProtoId=expandedProtoId===id?null:id;renderProtos();}
 function updateProtoField(id,field,value){const p=protoassemblies.find(x=>x.id===id);if(p)p[field]=value;}
+function updateProtoCompRule(pid,cid,rule){
+  const p=protoassemblies.find(x=>x.id===pid);if(!p)return;
+  const c=p.components.find(x=>x.comp_id===cid);if(c)c.qty_rule=rule;
+  renderProtos();
+}
 function updateProtoCompQty(pid,cid,value){const p=protoassemblies.find(x=>x.id===pid);if(!p)return;const c=p.components.find(x=>x.comp_id===cid);if(c)c.qty=parseFloat(value)||0;renderProtos();}
 function removeProtoComp(pid,cid){const p=protoassemblies.find(x=>x.id===pid);if(!p)return;p.components=p.components.filter(x=>x.comp_id!==cid);renderProtos();}
 function addProtoComp(pid){
   const sel=document.getElementById(`csel-${pid}`);const cid=parseInt(sel.value);if(!cid)return;
   const p=protoassemblies.find(x=>x.id===pid);if(!p)return;
   if(p.components.find(x=>x.comp_id===cid)){toast('Already in this protoassembly.');return;}
-  p.components.push({comp_id:cid,qty:1});renderProtos();
+  p.components.push({comp_id:cid,qty:1,qty_rule:'fixed'});renderProtos();
 }
 async function saveProto(id){
   const p=protoassemblies.find(x=>x.id===id);if(!p)return;
