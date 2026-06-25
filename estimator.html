@@ -2157,41 +2157,113 @@ function getAllLineItemsFlat(){
   return items;
 }
 
+function getMasterComponentList(){
+  // Returns {compId/key → {name, description, manufacturer, unit, category, qty, unitPrice}}
+  const master={};
+
+  const addComp=(compId,qty)=>{
+    const comp=catalogue.components.find(c=>c.id===compId);
+    if(!comp)return;
+    const key=compId;
+    if(!master[key])master[key]={
+      id:compId,
+      name:comp.technical_name||comp.description||'Unknown',
+      description:comp.description||comp.technical_name||'Unknown',
+      manufacturer:comp.manufacturer||'',
+      unit:comp.unit||'ea',
+      category:comp.category||'Other',
+      qty:0,
+      unitPrice:parseFloat(comp.unit_price)||0
+    };
+    master[key].qty+=parseFloat(qty)||0;
+  };
+
+  // For each line item, trace back to the protoassembly and its components
+  const resolveProto=(protoId,lineQty)=>{
+    const proto=catalogue.protoassemblies.find(p=>p.id===protoId);
+    if(!proto)return;
+    (proto.components||[]).forEach(c=>{
+      const rule=c.qty_rule||'fixed';
+      if(rule==='circuit_feed'||rule==='service_feed')return; // handled separately
+      addComp(c.comp_id,(parseFloat(c.qty)||1)*lineQty);
+    });
+  };
+
+  // Rooms — resolve each line item back to proto components
+  const allRooms=[...rooms,...extRooms];
+  allRooms.forEach(r=>{
+    r.lineItems.forEach(li=>{
+      if(li.protoId) resolveProto(li.protoId,li.qty||1);
+    });
+    // Lighting wire — it's already a component-level item
+    getLightingLineItems(r).forEach(li=>{
+      // Find matching component by description
+      const comp=catalogue.components.find(c=>li.desc&&li.desc.includes(c.description||c.technical_name));
+      if(comp)addComp(comp.id,li.qty||0);
+    });
+  });
+
+  // Add-ons
+  addons.forEach(a=>{
+    const proto=catalogue.protoassemblies.find(p=>p.id===a.protoId);
+    if(proto)(proto.components||[]).forEach(c=>{
+      if((c.qty_rule||'fixed')==='circuit_feed'||(c.qty_rule||'fixed')==='service_feed')return;
+      addComp(c.comp_id,(parseFloat(c.qty)||1));
+    });
+  });
+
+  // Auto-calculated items — these are component-level already (wire comps)
+  getComputedLineItems().forEach(li=>{
+    const comp=catalogue.components.find(c=>li.desc&&(li.desc.includes(c.description||'')||li.desc.includes(c.technical_name||'')));
+    if(comp)addComp(comp.id,li.qty||0);
+  });
+
+  return Object.values(master);
+}
+
 function renderTakeoff(){
   const el=document.getElementById('takeoff-content');
   if(!el)return;
 
   if(takeoffView==='master'){
-    // Group all items by description, sum quantities
-    const grouped={};
-    getAllLineItemsFlat().forEach(i=>{
-      const key=i.desc||'Unknown';
-      if(!grouped[key])grouped[key]={desc:key,cat:i.cat||'material',qty:0,price:i.price||0};
-      grouped[key].qty+=parseFloat(i.qty)||0;
-    });
-    const sorted=Object.values(grouped).sort((a,b)=>a.cat.localeCompare(b.cat)||a.desc.localeCompare(b.desc));
-    if(!sorted.length){el.innerHTML='<div style="color:var(--muted);font-size:13px;padding:8px 0">No items yet.</div>';return;}
+    const components=getMasterComponentList();
+    if(!components.length){el.innerHTML='<div style="color:var(--muted);font-size:13px;padding:8px 0">No items yet.</div>';return;}
 
     // Group by category
     const byCat={};
-    sorted.forEach(i=>{if(!byCat[i.cat])byCat[i.cat]=[];byCat[i.cat].push(i);});
+    components.forEach(c=>{
+      const cat=c.category||'Other';
+      if(!byCat[cat])byCat[cat]=[];
+      byCat[cat].push(c);
+    });
+    // Sort each category by description
+    Object.values(byCat).forEach(arr=>arr.sort((a,b)=>a.description.localeCompare(b.description)));
 
-    let html='';
-    Object.entries(byCat).forEach(([cat,items])=>{
-      html+=`<div style="margin-bottom:16px;">
-        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);padding:6px 0 4px;border-bottom:0.5px solid var(--border);margin-bottom:6px">${cat}</div>`;
-      items.forEach(i=>{
-        const qty=Number.isInteger(i.qty)?i.qty:i.qty.toFixed(2);
-        const total=i.qty*i.price;
-        html+=`<div style="display:grid;grid-template-columns:1fr 60px 80px 80px;gap:8px;padding:5px 0;border-bottom:0.5px solid #f0f0f0;font-size:12px;">
-          <span>${i.desc}</span>
-          <span style="text-align:right;font-weight:500">${qty}</span>
-          <span style="text-align:right;color:var(--muted)">$${(i.price||0).toFixed(2)}</span>
-          <span style="text-align:right;font-weight:600;color:var(--blue)">$${total.toFixed(2)}</span>
+    let html=`<div style="display:grid;grid-template-columns:1fr 120px 60px 80px 80px;gap:8px;padding:5px 0;border-bottom:1.5px solid var(--black);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);">
+      <span>Component</span><span>Manufacturer</span><span style="text-align:right">Qty</span><span style="text-align:right">Unit</span><span style="text-align:right">Total</span>
+    </div>`;
+
+    Object.entries(byCat).sort().forEach(([cat,items])=>{
+      html+=`<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);padding:10px 0 4px;border-bottom:0.5px solid var(--border)">${cat}</div>`;
+      items.forEach(c=>{
+        const qty=Number.isInteger(c.qty)?c.qty:parseFloat(c.qty.toFixed(2));
+        const total=c.qty*c.unitPrice;
+        html+=`<div style="display:grid;grid-template-columns:1fr 120px 60px 80px 80px;gap:8px;padding:5px 0;border-bottom:0.5px solid #f0f0f0;font-size:12px;">
+          <div><div style="font-weight:500">${c.description}</div><div style="font-size:10px;color:var(--muted)">${c.name}</div></div>
+          <span style="font-size:11px;color:var(--muted);align-self:center">${c.manufacturer}</span>
+          <span style="text-align:right;font-weight:600;align-self:center">${qty} ${c.unit}</span>
+          <span style="text-align:right;color:var(--muted);align-self:center">$${c.unitPrice.toFixed(2)}</span>
+          <span style="text-align:right;font-weight:600;color:var(--blue);align-self:center">$${total.toFixed(2)}</span>
         </div>`;
       });
-      html+='</div>';
     });
+
+    // Grand total
+    const grandTotal=components.reduce((s,c)=>s+c.qty*c.unitPrice,0);
+    html+=`<div style="display:grid;grid-template-columns:1fr 120px 60px 80px 80px;gap:8px;padding:10px 0 4px;border-top:1.5px solid var(--black);margin-top:8px;font-size:13px;font-weight:600;">
+      <span>Total materials</span><span></span><span></span><span></span>
+      <span style="text-align:right;color:var(--blue)">$${grandTotal.toFixed(2)}</span>
+    </div>`;
     el.innerHTML=html;
 
   } else {
@@ -2253,15 +2325,21 @@ function renderTakeoff(){
 
 function printTakeoff(){
   const content=document.getElementById('takeoff-content')?.innerHTML||'';
-  const view=takeoffView==='master'?'Master Material List':'Room-by-Room Breakdown';
-  const jobName=document.getElementById('job-address')?.value||'Assessment';
+  const view=takeoffView==='master'?'Component Master List':'Room-by-Room Breakdown';
+  const jobName=document.getElementById('job-address')?.value||document.getElementById('job-customer')?.value||'Assessment';
   const w=window.open('','_blank');
   w.document.write(`<!DOCTYPE html><html><head><title>Material Takeoff — ${jobName}</title>
-  <style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:800px;margin:0 auto;padding:2rem;font-size:12px;}
-  h1{font-size:18px;margin-bottom:4px;}h2{font-size:13px;font-weight:400;color:#666;margin-bottom:2rem;}
-  @media print{@page{margin:1.5cm;}}</style></head>
-  <body><h1>Material Takeoff — ${view}</h1><h2>${jobName} · ${new Date().toLocaleDateString('en-CA')}</h2>
-  ${content}</body></html>`);
+  <style>
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:900px;margin:0 auto;padding:2rem;font-size:12px;color:#1a1a1a;}
+    h1{font-size:20px;margin-bottom:4px;font-weight:700;}
+    h2{font-size:13px;font-weight:400;color:#666;margin-bottom:2rem;}
+    @media print{@page{margin:1.5cm;size:landscape;}body{font-size:11px;}}
+  </style></head>
+  <body>
+    <h1>Material Takeoff — ${view}</h1>
+    <h2>${jobName} · Generated ${new Date().toLocaleDateString('en-CA')}</h2>
+    ${content}
+  </body></html>`);
   w.document.close();
   setTimeout(()=>w.print(),300);
 }
