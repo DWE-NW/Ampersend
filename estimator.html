@@ -585,10 +585,15 @@
     <div class="card">
       <div class="card-title">
         Line items
-        <div style="display:flex;gap:8px;">
+        <div style="display:flex;gap:8px;align-items:center;">
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:400;cursor:pointer;">
+            <input type="checkbox" id="detail-toggle" onchange="toggleDetailMode(this.checked)" style="cursor:pointer"/>
+            Calibration view
+          </label>
           <button class="btn btn-sm" onclick="goStep(2)"><i class="ti ti-pencil"></i> Edit rooms</button>
         </div>
       </div>
+      <div id="detail-mode-note" style="display:none;font-size:11px;color:var(--muted);margin-bottom:8px;padding:6px 8px;background:var(--surface);border-radius:4px;border:0.5px solid var(--border)"><i class="ti ti-info-circle"></i> Calibration view — shows all quantities and unit prices. Hidden from client PDF.</div>
       <div class="li-head"><span>Description</span><span>Category</span><span>Qty</span><span>Unit price</span><span></span></div>
       <div id="all-line-items"></div>
       <button class="add-li-btn" onclick="addManualItem()"><i class="ti ti-plus"></i> Add item manually</button>
@@ -1052,23 +1057,16 @@ function getLightingWireItems(room){
   const grid=room.lightingGrid;
   if(!grid||!grid.nodes||!grid.nodes.length)return[];
   const items=[];
-  const w=room.w||10, l=room.l||10;
-  // Find 14/2 wire component or protoassembly
-  const wireProto=catalogue.protoassemblies.find(p=>
-    /14.2|14\/2/i.test(p.name)&&/nmd|wire|cable/i.test(p.name)
-  );
-  if(!wireProto)return[];
-  const unitPrice=calcProtoTotal(wireProto);
+  const w=room.w||10,l=room.l||10;
+  const wireComp=catalogue.components.find(c=>(c.description||'').includes('14/2'));
+  if(!wireComp)return[];
+  const unitPrice=parseFloat(wireComp.unit_price)||0;
   const groupsUsed=[...new Set(grid.nodes.map(n=>n.group))];
-
   groupsUsed.forEach(g=>{
     const nodes=grid.nodes.filter(n=>n.group===g);
     if(!nodes.length)return;
-    // Map grid index to room coordinates (ft)
-    // 5x5 grid, index 0-24, centre=99
     const toCoord=idx=>{
-      if(idx===99)return{x:w/2,y:l/2}; // centre
-      // Map perimeter index (0-23) to 5x5 grid position excluding centre
+      if(idx===99)return{x:w/2,y:l/2};
       const positions=[
         {r:0,c:0},{r:0,c:1},{r:0,c:2},{r:0,c:3},{r:0,c:4},
         {r:1,c:0},{r:1,c:1},{r:1,c:2},{r:1,c:3},{r:1,c:4},
@@ -1077,35 +1075,23 @@ function getLightingWireItems(room){
         {r:4,c:0},{r:4,c:1},{r:4,c:2},{r:4,c:3},{r:4,c:4}
       ];
       const pos=positions[idx]||{r:2,c:2};
-      return{x:(pos.c/4)*w, y:(pos.r/4)*l};
+      return{x:(pos.c/4)*w,y:(pos.r/4)*l};
     };
-
     const coords=nodes.map(n=>toCoord(n.index));
-    // Switch drop: assume switch at corner (0,0), drop to 4ft height
-    const switchDropFt=Math.min(w,l)*0.1+4; // rough corner-to-first-fixture
-    // Chain through fixtures (greedy nearest-neighbour)
-    let chainFt=0;
-    const remaining=[...coords];
-    let current=remaining.shift();
+    // Switch at bottom-left corner, 5ft up wall, then Manhattan distance to first fixture
+    const wallDropFt=5;
+    // Manhattan distance from corner (0,0) to each node
+    const withDist=coords.map(c=>({c,d:c.x+c.y}));
+    withDist.sort((a,b)=>a.d-b.d);
+    const cornerToFirstFt=withDist[0].d;
+    // Chain remaining nodes using Manhattan distance
+    let chainFt=0,remaining=withDist.slice(1).map(x=>x.c),current=withDist[0].c;
     while(remaining.length){
-      let nearest=remaining.reduce((best,c)=>{
-        const d=Math.sqrt(Math.pow(c.x-current.x,2)+Math.pow(c.y-current.y,2));
-        return d<best.d?{c,d}:{...best};
-      },{c:remaining[0],d:Infinity});
-      chainFt+=nearest.d;
-      current=nearest.c;
-      remaining.splice(remaining.indexOf(nearest.c),1);
+      let nearest=remaining.reduce((best,c)=>{const d=Math.abs(c.x-current.x)+Math.abs(c.y-current.y);return d<best.d?{c,d}:{...best};},{c:remaining[0],d:Infinity});
+      chainFt+=Math.abs(nearest.c.x-current.x)+Math.abs(nearest.c.y-current.y);current=nearest.c;remaining.splice(remaining.indexOf(nearest.c),1);
     }
-    const totalFt=switchDropFt+chainFt;
-    const totalM=Math.ceil(totalFt*0.3048*1.15); // ft→m + 15% waste
-    if(totalM>0){
-      items.push({
-        id:Date.now()+Math.random(),
-        desc:`${wireProto.name} — lighting group ${g} (${totalM} m)`,
-        cat:'material',qty:totalM,price:unitPrice,
-        source:'lighting-wire',codeNote:''
-      });
-    }
+    const totalM=Math.ceil((wallDropFt+cornerToFirstFt+chainFt)*0.3048*1.10);
+    if(totalM>0) items.push({id:Date.now()+Math.random(),desc:`${wireComp.description} — lighting group ${g} (${totalM} m)`,cat:'material',qty:totalM,price:unitPrice,source:'lighting-wire',codeNote:''});
   });
   return items;
 }
@@ -2121,6 +2107,14 @@ function renderAllLineItems(){
   el.innerHTML=html;
 }
 
+let detailMode=false;
+function toggleDetailMode(on){
+  detailMode=on;
+  const note=document.getElementById('detail-mode-note');
+  if(note)note.style.display=on?'block':'none';
+  renderAllLineItems();
+}
+
 function renderLIRow(item,source,sourceId){
   const cats=['material','permit','other'];
   const catOpts=cats.map(c=>`<option value="${c}" ${item.cat===c?'selected':''}>${c}</option>`).join('');
@@ -2134,8 +2128,16 @@ function renderLIRow(item,source,sourceId){
       <input type="number" min="0" step="0.01" value="${item.price||0}" oninput="updateItem('${source}',${item.id},'price',this.value)"/>
       <button class="li-del" onclick="removeItem('${source}',${item.id})"><i class="ti ti-trash"></i></button>
     </div>`;
+  } else if(detailMode){
+    // Calibration view — show all quantities and unit prices
+    return`<div class="li-row" style="background:${item.source==='lighting-wire'?'#eff6ff':item.source==='circuit-feed'?'#faf5ff':item.source==='gp-circuit'?'#f0fdf4':item.source==='service-feed'?'#fff7ed':item.source==='detectors'?'#fef2f2':''}">
+      <div style="font-size:12px;padding:5px 8px;">${item.desc||''}${item.codeNote?`<div style="font-size:10px;color:var(--blue);font-style:italic">${item.codeNote}</div>`:''}<div style="font-size:10px;color:var(--muted)">${item.source||''}</div></div>
+      <div style="font-size:11px;color:var(--muted);padding:5px 8px;">${item.cat||'material'}</div>
+      <div style="font-size:12px;font-weight:500;padding:5px 8px;">${item.qty||0}</div>
+      <div style="font-size:12px;padding:5px 8px;">$${(item.price||0).toFixed(2)}</div>
+      <div style="font-size:12px;font-weight:600;color:var(--blue);padding:5px 4px;text-align:right">$${lineTotal.toFixed(2)}</div>
+    </div>`;
   } else {
-    // Catalogue items — show but don't make fully editable (go back to edit rooms)
     return`<div class="li-row">
       <div style="font-size:13px;padding:5px 8px;">${item.desc||''}${item.codeNote?`<div style="font-size:10px;color:var(--blue);font-style:italic">${item.codeNote}</div>`:''}</div>
       <div style="font-size:12px;color:var(--muted);padding:5px 8px;">${item.cat||'material'}</div>
