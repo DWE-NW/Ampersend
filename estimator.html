@@ -687,6 +687,7 @@ const FT_TO_M=0.3048;
 
 // ── STATE ─────────────────────────────────────────────────────
 let catalogue={components:[],branches:[],protoassemblies:[],assemblies:[]};
+function getWireSlack(){return parseFloat(localStorage.getItem('dwe_wire_slack_factor'))||1.10;}
 let jobType='newbuild';
 let rooms=[];
 let addons=[];
@@ -1090,7 +1091,7 @@ function getLightingWireItems(room){
       let nearest=remaining.reduce((best,c)=>{const d=Math.abs(c.x-current.x)+Math.abs(c.y-current.y);return d<best.d?{c,d}:{...best};},{c:remaining[0],d:Infinity});
       chainFt+=Math.abs(nearest.c.x-current.x)+Math.abs(nearest.c.y-current.y);current=nearest.c;remaining.splice(remaining.indexOf(nearest.c),1);
     }
-    const totalM=Math.ceil((wallDropFt+cornerToFirstFt+chainFt)*0.3048*1.10);
+    const totalM=Math.ceil((wallDropFt+cornerToFirstFt+chainFt)*0.3048*getWireSlack());
     if(totalM>0) items.push({id:Date.now()+Math.random(),desc:`${wireComp.description} — lighting group ${g} (${totalM} m)`,cat:'material',qty:totalM,price:unitPrice,source:'lighting-wire',codeNote:''});
   });
   return items;
@@ -1146,7 +1147,7 @@ function getDedicatedFeedItems(){
   allRooms.forEach(r=>{
     const dist=getHomerunDistance(r.id)||getExtRoomHomerunDistance(r.id)||0;
     if(!dist)return;
-    const distM=Math.ceil(dist*0.3048*1.1);
+    const distM=Math.ceil(dist*0.3048*getWireSlack());
     const name=r.label?`${r.asmName} — ${r.label}`:r.asmName;
     const asm=catalogue.assemblies.find(a=>a.id===r.asmId);
     const protos=[];
@@ -1164,7 +1165,7 @@ function getDedicatedFeedItems(){
     addons.forEach(a=>{
       const proto=catalogue.protoassemblies.find(x=>x.id===a.protoId);
       if(!proto)return;
-      const distM=Math.ceil(avgDist*0.3048*1.1);
+      const distM=Math.ceil(avgDist*0.3048*getWireSlack());
       getFeedWires(proto).forEach(({comp,c})=>{
         const offset=parseFloat(c.qty_offset)||0;
         const totalM=distM+offset;
@@ -1212,7 +1213,7 @@ function getGPCircuitLineItems(){
   if(wire&&fpPanelCell){
     const avgDist=weightedAvgDistance(1.2);
     if(avgDist>0){
-      const avgM=Math.ceil(avgDist*0.3048*1.1);
+      const avgM=Math.ceil(avgDist*0.3048*getWireSlack());
       items.push({
         id:Date.now()+Math.random(),
         desc:`${wire.description||'14/2 NMD90'} branch circuit feeds — ${circuits} circuits × ~${avgM} m (weighted avg × 1.2)`,
@@ -1266,7 +1267,7 @@ function getServiceFeedItems(){
   const items=[];
   const svcDist=getServiceDistance(); // ft, from floor plan
   if(!svcDist)return items;
-  const distM=Math.ceil(svcDist*0.3048*1.1);
+  const distM=Math.ceil(svcDist*0.3048*getWireSlack());
 
   // Find panel protoassemblies in add-ons
   addons.forEach(a=>{

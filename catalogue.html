@@ -226,6 +226,9 @@
         <i class="ti ti-stack-2"></i> Assemblies
         <span class="sb-count" id="cnt-asm">0</span>
       </div>
+      <div class="sb-item" data-view="settings" onclick="switchView('settings',this)">
+        <i class="ti ti-settings"></i> Settings
+      </div>
     </div>
     <div class="sb-divider"></div>
     <div class="sb-filter-label" id="cat-filter-label">Filter by category</div>
@@ -273,6 +276,24 @@
         </div>
       </div>
       <div id="asm-grouped"></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="view" id="view-settings">
+      <div class="toolbar">
+        <div><div class="page-title">Settings</div><div class="page-sub">Global estimation parameters</div></div>
+      </div>
+      <div style="max-width:520px;display:flex;flex-direction:column;gap:16px;">
+        <div class="exp-card open" style="padding:20px;">
+          <div style="font-size:14px;font-weight:600;margin-bottom:4px;">Wire slack factor</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">Applied to all auto-calculated wire lengths (lighting, circuit feeds, service feeds). A factor of 1.10 adds 10% for waste and terminations.</div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <input type="number" id="wire-slack-input" min="1.0" max="2.0" step="0.01" value="1.10" style="width:90px;font-size:16px;font-weight:600;padding:8px 10px;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;" oninput="previewSlack(this.value)"/>
+            <span style="font-size:13px;color:var(--muted)" id="slack-preview">= 10% added to all wire runs</span>
+          </div>
+          <button class="btn btn-black" style="margin-top:14px;" onclick="saveSlackFactor()"><i class="ti ti-device-floppy"></i> Save</button>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -411,7 +432,7 @@ async function loadAll(){
     protoassemblies=protoassemblies.map(p=>({...p,components:safeJson(p.components,[])}));
     assemblies=assemblies.map(a=>({...a,fixed_components:safeJson(a.fixed_components,[]),rules:safeJson(a.rules,[])}));
   }catch(e){toast('Load failed: '+e.message);}
-  updateCounts();renderAll();updateCatFilters();
+  updateCounts();renderAll();updateCatFilters();loadSlackFactor();
 }
 
 function safeJson(str,def){try{return str?JSON.parse(str):def;}catch{return def;}}
@@ -423,6 +444,30 @@ function updateCounts(){
 }
 function renderAll(){renderComponents();renderBranches();renderProtos();renderAssemblies();}
 
+// ── SETTINGS ──────────────────────────────────────────────────
+const SLACK_KEY='dwe_wire_slack_factor';
+
+function loadSlackFactor(){
+  const val=parseFloat(localStorage.getItem(SLACK_KEY))||1.10;
+  const input=document.getElementById('wire-slack-input');
+  if(input)input.value=val.toFixed(2);
+  previewSlack(val);
+  return val;
+}
+
+function previewSlack(val){
+  const pct=Math.round((parseFloat(val)-1)*100);
+  const el=document.getElementById('slack-preview');
+  if(el)el.textContent=isNaN(pct)?'':pct>=0?`= ${pct}% added to all wire runs`:`= ${Math.abs(pct)}% reduction`;
+}
+
+function saveSlackFactor(){
+  const val=parseFloat(document.getElementById('wire-slack-input').value);
+  if(isNaN(val)||val<1.0||val>2.0){toast('Enter a value between 1.00 and 2.00');return;}
+  localStorage.setItem(SLACK_KEY,val.toFixed(2));
+  toast(`Wire slack factor saved: ×${val.toFixed(2)} ✓`);
+}
+
 function switchView(view,el){
   currentView=view;
   activeCompCat=null;activeProtoCat=null;
@@ -430,8 +475,8 @@ function switchView(view,el){
   el.classList.add('active');
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+view).classList.add('active');
-  const labels={components:'Add component',branches:'Add branch',protoassemblies:'Add protoassembly',assemblies:'Add assembly'};
-  document.getElementById('add-label').textContent=labels[view];
+  const labels={components:'Add component',branches:'Add branch',protoassemblies:'Add protoassembly',assemblies:'Add assembly',settings:''};
+  document.getElementById('add-label').textContent=labels[view]||'';
   updateCatFilters();
 }
 
