@@ -896,6 +896,7 @@ function evalAssembly(asm,w,l){
       cat:'material',
       qty,
       price:unitCost,
+      protoId:proto.id,
       source:'catalogue',
       codeNote:''
     });
@@ -929,6 +930,7 @@ function evalAssembly(asm,w,l){
         cat:'material',
         qty:rawQty,
         price:unitCost,
+        protoId:proto.id,
         source:'catalogue',
         codeNote:''
       });
@@ -947,6 +949,7 @@ function evalAssembly(asm,w,l){
         cat:'material',
         qty:parseFloat(qty.toFixed(2)),
         price:unitPrice,
+        compId:comp.id,
         source:'catalogue',
         codeNote:''
       });
@@ -2250,69 +2253,47 @@ function getAllLineItemsFlat(){
 }
 
 function getMasterComponentList(){
-  // Returns {compId/key → {name, description, manufacturer, unit, category, qty, unitPrice}}
   const master={};
-
   const addComp=(compId,qty)=>{
+    if(!compId)return;
     const comp=catalogue.components.find(c=>c.id===compId);
     if(!comp)return;
-    const key=compId;
-    if(!master[key])master[key]={
-      id:compId,
-      name:comp.technical_name||comp.description||'Unknown',
-      description:comp.description||comp.technical_name||'Unknown',
-      manufacturer:comp.manufacturer||'',
-      unit:comp.unit||'ea',
-      category:comp.category||'Other',
-      qty:0,
-      unitPrice:parseFloat(comp.unit_price)||0
-    };
-    master[key].qty+=parseFloat(qty)||0;
+    if(!master[compId])master[compId]={id:compId,name:comp.technical_name||comp.description||'Unknown',description:comp.description||comp.technical_name||'Unknown',manufacturer:comp.manufacturer||'',unit:comp.unit||'ea',category:comp.category||'Other',qty:0,unitPrice:parseFloat(comp.unit_price)||0};
+    master[compId].qty+=parseFloat(qty)||0;
   };
-
-  // For each line item, trace back to the protoassembly and its components
-  const resolveProto=(protoId,lineQty)=>{
-    const proto=catalogue.protoassemblies.find(p=>p.id===protoId);
-    if(!proto)return;
-    (proto.components||[]).forEach(c=>{
-      const rule=c.qty_rule||'fixed';
-      if(rule==='circuit_feed'||rule==='service_feed')return; // handled separately
-      addComp(c.comp_id,(parseFloat(c.qty)||1)*lineQty);
-    });
+  const resolveLineItem=li=>{
+    if(li.compId){addComp(li.compId,li.qty||0);return;}
+    if(li.protoId){
+      const proto=catalogue.protoassemblies.find(p=>p.id===li.protoId);
+      if(!proto)return;
+      const lineQty=parseFloat(li.qty)||1;
+      (proto.components||[]).forEach(c=>{
+        const rule=c.qty_rule||'fixed';
+        if(rule==='circuit_feed'||rule==='service_feed')return;
+        addComp(c.comp_id,(parseFloat(c.qty)||1)*lineQty);
+      });
+    }
   };
-
-  // Rooms — resolve each line item back to proto components
   const allRooms=[...rooms,...extRooms];
   allRooms.forEach(r=>{
-    r.lineItems.forEach(li=>{
-      if(li.protoId) resolveProto(li.protoId,li.qty||1);
-    });
-    // Lighting wire — it's already a component-level item
+    r.lineItems.forEach(resolveLineItem);
     getLightingLineItems(r).forEach(li=>{
-      // Find matching component by description
-      const comp=catalogue.components.find(c=>li.desc&&li.desc.includes(c.description||c.technical_name));
-      if(comp)addComp(comp.id,li.qty||0);
+      if(li.compId)addComp(li.compId,li.qty||0);
+      else{const comp=catalogue.components.find(c=>(c.description||'').includes('14/2'));if(comp)addComp(comp.id,li.qty||0);}
     });
   });
-
-  // Add-ons
-  addons.forEach(a=>{
-    const proto=catalogue.protoassemblies.find(p=>p.id===a.protoId);
-    if(proto)(proto.components||[]).forEach(c=>{
-      if((c.qty_rule||'fixed')==='circuit_feed'||(c.qty_rule||'fixed')==='service_feed')return;
-      addComp(c.comp_id,(parseFloat(c.qty)||1));
-    });
-  });
-
-  // Auto-calculated items — these are component-level already (wire comps)
+  addons.forEach(a=>a.lineItems.forEach(resolveLineItem));
   getComputedLineItems().forEach(li=>{
-    const comp=catalogue.components.find(c=>li.desc&&(li.desc.includes(c.description||'')||li.desc.includes(c.technical_name||'')));
-    if(comp)addComp(comp.id,li.qty||0);
+    if(li.compId){addComp(li.compId,li.qty||0);}
+    else if(li.protoId){resolveLineItem(li);}
+    else{
+      const comp=catalogue.components.find(c=>li.desc&&(li.desc.includes(c.description||'zzz')||li.desc.includes(c.technical_name||'zzz')));
+      if(comp)addComp(comp.id,li.qty||0);
+      else{const proto=catalogue.protoassemblies.find(p=>li.desc&&li.desc.includes(p.name));if(proto)(proto.components||[]).forEach(c=>addComp(c.comp_id,(parseFloat(c.qty)||1)*(li.qty||1)));}
+    }
   });
-
   return Object.values(master);
 }
-
 function renderTakeoff(){
   const el=document.getElementById('takeoff-content');
   if(!el)return;
