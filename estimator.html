@@ -610,6 +610,20 @@
       </div>
     </div>
 
+    <div class="card" id="takeoff-card">
+      <div class="card-title">
+        Material takeoff
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div class="margin-toggle" style="margin:0">
+            <button class="margin-toggle-btn active" id="takeoff-master-btn" onclick="setTakeoffView('master',this)">Master list</button>
+            <button class="margin-toggle-btn" id="takeoff-room-btn" onclick="setTakeoffView('room',this)">By room</button>
+          </div>
+          <button class="btn btn-sm" onclick="printTakeoff()"><i class="ti ti-printer"></i> Print</button>
+        </div>
+      </div>
+      <div id="takeoff-content"></div>
+    </div>
+
     <div class="card" id="client-card">
       <div class="card-title">Client-facing assessment</div>
       <div class="info-note">This is what the client sees — cost range only, no quantities or unit prices.</div>
@@ -801,7 +815,7 @@ function goStep(n){
   });
   currentStep=n;
   if(n===3){initFloorPlan();}
-  if(n===6){buildAllLineItems();renderAllLineItems();updateTotals();preparePrint();}
+  if(n===6){buildAllLineItems();renderAllLineItems();updateTotals();preparePrint();renderTakeoff();}
   window.scrollTo(0,0);
 }
 
@@ -2120,7 +2134,137 @@ function renderAllLineItems(){
   el.innerHTML=html;
 }
 
-let detailMode=false;
+let takeoffView='master';
+
+function setTakeoffView(view,btn){
+  takeoffView=view;
+  document.querySelectorAll('#takeoff-card .margin-toggle-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTakeoff();
+}
+
+function getAllLineItemsFlat(){
+  const items=[];
+  const allRooms=[...rooms,...extRooms];
+  allRooms.forEach(r=>{
+    r.lineItems.forEach(i=>items.push({...i,_room:r}));
+    getLightingLineItems(r).forEach(i=>items.push({...i,_room:r}));
+  });
+  addons.forEach(a=>a.lineItems.forEach(i=>items.push({...i,_room:null})));
+  getComputedLineItems().forEach(i=>items.push({...i,_room:null}));
+  aiItems.forEach(i=>items.push({...i,_room:null}));
+  manualItems.forEach(i=>items.push({...i,_room:null}));
+  return items;
+}
+
+function renderTakeoff(){
+  const el=document.getElementById('takeoff-content');
+  if(!el)return;
+
+  if(takeoffView==='master'){
+    // Group all items by description, sum quantities
+    const grouped={};
+    getAllLineItemsFlat().forEach(i=>{
+      const key=i.desc||'Unknown';
+      if(!grouped[key])grouped[key]={desc:key,cat:i.cat||'material',qty:0,price:i.price||0};
+      grouped[key].qty+=parseFloat(i.qty)||0;
+    });
+    const sorted=Object.values(grouped).sort((a,b)=>a.cat.localeCompare(b.cat)||a.desc.localeCompare(b.desc));
+    if(!sorted.length){el.innerHTML='<div style="color:var(--muted);font-size:13px;padding:8px 0">No items yet.</div>';return;}
+
+    // Group by category
+    const byCat={};
+    sorted.forEach(i=>{if(!byCat[i.cat])byCat[i.cat]=[];byCat[i.cat].push(i);});
+
+    let html='';
+    Object.entries(byCat).forEach(([cat,items])=>{
+      html+=`<div style="margin-bottom:16px;">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);padding:6px 0 4px;border-bottom:0.5px solid var(--border);margin-bottom:6px">${cat}</div>`;
+      items.forEach(i=>{
+        const qty=Number.isInteger(i.qty)?i.qty:i.qty.toFixed(2);
+        const total=i.qty*i.price;
+        html+=`<div style="display:grid;grid-template-columns:1fr 60px 80px 80px;gap:8px;padding:5px 0;border-bottom:0.5px solid #f0f0f0;font-size:12px;">
+          <span>${i.desc}</span>
+          <span style="text-align:right;font-weight:500">${qty}</span>
+          <span style="text-align:right;color:var(--muted)">$${(i.price||0).toFixed(2)}</span>
+          <span style="text-align:right;font-weight:600;color:var(--blue)">$${total.toFixed(2)}</span>
+        </div>`;
+      });
+      html+='</div>';
+    });
+    el.innerHTML=html;
+
+  } else {
+    // Room by room
+    let html='';
+    const allRooms=[...rooms,...extRooms];
+    allRooms.forEach(r=>{
+      const name=r.label?`${r.asmName} — ${r.label}`:r.asmName;
+      const items=[...r.lineItems,...getLightingLineItems(r)];
+      if(!items.length)return;
+      html+=`<div style="margin-bottom:20px;">
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 0 4px;border-bottom:1.5px solid var(--black);margin-bottom:8px">${name} <span style="font-weight:400;font-size:11px;color:var(--muted)">${r.w}×${r.l} ft</span></div>`;
+      items.forEach(i=>{
+        const qty=Number.isInteger(i.qty)?i.qty:i.qty.toFixed(2);
+        const total=(i.qty||0)*(i.price||0);
+        html+=`<div style="display:grid;grid-template-columns:1fr 60px 80px 80px;gap:8px;padding:4px 0;border-bottom:0.5px solid #f0f0f0;font-size:12px;">
+          <span>${i.desc}</span>
+          <span style="text-align:right;font-weight:500">${qty}</span>
+          <span style="text-align:right;color:var(--muted)">$${(i.price||0).toFixed(2)}</span>
+          <span style="text-align:right;font-weight:600;color:var(--blue)">$${total.toFixed(2)}</span>
+        </div>`;
+      });
+      html+='</div>';
+    });
+    // Add-ons
+    if(addons.length){
+      html+=`<div style="margin-bottom:20px;">
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 0 4px;border-bottom:1.5px solid var(--black);margin-bottom:8px">Add-ons</div>`;
+      addons.forEach(a=>a.lineItems.forEach(i=>{
+        const total=(i.qty||0)*(i.price||0);
+        html+=`<div style="display:grid;grid-template-columns:1fr 60px 80px 80px;gap:8px;padding:4px 0;border-bottom:0.5px solid #f0f0f0;font-size:12px;">
+          <span>${i.desc}</span><span style="text-align:right;font-weight:500">${i.qty}</span>
+          <span style="text-align:right;color:var(--muted)">$${(i.price||0).toFixed(2)}</span>
+          <span style="text-align:right;font-weight:600;color:var(--blue)">$${total.toFixed(2)}</span>
+        </div>`;
+      }));
+      html+='</div>';
+    }
+    // Auto-calculated
+    const computed=getComputedLineItems();
+    if(computed.length){
+      html+=`<div style="margin-bottom:20px;">
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 0 4px;border-bottom:1.5px solid var(--black);margin-bottom:8px">Auto-calculated</div>`;
+      computed.forEach(i=>{
+        const qty=Number.isInteger(i.qty)?i.qty:i.qty.toFixed(2);
+        const total=(i.qty||0)*(i.price||0);
+        html+=`<div style="display:grid;grid-template-columns:1fr 60px 80px 80px;gap:8px;padding:4px 0;border-bottom:0.5px solid #f0f0f0;font-size:12px;">
+          <span>${i.desc}</span><span style="text-align:right;font-weight:500">${qty}</span>
+          <span style="text-align:right;color:var(--muted)">$${(i.price||0).toFixed(2)}</span>
+          <span style="text-align:right;font-weight:600;color:var(--blue)">$${total.toFixed(2)}</span>
+        </div>`;
+      });
+      html+='</div>';
+    }
+    if(!html)html='<div style="color:var(--muted);font-size:13px;padding:8px 0">No items yet.</div>';
+    el.innerHTML=html;
+  }
+}
+
+function printTakeoff(){
+  const content=document.getElementById('takeoff-content')?.innerHTML||'';
+  const view=takeoffView==='master'?'Master Material List':'Room-by-Room Breakdown';
+  const jobName=document.getElementById('job-address')?.value||'Assessment';
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><title>Material Takeoff — ${jobName}</title>
+  <style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:800px;margin:0 auto;padding:2rem;font-size:12px;}
+  h1{font-size:18px;margin-bottom:4px;}h2{font-size:13px;font-weight:400;color:#666;margin-bottom:2rem;}
+  @media print{@page{margin:1.5cm;}}</style></head>
+  <body><h1>Material Takeoff — ${view}</h1><h2>${jobName} · ${new Date().toLocaleDateString('en-CA')}</h2>
+  ${content}</body></html>`);
+  w.document.close();
+  setTimeout(()=>w.print(),300);
+}
 function toggleDetailMode(on){
   detailMode=on;
   const note=document.getElementById('detail-mode-note');
