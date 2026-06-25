@@ -906,7 +906,7 @@ function buildAsmCard(a){
         <option value="width" ${r.basis==='width'?'selected':''}>Width (ft)</option>
         <option value="length" ${r.basis==='length'?'selected':''}>Length (ft)</option>
       </select>
-      <input class="rule-formula" value="${esc(r.formula||'')}" placeholder="e.g. ceil(x/12)+1" onchange="updateRule(${a.id},${i},'formula',this.value)"/>
+      <input class="rule-formula" value="${esc(r.formula||'')}" placeholder="e.g. ceil(x/12)+1 — or blank for wire (uses slack)" onchange="updateRule(${a.id},${i},'formula',this.value)"/>
       <button class="sub-del" onclick="removeRule(${a.id},${i})"><i class="ti ti-x"></i></button>
     </div>`;
   }).join('');
@@ -952,7 +952,7 @@ function buildAsmCard(a){
         </div>
         ${rules.length
           ?`<div class="rule-head"><span>Type</span><span>Protoassembly or component</span><span>Based on</span><span>Formula — x = dimension</span><span></span></div>${ruleRows}
-            <div class="rule-hint">Examples: <code>ceil(x/12)+1</code> receptacles from perimeter · <code>round(x*1.2)</code> wire with buffer · <code>floor(x/4)</code> items from width<br>Wire priced per metre? Footage is auto-converted. Just write the formula in feet.</div>`
+            <div class="rule-hint">Examples: <code>ceil(x/12)+1</code> receptacles from perimeter · <code>round(x*1.2)</code> wire with buffer · <code>floor(x/4)</code> items from width<br>Wire component with blank formula → uses dimension × global slack factor automatically.</div>`
           :'<div style="font-size:13px;color:var(--muted);padding:4px 0">No rules — this assembly uses fixed quantities only.</div>'
         }
       </div>
@@ -984,7 +984,7 @@ function removeRule(aid,idx){const a=assemblies.find(x=>x.id===aid);if(!a)return
 function addRule(aid){
   const a=assemblies.find(x=>x.id===aid);if(!a)return;
   const first=protoassemblies[0];
-  a.rules.push({type:'protoassembly',ref_id:first?first.id:null,basis:'perimeter',formula:'ceil(x/12)'});
+  a.rules.push({type:'protoassembly',ref_id:first?first.id:null,basis:'perimeter',formula:''});
   renderAssemblies();
 }
 async function saveAsm(id){

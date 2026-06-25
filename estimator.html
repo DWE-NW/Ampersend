@@ -889,7 +889,19 @@ function evalAssembly(asm,w,l){
   // Rules
   (asm.rules||[]).forEach(r=>{
     const dimVal=r.basis==='perimeter'?perimeter:r.basis==='area'?area:r.basis==='width'?w:l;
-    const rawQty=roundQty(evalFormula(r.formula||'0',dimVal));
+
+    // If formula is blank, default to dimension × slack (for wire) or just dimension
+    let rawQty;
+    if(!r.formula||r.formula.trim()===''){
+      // Check if this is a wire component — apply slack automatically
+      const isWire=r.type==='component'&&(()=>{
+        const comp=catalogue.components.find(x=>x.id===r.ref_id);
+        return comp&&((comp.category||'').toLowerCase().includes('wire')||(comp.description||'').toLowerCase().includes('nmd')||(comp.description||'').toLowerCase().includes('teck')||(comp.description||'').toLowerCase().includes('/'));
+      })();
+      rawQty=roundQty(isWire?dimVal*getWireSlack():dimVal);
+    } else {
+      rawQty=roundQty(evalFormula(r.formula,dimVal));
+    }
     if(rawQty<=0)return;
 
     if(r.type==='protoassembly'){
