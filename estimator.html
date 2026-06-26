@@ -1060,6 +1060,7 @@ function getLightingLineItems(room){
         desc:`${switchProto.name} (lighting circuit ${g})`,
         cat:'material',qty:1,
         price:calcProtoTotal(switchProto),
+        protoId:switchProto.id,
         source:'lighting',codeNote:''
       });
     }
@@ -1074,6 +1075,7 @@ function getLightingLineItems(room){
           desc:`${fixtureProto.name} (circuit ${g})`,
           cat:'material',qty:nodeCount,
           price:calcProtoTotal(fixtureProto),
+          protoId:fixtureProto.id,
           source:'lighting',codeNote:''
         });
       }
@@ -1174,6 +1176,7 @@ function getDedicatedFeedItems(){
   };
 
   const allRooms=[...rooms,...extRooms];
+  const seenFeeds=new Set(); // deduplicate by protoId+compId+roomId
   allRooms.forEach(r=>{
     const dist=getHomerunDistance(r.id)||getExtRoomHomerunDistance(r.id)||0;
     if(!dist)return;
@@ -1181,9 +1184,17 @@ function getDedicatedFeedItems(){
     const name=r.label?`${r.asmName} — ${r.label}`:r.asmName;
     const asm=catalogue.assemblies.find(a=>a.id===r.asmId);
     const protos=[];
-    if(asm)(asm.fixed_components||[]).forEach(f=>{const p=catalogue.protoassemblies.find(x=>x.id===f.proto_id);if(p)protos.push(p);});
+    if(asm){
+      // Fixed protoassemblies
+      (asm.fixed_components||[]).forEach(f=>{const p=catalogue.protoassemblies.find(x=>x.id===f.proto_id);if(p&&!protos.find(x=>x.id===p.id))protos.push(p);});
+      // Rule-based protoassemblies
+      (asm.rules||[]).filter(r=>r.type==='protoassembly'&&r.ref_id).forEach(r=>{const p=catalogue.protoassemblies.find(x=>x.id===r.ref_id);if(p&&!protos.find(x=>x.id===p.id))protos.push(p);});
+    }
     protos.forEach(proto=>{
       getFeedWires(proto).forEach(({comp,c})=>{
+        const dedupeKey=`${r.id}-${proto.id}-${comp.id}`;
+        if(seenFeeds.has(dedupeKey))return;
+        seenFeeds.add(dedupeKey);
         const offset=parseFloat(c.qty_offset)||0;
         const totalM=distM+offset;
         items.push({id:Date.now()+Math.random(),desc:`${comp.description||comp.technical_name} circuit feed — ${name} (~${totalM} m${offset?`, incl. ${offset}m offset`:''})`,cat:'material',qty:totalM,price:parseFloat(comp.unit_price)||0,source:'circuit-feed',codeNote:''});
@@ -1215,8 +1226,7 @@ function getGPCircuitLineItems(){
   let totalDevices15A=0;
   const devicesByRoom=[];
   allRooms.forEach(r=>{
-    // Check if this room's assembly has any proto with a breaker component — if so, skip GP counting
-    const asm=catalogue.assemblies.find(a=>a.id===r.asmId);
+    // Check if this room has any proto (fixed OR rule-based) with a breaker component
     const hasDedicatedBreaker=r.lineItems.some(li=>{
       if(!li.protoId)return false;
       const proto=catalogue.protoassemblies.find(p=>p.id===li.protoId);
@@ -1229,7 +1239,7 @@ function getGPCircuitLineItems(){
     if(hasDedicatedBreaker)return; // this room manages its own breakers
     let count=0;
     r.lineItems.forEach(i=>{
-      if(/15a receptacle|15a switch|single.pole/i.test(i.desc)) count+=Math.round(i.qty)||1;
+      if(/15a receptacle|15a gfci|15a switch|single.pole/i.test(i.desc)) count+=Math.round(i.qty)||1;
     });
     totalDevices15A+=count;
     if(count>0)devicesByRoom.push({r,count});
@@ -1247,6 +1257,7 @@ function getGPCircuitLineItems(){
       id:Date.now()+Math.random(),
       desc:`15A AFCI/GFCI Breaker — ${circuits} branch circuit${circuits>1?'s':''} (${totalDevices15A} devices ÷ 12)`,
       cat:'material',qty:circuits,price:calcProtoTotal(breakerProto),
+      protoId:breakerProto.id,
       source:'gp-circuit',codeNote:'OEC 26-650'
     });
   }
@@ -1291,6 +1302,7 @@ function getDetectorLineItems(){
       id:Date.now()+Math.random(),
       desc:`${comboProto.name} (${floors} floor${floors>1?'s':''})`,
       cat:'material',qty:floors,price:calcProtoTotal(comboProto),
+      protoId:comboProto.id,
       source:'detectors',codeNote:'OEC 760'
     });
   }
@@ -1299,6 +1311,7 @@ function getDetectorLineItems(){
       id:Date.now()+Math.random(),
       desc:`${smokeProto.name} — bedrooms (${bedroomCount})`,
       cat:'material',qty:bedroomCount,price:calcProtoTotal(smokeProto),
+      protoId:smokeProto.id,
       source:'detectors',codeNote:'OEC 760'
     });
   }
