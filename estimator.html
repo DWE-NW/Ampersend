@@ -1210,13 +1210,26 @@ function getGPCircuitLineItems(){
   const items=[];
   const allRooms=[...rooms,...extRooms];
 
-  // Count all 15A devices
+  // Count all 15A devices — exclude rooms that have their own dedicated breaker assembly
+  // (e.g. "15A Receptacle Circuit" in garage/basement already includes a breaker)
   let totalDevices15A=0;
   const devicesByRoom=[];
   allRooms.forEach(r=>{
+    // Check if this room's assembly has any proto with a breaker component — if so, skip GP counting
+    const asm=catalogue.assemblies.find(a=>a.id===r.asmId);
+    const hasDedicatedBreaker=r.lineItems.some(li=>{
+      if(!li.protoId)return false;
+      const proto=catalogue.protoassemblies.find(p=>p.id===li.protoId);
+      if(!proto)return false;
+      return (proto.components||[]).some(c=>{
+        const comp=catalogue.components.find(x=>x.id===c.comp_id);
+        return comp&&/breaker|circuit.breaker|arc.fault/i.test(comp.description||comp.technical_name||'');
+      });
+    });
+    if(hasDedicatedBreaker)return; // this room manages its own breakers
     let count=0;
     r.lineItems.forEach(i=>{
-      if(/15a|15 a/i.test(i.desc)) count+=Math.round(i.qty)||1;
+      if(/15a receptacle|15a switch|single.pole/i.test(i.desc)) count+=Math.round(i.qty)||1;
     });
     totalDevices15A+=count;
     if(count>0)devicesByRoom.push({r,count});
@@ -1836,7 +1849,7 @@ function addAddon(){
   const unitCost=calcProtoTotal(proto);
   addons.push({
     id:Date.now(),protoId,protoName:proto.name,qty:1,
-    lineItems:[{id:Date.now()+1,desc:proto.name,cat:'material',qty:1,price:unitCost,source:'catalogue',codeNote:''}]
+    lineItems:[{id:Date.now()+1,desc:proto.name,cat:'material',qty:1,price:unitCost,protoId:proto.id,source:'catalogue',codeNote:''}]
   });
   document.getElementById('addon-proto-sel').value='';
   renderAddons();
@@ -2646,7 +2659,16 @@ function loadAssessmentData(asm){
   if(asm.client_description)document.getElementById('client-desc').value=asm.client_description;
   if(asm.terms)document.getElementById('terms-text').value=asm.terms;
   const safeJ=s=>{try{return s?JSON.parse(s):[];}catch{return[];}};
-  rooms=safeJ(asm.rooms);
+  const rawRooms=safeJ(asm.rooms);
+  // Re-evaluate rooms to restore protoId/compId on line items (fix for saved data without these fields)
+  rooms=rawRooms.map(r=>{
+    const asmObj=catalogue.assemblies.find(a=>a.id===r.asmId);
+    if(asmObj&&r.w&&r.l){
+      const freshItems=evalAssembly(asmObj,r.w,r.l);
+      return{...r,lineItems:freshItems};
+    }
+    return r;
+  });
   addons=safeJ(asm.addons);
   exteriorAreas=safeJ(asm.exteriorAreas);
   extRooms=safeJ(asm.extRooms);
